@@ -1,6 +1,10 @@
+import 'dart:typed_data';
+
 import '../core/failures.dart';
 import '../core/result.dart';
 import '../core/unit.dart';
+import 'envelope.dart';
+import 'envelope_authenticator.dart';
 import 'ids.dart';
 import 'participant_session.dart';
 import 'room.dart';
@@ -11,8 +15,12 @@ class RoomSessionStateMachine {
 
   Room _room;
   final Map<ParticipantId, ParticipantSession> _participants = {};
+  final EnvelopeAuthenticator _authenticator;
 
-  RoomSessionStateMachine({required Room room}) : _room = room;
+  RoomSessionStateMachine(
+      {required Room room, EnvelopeAuthenticator? authenticator})
+      : _room = room,
+        _authenticator = authenticator ?? EnvelopeAuthenticator();
 
   Room get room => _room;
 
@@ -79,6 +87,64 @@ class RoomSessionStateMachine {
     _participants[id] = session.copyWith(
       state: ParticipantState.rejected,
       clearPendingSince: true,
+    );
+    return const Result.success(Unit());
+  }
+
+  Result<Unit, Failure> completeHandshake(
+      ParticipantId id, Uint8List sessionKey) {
+    final session = _participants[id];
+    if (session == null) {
+      return Result.failure(
+        NotFoundFailure(code: 'session.participant-not-found'),
+      );
+    }
+    if (session.state != ParticipantState.approved) {
+      return Result.failure(
+        ValidationFailure(code: 'session.participant-not-approved'),
+      );
+    }
+
+    _participants[id] = session.copyWith(
+      state: ParticipantState.connected,
+      sessionKey: sessionKey,
+    );
+    return const Result.success(Unit());
+  }
+
+  Result<Unit, Failure> acceptEnvelope(
+    Envelope envelope,
+    DateTime now, {
+    bool requiresMasterRole = false,
+  }) {
+    final session = _participants[envelope.senderId];
+    final sessionKey = session?.sessionKey;
+    if (session == null ||
+        session.state != ParticipantState.connected ||
+        sessionKey == null) {
+      return Result.failure(
+        NotFoundFailure(code: 'session.participant-not-found'),
+      );
+    }
+
+    final verifyResult = _authenticator.verify(
+      envelope,
+      sessionKey,
+      session.lastAcceptedSequence,
+    );
+    if (verifyResult.isFailure) {
+      return verifyResult;
+    }
+
+    if (requiresMasterRole && session.role != ParticipantRole.master) {
+      return Result.failure(
+        ValidationFailure(code: 'session.unauthorized-role'),
+      );
+    }
+
+    _participants[envelope.senderId] = session.copyWith(
+      lastAcceptedSequence: envelope.sequence,
+      lastActivityAt: now,
     );
     return const Result.success(Unit());
   }

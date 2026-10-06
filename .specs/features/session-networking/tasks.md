@@ -311,7 +311,9 @@ T9 → T10 → T11 → T12
 
 #### T11: `RoomSessionStateMachine` — envelope acceptance & role enforcement (P2)
 
-**What**: Implement `acceptEnvelope`, wiring to `EnvelopeAuthenticator` (T7) plus the Master-only role check.
+**Note (execution-time plan correction):** `acceptEnvelope` only operates on a `connected` participant holding a `sessionKey`, and that transition is `completeHandshake` — originally scheduled in T12. Testing T11 in isolation requires it now, so `completeHandshake` (NET-05/07, with its own failure-mode tests: unknown id, non-`approved` source state) is implemented here instead. T12 no longer implements it — see T12's note.
+
+**What**: Implement `acceptEnvelope`, wiring to `EnvelopeAuthenticator` (T7) plus the Master-only role check; implement `completeHandshake` as its prerequisite.
 **Where**: `lib/domain/session/room_session_state_machine.dart` (same file as T10)
 **Depends on**: T10, T7
 **Reuses**: `EnvelopeAuthenticator` (T6/T7)
@@ -322,10 +324,12 @@ T9 → T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: envelope from unknown sender, envelope from a `disconnected`/`expired` sender, Visitor sending a Master-only message type
-- [ ] `acceptEnvelope` delegates HMAC/sequence to `EnvelopeAuthenticator`, adds the role check, and never mutates state on any rejection path (spec's Independent Test for P2 asserts this directly)
-- [ ] Unit tests cover NET-10..15 plus the 3 listed failure modes
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: envelope from unknown sender, envelope from a `disconnected`/`expired` sender, Visitor sending a Master-only message type (disconnected/expired is a spec-precision gap here — `disconnect()`/TTL expiry for `connected` participants don't exist until T12; the never-connected case, which hits the same code path, is tested instead)
+- [x] Failure modes for `completeHandshake` (pulled in from T12, see Note above): unknown participant id, participant not in `approved` state
+- [x] `completeHandshake` transitions `approved` → `connected` and sets `sessionKey` (NET-05/07)
+- [x] `acceptEnvelope` delegates HMAC/sequence to `EnvelopeAuthenticator`, adds the role check, and never mutates state on any rejection path (spec's Independent Test for P2 asserts this directly)
+- [x] Unit tests cover NET-10..15 plus the 3 listed failure modes
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
@@ -336,7 +340,9 @@ T9 → T10 → T11 → T12
 
 #### T12: `RoomSessionStateMachine` — TTL, disconnect, room end (P3)
 
-**What**: Implement `completeHandshake`, `disconnect`, TTL expiry in `tick()`, and `endRoom`.
+**Note (execution-time plan correction):** `completeHandshake` was moved to T11 (it's a prerequisite for testing `acceptEnvelope` in isolation — see T11's note). This task now covers only `disconnect`, TTL expiry in `tick()`, and `endRoom`.
+
+**What**: Implement `disconnect`, TTL expiry in `tick()`, and `endRoom`.
 **Where**: `lib/domain/session/room_session_state_machine.dart` (same file as T10/T11)
 **Depends on**: T11, T8 (handshake key shape)
 **Reuses**: same file, extends `tick()` from T10
@@ -347,7 +353,7 @@ T9 → T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: `completeHandshake` called for a non-pending/already-approved participant, `disconnect` called for an unknown participant, rejoin attempt reusing an old session key (must be rejected — spec Edge Case)
+- [ ] Failure modes listed first: `disconnect` called for an unknown participant, rejoin attempt reusing an old session key (must be rejected — spec Edge Case)
 - [ ] `tick()` now also expires `connected` participants silent for 30 min to `expired`, freeing their slot (NET-16)
 - [ ] `disconnect()` frees the slot immediately and invalidates the session key for future `acceptEnvelope` calls (NET-17)
 - [ ] `endRoom()` disconnects every participant and marks the room ended (NET-20)
