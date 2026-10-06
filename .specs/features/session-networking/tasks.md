@@ -138,9 +138,9 @@ T4
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] `RoomId`, `DeviceId`, `ParticipantId` value classes defined, `const` constructors, value equality (per AD-006 pattern)
-- [ ] No logic beyond identity/equality — Coverage Expectation says "none" for pure value holders
-- [ ] Build gate passes
+- [x] `RoomId`, `DeviceId`, `ParticipantId` value classes defined, `const` constructors, value equality (per AD-006 pattern)
+- [x] No logic beyond identity/equality — Coverage Expectation says "none" for pure value holders
+- [x] Build gate passes
 
 **Tests**: none
 **Gate**: build
