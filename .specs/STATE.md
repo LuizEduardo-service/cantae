@@ -66,10 +66,10 @@
 
 ## Handoff
 
-Phase 1 (Audio Domain) complete and verified on branch `feat/phase-1-audio-domain`.
-- 72 domain tests passing (all of `test/domain/`)
-- `flutter analyze`: 0 issues
-- Layer purity: clean (`check_layers.py`)
-- Verifier: PASS — 39/39 ACs, 4/4 mutations killed
+Phase 2 (Local Persistence — library-persistence feature) complete and verified on branch `feat/phase-2-library-persistence`, HEAD `d8b2c34`.
+- All 14 tasks (T1-T14) done: `Unit` type, `SongRepository` interface, `drift` schema (songs/song_tracks/lyric_lines, v1, FK cascade), `AppDatabase` migration, 3 mappers, `DriftSongRepository` (save/getById/getAll/delete/deleteAll)
+- 110 tests passing (`flutter test`), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`)
+- Verifier: PASS — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (LIB-04, no migration exists yet to test), 3/3 discrimination-sensor mutations killed
+- Report: `.specs/features/library-persistence/validation.md`
 
-**Next:** merge `feat/phase-1-audio-domain` → `develop`, then start Phase 2 (Local Persistence — SQLite schema, library repo, CRUD).
+**Next:** merge `feat/phase-2-library-persistence` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 3 (Session & Networking — mDNS, state machine, handshake, envelope auth) or Studio if prioritized first.
