@@ -39,12 +39,13 @@ class ParticipantSession {
     DateTime? lastActivityAt,
     DateTime? pendingSince,
     bool clearPendingSince = false,
+    bool clearSessionKey = false,
   }) {
     return ParticipantSession(
       id: id,
       role: role,
       state: state ?? this.state,
-      sessionKey: sessionKey ?? this.sessionKey,
+      sessionKey: clearSessionKey ? null : (sessionKey ?? this.sessionKey),
       lastAcceptedSequence: lastAcceptedSequence ?? this.lastAcceptedSequence,
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
       pendingSince:

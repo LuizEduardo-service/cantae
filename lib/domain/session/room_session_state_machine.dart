@@ -12,6 +12,7 @@ import 'room.dart';
 class RoomSessionStateMachine {
   static const maxApprovedParticipants = 8;
   static const pendingApprovalTtl = Duration(seconds: 60);
+  static const connectedInactivityTtl = Duration(minutes: 30);
 
   Room _room;
   final Map<ParticipantId, ParticipantSession> _participants = {};
@@ -149,6 +150,34 @@ class RoomSessionStateMachine {
     return const Result.success(Unit());
   }
 
+  Result<Unit, Failure> disconnect(ParticipantId id) {
+    final session = _participants[id];
+    if (session == null) {
+      return Result.failure(
+        NotFoundFailure(code: 'session.participant-not-found'),
+      );
+    }
+
+    _participants[id] = session.copyWith(
+      state: ParticipantState.disconnected,
+      clearSessionKey: true,
+      clearPendingSince: true,
+    );
+    return const Result.success(Unit());
+  }
+
+  Unit endRoom() {
+    for (final entry in _participants.entries.toList()) {
+      _participants[entry.key] = entry.value.copyWith(
+        state: ParticipantState.disconnected,
+        clearSessionKey: true,
+        clearPendingSince: true,
+      );
+    }
+    _room = _room.copyWith(state: RoomLifecycle.ended);
+    return const Unit();
+  }
+
   Unit tick(DateTime now) {
     for (final entry in _participants.entries.toList()) {
       final session = entry.value;
@@ -159,6 +188,13 @@ class RoomSessionStateMachine {
         _participants[entry.key] = session.copyWith(
           state: ParticipantState.rejected,
           clearPendingSince: true,
+        );
+        continue;
+      }
+      if (session.state == ParticipantState.connected &&
+          now.difference(session.lastActivityAt) > connectedInactivityTtl) {
+        _participants[entry.key] = session.copyWith(
+          state: ParticipantState.expired,
         );
       }
     }

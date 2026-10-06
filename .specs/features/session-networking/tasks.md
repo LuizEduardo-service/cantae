@@ -353,12 +353,12 @@ T9 → T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: `disconnect` called for an unknown participant, rejoin attempt reusing an old session key (must be rejected — spec Edge Case)
-- [ ] `tick()` now also expires `connected` participants silent for 30 min to `expired`, freeing their slot (NET-16)
-- [ ] `disconnect()` frees the slot immediately and invalidates the session key for future `acceptEnvelope` calls (NET-17)
-- [ ] `endRoom()` disconnects every participant and marks the room ended (NET-20)
-- [ ] Unit tests cover NET-05/07/16/17/18/19/20 and the 3 listed failure modes
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: `disconnect` called for an unknown participant, rejoin attempt reusing an old session key (must be rejected — spec Edge Case)
+- [x] `tick()` now also expires `connected` participants silent for 30 min to `expired`, freeing their slot (NET-16)
+- [x] `disconnect()` frees the slot immediately and invalidates the session key for future `acceptEnvelope` calls (NET-17)
+- [x] `endRoom()` disconnects every participant and marks the room ended (NET-20)
+- [x] Unit tests cover NET-16/17/18/19/20 and the 2 listed failure modes (NET-05/07 were covered by T11's `completeHandshake`, pulled forward — see T11's note)
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
