@@ -187,10 +187,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 11. Valid loop → `repositionTarget == startMs`
 
 **Done when**:
-- [ ] Tests in `test/domain/audio/loop_controller_test.dart` written covering all 11 failure modes (BEFORE implementation)
-- [ ] `lib/domain/audio/loop_controller.dart` implemented
-- [ ] Gate check passes: `flutter test test/domain/audio/`
-- [ ] Test count: ≥ 11 assertions pass
+- [x] Tests in `test/domain/audio/loop_controller_test.dart` written covering all 11 failure modes (BEFORE implementation)
+- [x] `lib/domain/audio/loop_controller.dart` implemented
+- [x] Gate check passes: `flutter test test/domain/audio/`
+- [x] Test count: ≥ 11 assertions pass
 
 **Tests**: unit
 **Gate**: quick
