@@ -384,7 +384,7 @@ T13 → T14
 
 ---
 
-### T13: Implement `DriftSongRepository.delete()`
+### T13: Implement `DriftSongRepository.delete()` ✅ Complete
 
 **What**: Implement `delete(String id)` — existence check via `getSingleOrNull()`, then delete the song row (cascade removes its tracks/lyrics); `NotFoundFailure` if absent.
 **Where**: `lib/data/repositories/drift_song_repository.dart` (add `delete` method)

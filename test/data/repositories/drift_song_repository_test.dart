@@ -253,6 +253,49 @@ void main() {
           reason: 'getAll() must issue exactly 3 SELECTs (songs, tracks, lyrics) regardless of song count');
     });
   });
+
+  group('DriftSongRepository.delete', () {
+    test('removes the song row and cascades its tracks/lyrics (LIB-16, LIB-18)', () async {
+      await repo.save(fixtureSong());
+
+      final result = await repo.delete('song-1');
+
+      expect(result.isSuccess, isTrue);
+
+      final songRows = await (db.select(db.songsTable)..where((s) => s.id.equals('song-1'))).get();
+      final trackRows = await (db.select(db.songTracksTable)
+            ..where((t) => t.songId.equals('song-1')))
+          .get();
+      final lyricRows = await (db.select(db.lyricLinesTable)
+            ..where((l) => l.songId.equals('song-1')))
+          .get();
+
+      expect(songRows, isEmpty);
+      expect(trackRows, isEmpty);
+      expect(lyricRows, isEmpty);
+
+      final allResult = await repo.getAll();
+      allResult.when(
+        success: (songs) => expect(songs.any((s) => s.id == 'song-1'), isFalse),
+        failure: (_) => fail('expected success'),
+      );
+    });
+
+    test('returns NotFoundFailure for an unknown id, touching no rows (LIB-17)', () async {
+      await repo.save(fixtureSong());
+
+      final result = await repo.delete('does-not-exist');
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, isNotEmpty),
+      );
+
+      final songRows = await db.select(db.songsTable).get();
+      expect(songRows, hasLength(1), reason: 'the existing song must be untouched');
+    });
+  });
 }
 
 class _QueryCountInterceptor extends QueryInterceptor {
