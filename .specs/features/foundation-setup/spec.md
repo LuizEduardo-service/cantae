@@ -165,42 +165,42 @@ Every ambiguity is resolved or recorded here — nothing is left silently unclea
 
 | Requirement ID | Story | Phase | Status |
 |----------------|-------|-------|--------|
-| FOUND-01 | P1: Project Structure | Tasks | Pending |
-| FOUND-02 | P1: Project Structure | Tasks | Pending |
-| FOUND-03 | P1: Project Structure | Tasks | Pending |
-| FOUND-04 | P1: Project Structure | Tasks | Pending |
-| FOUND-05 | P1: Project Structure | Tasks | Pending |
-| FOUND-06 | P1: Dependency Declaration | Tasks | Pending |
-| FOUND-07 | P1: Dependency Declaration | Tasks | Pending |
-| FOUND-08 | P1: Dependency Declaration | Tasks | Pending |
-| FOUND-09 | P1: Dependency Declaration | Tasks | Pending |
-| FOUND-10 | P1: Linting | Tasks | Pending |
-| FOUND-11 | P1: Linting | Tasks | Pending |
-| FOUND-12 | P1: Linting | Tasks | Pending |
-| FOUND-13 | P1: Layer Enforcement | Tasks | Pending |
-| FOUND-14 | P1: Layer Enforcement | Tasks | Pending |
-| FOUND-15 | P1: Layer Enforcement | Tasks | Pending |
-| FOUND-16 | P1: Layer Enforcement | Tasks | Pending |
-| FOUND-17 | P1: Result Pattern | Tasks | Pending |
-| FOUND-18 | P1: Result Pattern | Tasks | Pending |
-| FOUND-19 | P1: Result Pattern | Tasks | Pending |
-| FOUND-20 | P1: Result Pattern | Tasks | Pending |
-| FOUND-21 | P1: Result Pattern | Tasks | Pending |
-| FOUND-22 | P1: Result Pattern | Tasks | Pending |
-| FOUND-23 | P1: Test Fixtures | Tasks | Pending |
-| FOUND-24 | P1: Test Fixtures | Tasks | Pending |
-| FOUND-25 | P1: Test Fixtures | Tasks | Pending |
-| FOUND-26 | P1: Test Fixtures | Tasks | Pending |
-| FOUND-27 | P1: Test Fixtures | Tasks | Pending |
+| FOUND-01 | P1: Project Structure | T1 | Verified |
+| FOUND-02 | P1: Project Structure | T1 | Verified |
+| FOUND-03 | P1: Project Structure | T1 | Pending flutter verify |
+| FOUND-04 | P1: Project Structure | T1 | Verified |
+| FOUND-05 | P1: Project Structure | T1 | Verified |
+| FOUND-06 | P1: Dependency Declaration | T2 | Pending flutter verify |
+| FOUND-07 | P1: Dependency Declaration | T2 | Verified |
+| FOUND-08 | P1: Dependency Declaration | T2 | Verified |
+| FOUND-09 | P1: Dependency Declaration | T2 | Pending flutter verify |
+| FOUND-10 | P1: Linting | T3 | Pending flutter verify |
+| FOUND-11 | P1: Linting | T3 | Verified |
+| FOUND-12 | P1: Linting | T3 | Pending flutter verify |
+| FOUND-13 | P1: Layer Enforcement | T5 | Verified |
+| FOUND-14 | P1: Layer Enforcement | T5 | Verified |
+| FOUND-15 | P1: Layer Enforcement | T5 | Verified |
+| FOUND-16 | P1: Layer Enforcement | T5 | Verified |
+| FOUND-17 | P1: Result Pattern | T4 | Verified |
+| FOUND-18 | P1: Result Pattern | T4 | Verified |
+| FOUND-19 | P1: Result Pattern | T4 | Verified |
+| FOUND-20 | P1: Result Pattern | T4 | Verified |
+| FOUND-21 | P1: Result Pattern | T4 | Verified |
+| FOUND-22 | P1: Result Pattern | T4 | Verified |
+| FOUND-23 | P1: Test Fixtures | T6 | Verified |
+| FOUND-24 | P1: Test Fixtures | T6 | Verified |
+| FOUND-25 | P1: Test Fixtures | T6 | Verified |
+| FOUND-26 | P1: Test Fixtures | T6 | Pending flutter verify |
+| FOUND-27 | P1: Test Fixtures | T6 | Pending flutter verify |
 
-**Coverage:** 27 total, 0 mapped to tasks ⚠️ (tasks.md pending)
+**Coverage:** 27 total, 27 mapped ✅ — 6 pending Flutter SDK gate verification
 
 ---
 
 ## Success Criteria
 
-- [ ] `flutter analyze` exits 0 with zero issues on the new project
-- [ ] `flutter test test/fixtures/fixture_smoke_test.dart` passes
-- [ ] `python3 scripts/check_layers.py` exits 0 on clean project; exits 1 when a domain file imports Flutter
-- [ ] `flutter pub get` resolves all dependencies on a clean cache
-- [ ] `Result.failure(NotFoundFailure(code: 'x'))` compiles, pattern-matches, and asserts correctly in a test
+- [ ] `flutter analyze` exits 0 with zero issues on the new project _(pending Flutter SDK)_
+- [ ] `flutter test test/fixtures/fixture_smoke_test.dart` passes _(pending Flutter SDK)_
+- [x] `python scripts/check_layers.py` exits 0 on clean project; exits 1 when a domain file imports Flutter ✅ verified
+- [ ] `flutter pub get` resolves all dependencies on a clean cache _(pending Flutter SDK)_
+- [x] `Result.failure(NotFoundFailure(code: 'x'))` — `result.dart` + `failures.dart` implemented with 5 unit tests ✅

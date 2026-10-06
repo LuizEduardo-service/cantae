@@ -1,0 +1,19 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  errors:
+    unused_import: error
+    unused_local_variable: warning
+  exclude:
+    - build/**
+
+linter:
+  rules:
+    avoid_print: true
+    prefer_const_constructors: true
+    unnecessary_null_checks: true
+    prefer_final_locals: true
+    prefer_single_quotes: true
+    always_declare_return_types: true
+    avoid_empty_else: true
+    avoid_redundant_argument_values: true
