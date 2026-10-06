@@ -114,11 +114,11 @@ T1 → T2 → T3 → T4 → T5 → T6
 9. Empty track list → `isComplete == false`
 
 **Done when**:
-- [ ] Tests in `test/domain/entities/song_test.dart` written covering all 9 failure modes (BEFORE implementation)
-- [ ] `Song.isComplete` getter implemented
-- [ ] `Naipe.custom` and `isPlayback: true` tracks are excluded from the check
-- [ ] Gate check passes: `flutter test test/domain/entities/`
-- [ ] Test count: ≥ 9 assertions pass
+- [x] Tests in `test/domain/entities/song_test.dart` written covering all 9 failure modes (BEFORE implementation)
+- [x] `Song.isComplete` getter implemented
+- [x] `Naipe.custom` and `isPlayback: true` tracks are excluded from the check
+- [x] Gate check passes: `flutter test test/domain/entities/`
+- [x] Test count: ≥ 9 assertions pass
 
 **Tests**: unit
 **Gate**: quick
