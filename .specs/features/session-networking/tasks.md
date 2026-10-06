@@ -443,10 +443,10 @@ T15 → T16 → T17
 - Skill: `flutter-clean-architecture` (Riverpod DI wiring pattern, same as `SongRepository`)
 
 **Done when**:
-- [ ] `createRoom`, `discoverRooms`, `requestJoin`, `approve`, `reject`, `snapshots` stream implemented per design.md interfaces
-- [ ] A `Timer.periodic` invokes `tick(DateTime.now())` on the underlying state machine; integration test uses a fake clock injected into the state machine (not real 60s/30min waits) to assert expiry actually fires through the controller, not just in isolated state-machine unit tests
-- [ ] Integration test runs two controller instances over real loopback TCP (via T13) with a fake `RoomDiscovery` (no real mDNS in test) proving join→approve→handshake completes end-to-end
-- [ ] Gate passes: `flutter test test/data/session/`
+- [x] `createRoom`, `discoverRooms`, `requestJoin`, `approve`, `reject`, `snapshots` stream implemented per design.md interfaces (plus a Wire Protocol addendum to design.md — framing + message types — required for any of this to work over a byte-stream TCP connection; see design.md)
+- [x] A `Timer.periodic` invokes `tick()` on the underlying state machine with an injectable clock; integration test uses a fake clock (not real 60s/30min waits) to assert expiry actually fires through the controller, not just in isolated state-machine unit tests
+- [x] Integration test runs two controller instances over real loopback TCP (via T13) with a fake `RoomDiscovery` (no real mDNS in test) proving join→approve→handshake completes end-to-end
+- [x] Gate passes: `flutter test test/data/session/`
 
 **Tests**: integration
 **Gate**: full

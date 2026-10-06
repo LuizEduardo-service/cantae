@@ -27,6 +27,9 @@ class RoomSessionStateMachine {
 
   ParticipantSession? participant(ParticipantId id) => _participants[id];
 
+  List<ParticipantSession> get allParticipants =>
+      List.unmodifiable(_participants.values);
+
   Result<Unit, Failure> requestJoin(DeviceId id, String code, DateTime now) {
     if (code != _room.code) {
       return Result.failure(ValidationFailure(code: 'session.invalid-code'));

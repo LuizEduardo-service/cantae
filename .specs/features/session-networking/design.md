@@ -219,6 +219,30 @@ No new sealed hierarchy. Every operation returns one of the four existing `Failu
 
 ---
 
+## Wire Protocol (addendum, filled during T15 implementation)
+
+Design.md never specified how bytes on the `SessionTransport` connection are structured — `SessionTransport.send`/`receive` move raw bytes over a TCP byte stream, which has no inherent message boundaries. `RoomSessionController` needs this to actually drive the P1/P2 flows, so it is defined here rather than invented silently inside the implementation.
+
+**Framing**: every message is a frame: a 4-byte big-endian length prefix followed by that many payload bytes. `TcpSessionTransport.receive()` can deliver a partial frame, multiple frames in one chunk, or a frame split across chunks — `lib/data/session/frame_codec.dart` buffers raw chunks and reassembles complete frame payloads before anything is decoded.
+
+**Message types** (`lib/data/session/session_wire_message.dart`, 1-byte type tag + body, used as the frame payload):
+
+| Tag | Message | Body | Direction |
+| --- | --- | --- | --- |
+| `0x01` | `JoinRequestMessage` | `deviceId` (u16 len + utf8), `code` (u16 len + utf8) | visitor → master |
+| `0x02` | `JoinRejectedMessage` | `reasonCode` (u16 len + utf8) | master → visitor |
+| `0x03` | `HandshakeInitMessage` | `publicKey` (u16 len + bytes) | master → visitor, sent right after `approve()` |
+| `0x04` | `HandshakeResponseMessage` | `publicKey` (u16 len + bytes) | visitor → master, completes the ECDH exchange |
+| `0x05` | `EnvelopeMessage` | `requiresMasterRole` (1 byte bool), `senderId` (u16 len + utf8), `sequence` (8-byte BE int), `hmac` (32 bytes), `payload` (u32 len + bytes) | either direction, post-handshake |
+
+**Sequence**: visitor connects → sends `JoinRequestMessage` → master calls `requestJoin`; on failure sends `JoinRejectedMessage` and closes; on success the pending participant appears in `snapshots` for the local app to decide. On `approve(id)`, master generates an ephemeral keypair and sends `HandshakeInitMessage`; the visitor derives its session key and replies with `HandshakeResponseMessage`; the master derives the same key and calls `completeHandshake`. From there, either side may send `EnvelopeMessage` frames authenticated by `EnvelopeAuthenticator`.
+
+`requiresMasterRole` travels in the clear (outside the HMAC) — this is safe because it is not a security boundary by itself: `acceptEnvelope`'s role check (T11) validates against the *stored* session role, not against whatever a sender claims, so a Visitor cannot grant itself Master privilege by setting this bit.
+
+**Visitor-side session tracking**: `RoomSessionStateMachine` is a master-only, multi-participant admission authority (capacity, approve/reject). A visitor has exactly one peer (the master) and never makes admission decisions, so the visitor side of `RoomSessionController` tracks its own session key, outgoing sequence counter, and last-accepted-from-master sequence directly, calling `EnvelopeAuthenticator`/`HandshakeService` without going through `RoomSessionStateMachine`.
+
+---
+
 ## Risks & Concerns
 
 | Concern | Location | Impact | Mitigation |

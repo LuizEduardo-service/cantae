@@ -33,6 +33,7 @@ dev_dependencies:
   build_runner: ^2.4.12
   nsd_platform_interface: ^2.2.0
   plugin_platform_interface: ^2.1.8
+  collection: ^1.19.1
 
 flutter:
   uses-material-design: true
