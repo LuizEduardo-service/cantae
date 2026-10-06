@@ -223,10 +223,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 9. `choirGain(-0.1)` → `1.0` (clamped)
 
 **Done when**:
-- [ ] Tests in `test/domain/audio/audio_mix_calculator_test.dart` written covering all 9 failure modes (BEFORE implementation)
-- [ ] `lib/domain/audio/audio_mix_calculator.dart` implemented
-- [ ] Gate check passes: `flutter test test/domain/audio/`
-- [ ] Test count: ≥ 9 assertions pass
+- [x] Tests in `test/domain/audio/audio_mix_calculator_test.dart` written covering all 9 failure modes (BEFORE implementation)
+- [x] `lib/domain/audio/audio_mix_calculator.dart` implemented
+- [x] Gate check passes: `flutter test test/domain/audio/`
+- [x] Test count: ≥ 9 assertions pass
 
 **Tests**: unit
 **Gate**: quick
