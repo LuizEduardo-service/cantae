@@ -149,10 +149,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 7. `toTimeline` with negative `startDelayMs` → `AssertionError`
 
 **Done when**:
-- [ ] Tests in `test/domain/audio/timeline_converter_test.dart` written covering all 7 failure modes (BEFORE implementation)
-- [ ] `lib/domain/audio/timeline_converter.dart` implemented with static methods
-- [ ] Gate check passes: `flutter test test/domain/audio/`
-- [ ] Test count: ≥ 7 assertions pass (including roundtrip parametric)
+- [x] Tests in `test/domain/audio/timeline_converter_test.dart` written covering all 7 failure modes (BEFORE implementation)
+- [x] `lib/domain/audio/timeline_converter.dart` implemented with static methods
+- [x] Gate check passes: `flutter test test/domain/audio/`
+- [x] Test count: ≥ 7 assertions pass (including roundtrip parametric)
 
 **Tests**: unit
 **Gate**: quick
