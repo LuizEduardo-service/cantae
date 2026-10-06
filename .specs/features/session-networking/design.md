@@ -122,9 +122,10 @@ graph TD
 - **Purpose**: Advertise a room (master) / discover rooms (visitor) over mDNS, carrying only `roomId` + service name — never the 4-digit code or any key material.
 - **Location**: port `lib/domain/session/room_discovery.dart`; impl `lib/infrastructure/network/nsd_room_discovery.dart`
 - **Interfaces** (port):
-  - `Future<void> advertise(RoomId id)`
-  - `Stream<DiscoveredRoom> discover()`
+  - `Future<void> advertise(RoomId id, int port)` — mDNS registration needs the master's actual TCP port; the original sketch omitted it
+  - `Stream<DiscoveredRoom> discover()` — cancelling the subscription stops the underlying mDNS discovery (no separate `stopDiscovery` method needed)
   - `Future<void> stopAdvertising()`
+- **`DiscoveredRoom`** (domain value object, filled during T14 — not in the original Data Models section): `{ RoomId id; String host; int port; }`, enough for a visitor to open a `SessionTransport.connect(host, port)` call
 - **Dependencies** (impl): `nsd` package (already declared)
 - **Reuses**: none existing
 

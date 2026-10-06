@@ -412,10 +412,10 @@ T14
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Port interface matches design.md exactly
-- [ ] `NsdRoomDiscovery` implements advertise/discover/stopAdvertising against the real `nsd` API
-- [ ] A thin contract test confirms the adapter calls `nsd` with the correct service type/name and maps results to `DiscoveredRoom` (real mDNS multicast is NOT exercised — flagged as an accepted gap in design.md Risks, verified manually on real devices during Phase 3 manual QA, not by this task's automated gate)
-- [ ] Gate passes: `flutter test test/infrastructure/network/`
+- [x] Port interface matches design.md exactly (extended with a `port` param on `advertise` and a `DiscoveredRoom` value object — see design.md's T14 addendum)
+- [x] `NsdRoomDiscovery` implements advertise/discover/stopAdvertising against the real `nsd` API
+- [x] A thin contract test confirms the adapter calls `nsd` with the correct service type/name and maps results to `DiscoveredRoom` (real mDNS multicast is NOT exercised — flagged as an accepted gap in design.md Risks, verified manually on real devices during Phase 3 manual QA, not by this task's automated gate)
+- [x] Gate passes: `flutter test test/infrastructure/network/`
 
 **Tests**: integration
 **Gate**: full

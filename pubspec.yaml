@@ -31,6 +31,8 @@ dev_dependencies:
     sdk: flutter
   drift_dev: ^2.21.0
   build_runner: ^2.4.12
+  nsd_platform_interface: ^2.2.0
+  plugin_platform_interface: ^2.1.8
 
 flutter:
   uses-material-design: true

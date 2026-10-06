@@ -560,7 +560,7 @@ packages:
     source: hosted
     version: "2.0.1"
   nsd_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: nsd_platform_interface
       sha256: b1a5ace6f01ea2ce37f373e52c3b7af4fd7c11de2582ddcc89f4fc00615d9dff
@@ -656,7 +656,7 @@ packages:
     source: hosted
     version: "3.2.0"
   plugin_platform_interface:
-    dependency: transitive
+    dependency: "direct dev"
     description:
       name: plugin_platform_interface
       sha256: "4820fbfdb9478b1ebae27888254d445073732dae3d6ea81f0b7e06d5dedc3f02"
