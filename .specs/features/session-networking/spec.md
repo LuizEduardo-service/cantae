@@ -123,7 +123,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | NET-03 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
 | NET-04 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
 | NET-05 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
-| NET-06 | P1: Discover/Join/Approve/Handshake | Execute | ⚠️ Fixed, pending re-verification |
+| NET-06 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
 | NET-07 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
 | NET-08 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
 | NET-09 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
@@ -143,7 +143,7 @@ Explicitly excluded. Documented to prevent scope creep.
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 20 total, 20 mapped to tasks (T1-T17 + fix rounds 1-2). Verification iteration 2 (`.specs/features/session-networking/validation.md`): 18 ✅ Verified, 1 ⚠️ spec-precision gap (NET-02), 1 ⚠️ fixed pending re-verification (NET-06 — was non-discriminating, see sensor mutation 3).
+**Coverage:** 20 total, 20 mapped to tasks (T1-T17 + fix rounds 1-2). Verification iteration 3 — final (`.specs/features/session-networking/validation.md`): **19 ✅ Verified, 1 ⚠️ spec-precision gap (NET-02, accepted — real-LAN multicast not exercisable in this sandbox)**. Discrimination sensor 4/4 mutations killed, including a re-run of the iteration-2 survivor on NET-06. Gate: 185 tests passed, 0 failed. Ready to merge.
 
 ---
 

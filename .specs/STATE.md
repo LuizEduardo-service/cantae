@@ -73,10 +73,13 @@
 
 ## Handoff
 
-Phase 2 (Local Persistence — library-persistence feature) complete and verified on branch `feat/phase-2-library-persistence`, HEAD `d8b2c34`.
-- All 14 tasks (T1-T14) done: `Unit` type, `SongRepository` interface, `drift` schema (songs/song_tracks/lyric_lines, v1, FK cascade), `AppDatabase` migration, 3 mappers, `DriftSongRepository` (save/getById/getAll/delete/deleteAll)
-- 110 tests passing (`flutter test`), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`)
-- Verifier: PASS — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (LIB-04, no migration exists yet to test), 3/3 discrimination-sensor mutations killed
-- Report: `.specs/features/library-persistence/validation.md`
+Phase 3 (Session & Networking — session-networking feature) complete and verified on branch `feat/phase-3-session-networking`, HEAD `750b1cf` (plus two doc-only commits with the final Verifier report).
+- All 17 tasks (T1-T17) done, inline execution, one atomic commit each: discovery/handshake crypto (X25519 ECDH + HKDF), `EnvelopeAuthenticator` (HMAC-SHA-256 + replay detection), `RoomSessionStateMachine` (join/approve/reject/capacity/TTL/disconnect/endRoom), `TcpSessionTransport`, `NsdRoomDiscovery`, `RoomSessionController` orchestration, a length-prefixed wire protocol (added mid-implementation — design.md's original sketch had no framing), full E2E test.
+- Two post-Verifier fix rounds: Round 1 closed a real security bug (pre-auth session reset via a device that merely knew the non-secret 4-digit code), a slot-leak (no handshake timeout), missing `endRoom()` wiring, and 3 test-coverage gaps. Round 2 fixed a non-discriminating test (NET-06) the iteration-2 Verifier's mutation sensor caught.
+- 185 tests passing (`flutter test`, up from 110 at the Phase 2 handoff), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`), `dart analyze lib/domain/`: 0 issues.
+- Verifier: PASS (iteration 3 of 3, final) — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (NET-02, real mDNS multicast not exercisable in this sandbox), 4/4 discrimination-sensor mutations killed including a re-run of the prior iteration's survivor.
+- Report: `.specs/features/session-networking/validation.md`
+- 2 candidate lessons recorded (`.specs/lessons.json`, `.specs/LESSONS.md`) — not yet promoted to Confirmed.
+- `integration_test/session_networking_test.dart` cannot run via the documented gate command in this sandbox (needs a device; none configured — project is Android/iOS-only per CLAUDE.md). Verified instead via a temporary scratch copy run through the plain VM test runner each time; this should be re-run for real on an actual device/emulator before a release build.
 
-**Next:** merge `feat/phase-2-library-persistence` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 3 (Session & Networking — mDNS, state machine, handshake, envelope auth) or Studio if prioritized first.
+**Next:** merge `feat/phase-3-session-networking` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 4 (File Transfer & Real Audio) or Studio if prioritized first.

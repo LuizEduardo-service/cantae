@@ -536,7 +536,19 @@ Iteration-2 Verifier returned **FAIL** with 1 Major gap and 2 Minor: the discrim
 | Minor | NET id labelling drift in P2 (`design.md` + test names off-by-one: replay as NET-13 instead of NET-12, role enforcement as NET-15 instead of NET-14) | Relabelled to match spec.md's stated P2 ACs 10-15 assignment |
 | Minor | NET-02 "list every room within 5s" asserted only via a single-service fake + test timeout | Left as an acknowledged spec-precision gap (consistent with design.md's existing Risks entry on real mDNS not being exercisable in this sandbox) |
 
-**Result**: 185 tests passing, 0 failures (test count unchanged — this round strengthened an existing test and relabelled comments, added no new test). Re-verification (iteration 3 of 3 max) dispatched next. If this does not resolve cleanly, the skill's 3-iteration bound requires escalating to the user rather than looping again.
+**Result**: 185 tests passing, 0 failures (test count unchanged — this round strengthened an existing test and relabelled comments, added no new test).
+
+## Final Verification — Iteration 3 of 3 (PASS)
+
+The final allowed Verifier iteration re-derived all 20 ACs from scratch (not inherited from iteration 2), re-ran iteration-2's surviving mutation independently, and added 3 more mutations on previously-untested-adversarially code (replay boundary, role enforcement, `endRoom()`'s close loop). All 4 killed. Verdict: **PASS — ready to merge.**
+
+- 19/20 ACs verified with spec-matching, discriminating assertions; NET-02 remains an accepted spec-precision gap (real mDNS multicast not exercisable in this sandbox, already documented in design.md Risks).
+- Gate: `flutter analyze` clean, `flutter test` 185/185 in 37.9s (no hang), `check_layers.py` exit 0, `dart analyze lib/domain/` clean, E2E verified via scratch copy.
+- Report: `.specs/features/session-networking/validation.md` (iteration 3, final/authoritative).
+- `validate_state.py session-networking` → exit 0.
+- Lessons distilled (first iteration with a non-disposable worktree to do so): `.specs/lessons.json` / `.specs/LESSONS.md` — 2 candidate lessons recorded (L-001: assert collection cardinality >1 when spec says "every"/"all"; L-002: bound a wait window below a periodic sweep's interval when asserting an event-triggered side effect the sweep also produces). Both `status: candidate`, `recurrence: 1` — not yet promoted to Confirmed (needs a second distinct feature).
+
+**Feature status: DONE.** Merge of `feat/phase-3-session-networking` requires explicit user go-ahead (not performed automatically, per the skill's blast-radius rule).
 
 ---
 
