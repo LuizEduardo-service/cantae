@@ -4,7 +4,7 @@ abstract class Failure {
   Failure({required this.code}) : assert(code.isNotEmpty, 'Failure.code must not be empty');
 
   @override
-  String toString() => '${runtimeType}(code: $code)';
+  String toString() => '$runtimeType(code: $code)';
 }
 
 class NotFoundFailure extends Failure {
