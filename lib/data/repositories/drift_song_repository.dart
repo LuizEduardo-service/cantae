@@ -7,6 +7,7 @@ import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/infrastructure/database/app_database.dart';
+import 'package:drift/drift.dart';
 
 class DriftSongRepository implements SongRepository {
   DriftSongRepository(this._db);
@@ -62,7 +63,41 @@ class DriftSongRepository implements SongRepository {
   }
 
   @override
-  Future<Result<Song, Failure>> getById(String id) => throw UnimplementedError();
+  Future<Result<Song, Failure>> getById(String id) async {
+    final songRow = await (_db.select(_db.songsTable)
+          ..where((s) => s.id.equals(id)))
+        .getSingleOrNull();
+
+    if (songRow == null) {
+      return Result.failure(NotFoundFailure(code: 'song_not_found'));
+    }
+
+    final trackRows = await (_db.select(_db.songTracksTable)
+          ..where((t) => t.songId.equals(id)))
+        .get();
+    final lyricRows = await (_db.select(_db.lyricLinesTable)
+          ..where((l) => l.songId.equals(id))
+          ..orderBy([
+            (l) => OrderingTerm.asc(l.onsetMs),
+            (l) => OrderingTerm.asc(l.rowId),
+          ]))
+        .get();
+
+    final tracks = trackRows
+        .where((row) => !row.isPlaybackSlot)
+        .map(SongTrackMapper.fromRow)
+        .toList();
+    final playbackRow = trackRows.where((row) => row.isPlaybackSlot).firstOrNull;
+
+    final song = SongMapper.fromRow(
+      songRow,
+      tracks: tracks,
+      lyrics: lyricRows.map(LyricLineMapper.fromRow).toList(),
+      playbackTrack: playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+    );
+
+    return Result.success(song);
+  }
 
   @override
   Future<Result<List<Song>, StorageFailure>> getAll() => throw UnimplementedError();

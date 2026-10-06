@@ -332,7 +332,7 @@ T13 → T14
 
 ---
 
-### T11: Implement `DriftSongRepository.getById()`
+### T11: Implement `DriftSongRepository.getById()` ✅ Complete
 
 **What**: Implement `getById(String id)` — fetch the song row, its tracks (split into `tracks`/`playbackTrack` by `is_playback_slot`), and its lyrics; `NotFoundFailure` if the song row is absent.
 **Where**: `lib/data/repositories/drift_song_repository.dart` (add `getById` method)

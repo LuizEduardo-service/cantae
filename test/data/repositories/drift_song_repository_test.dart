@@ -124,4 +124,56 @@ void main() {
       expect(songRows.single.metronomeBpm, isNull);
     });
   });
+
+  group('DriftSongRepository.getById', () {
+    test('returns every field exactly equal to what was saved (LIB-11)', () async {
+      final fixture = fixtureSong();
+      await repo.save(fixture);
+
+      final result = await repo.getById('song-1');
+
+      expect(result.isSuccess, isTrue);
+      result.when(
+        success: (song) {
+          expect(song.id, equals(fixture.id));
+          expect(song.name, equals(fixture.name));
+          expect(song.author, equals(fixture.author));
+          expect(song.version, equals(fixture.version));
+
+          expect(song.tracks, hasLength(2));
+          final trackIds = song.tracks.map((t) => t.id).toSet();
+          expect(trackIds, equals({'track-s', 'track-c'}));
+          final soprano = song.tracks.firstWhere((t) => t.id == 'track-s');
+          expect(soprano.filePath, equals('soprano.mp3'));
+          expect(soprano.naipe, equals(Naipe.soprano));
+
+          expect(song.playbackTrack, isNotNull);
+          expect(song.playbackTrack!.id, equals('track-pb'));
+          expect(song.playbackTrack!.isPlayback, isTrue);
+
+          expect(song.lyrics, hasLength(3));
+          expect(song.lyrics.map((l) => l.text).toList(), [
+            'First line',
+            'Second line',
+            'Third line',
+          ]);
+
+          expect(song.metronomeConfig, isNotNull);
+          expect(song.metronomeConfig!.bpm, equals(100));
+          expect(song.metronomeConfig!.beatsPerMeasure, equals(4));
+        },
+        failure: (_) => fail('expected success'),
+      );
+    });
+
+    test('returns NotFoundFailure for an unknown id (LIB-12)', () async {
+      final result = await repo.getById('does-not-exist');
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, isNotEmpty),
+      );
+    });
+  });
 }
