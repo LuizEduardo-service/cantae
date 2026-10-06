@@ -151,23 +151,23 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 | LIB-03 | P1: Schema & Migration | T3, T4, T6 | Done |
 | LIB-04 | P1: Schema & Migration | T6 | Done (no migration exists yet to exercise beyond v1 — mechanism is in place, per spec's Out of Scope) |
 | LIB-05 | P1: Schema & Migration | T6 | Done |
-| LIB-06 | P1: Repository Save | Tasks | Pending |
-| LIB-07 | P1: Repository Save | Tasks | Pending |
-| LIB-08 | P1: Repository Save | Tasks | Pending |
-| LIB-09 | P1: Repository Save | Tasks | Pending |
-| LIB-10 | P1: Repository Save | Tasks | Pending |
-| LIB-11 | P1: Repository Read | Tasks | Pending |
-| LIB-12 | P1: Repository Read | Tasks | Pending |
-| LIB-13 | P1: Repository Read | Tasks | Pending |
-| LIB-14 | P1: Repository Read | Tasks | Pending |
-| LIB-15 | P1: Repository Read | Tasks | Pending |
-| LIB-16 | P1: Repository Delete | Tasks | Pending |
-| LIB-17 | P1: Repository Delete | Tasks | Pending |
-| LIB-18 | P1: Repository Delete | Tasks | Pending |
-| LIB-19 | P2: Full Library Wipe | Tasks | Pending |
-| LIB-20 | P2: Full Library Wipe | Tasks | Pending |
+| LIB-06 | P1: Repository Save | T10 | Done |
+| LIB-07 | P1: Repository Save | T10 | Done |
+| LIB-08 | P1: Repository Save | T10 | Done |
+| LIB-09 | P1: Repository Save | T10 | Done |
+| LIB-10 | P1: Repository Save | T9, T10 | Done |
+| LIB-11 | P1: Repository Read | T7, T8, T9, T11 | Done |
+| LIB-12 | P1: Repository Read | T11 | Done |
+| LIB-13 | P1: Repository Read | T12 | Done |
+| LIB-14 | P1: Repository Read | T12 | Done |
+| LIB-15 | P1: Repository Read | T8, T12 | Done |
+| LIB-16 | P1: Repository Delete | T13 | Done |
+| LIB-17 | P1: Repository Delete | T13 | Done |
+| LIB-18 | P1: Repository Delete | T13 | Done |
+| LIB-19 | P2: Full Library Wipe | T14 | Done |
+| LIB-20 | P2: Full Library Wipe | T14 | Done |
 
-**Coverage:** 20 total, 0 mapped to tasks ⚠️ (tasks.md pending)
+**Coverage:** 20 total, 20 mapped to tasks — all Done.
 
 ---
 

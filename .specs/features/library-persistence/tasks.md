@@ -410,7 +410,7 @@ T13 → T14
 
 ---
 
-### T14: Implement `DriftSongRepository.deleteAll()`
+### T14: Implement `DriftSongRepository.deleteAll()` ✅ Complete
 
 **What**: Implement `deleteAll()` — unconditional delete of every row in `songs` (cascades `song_tracks`/`lyric_lines`); always returns `Result.success(Unit)`, including on an already-empty library.
 **Where**: `lib/data/repositories/drift_song_repository.dart` (add `deleteAll` method)

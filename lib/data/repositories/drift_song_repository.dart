@@ -164,5 +164,8 @@ class DriftSongRepository implements SongRepository {
   }
 
   @override
-  Future<Result<Unit, StorageFailure>> deleteAll() => throw UnimplementedError();
+  Future<Result<Unit, StorageFailure>> deleteAll() async {
+    await _db.delete(_db.songsTable).go();
+    return const Result.success(Unit());
+  }
 }

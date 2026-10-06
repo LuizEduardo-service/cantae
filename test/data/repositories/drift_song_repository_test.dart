@@ -296,6 +296,32 @@ void main() {
       expect(songRows, hasLength(1), reason: 'the existing song must be untouched');
     });
   });
+
+  group('DriftSongRepository.deleteAll', () {
+    test('removes every song, track, and lyric row (LIB-19)', () async {
+      await repo.save(fixtureSong());
+      await repo.save(fixtureSong(id: 'song-2'));
+      await repo.save(fixtureSong(id: 'song-3'));
+
+      final result = await repo.deleteAll();
+
+      expect(result.isSuccess, isTrue);
+
+      final allResult = await repo.getAll();
+      allResult.when(
+        success: (songs) => expect(songs, isEmpty),
+        failure: (_) => fail('expected success'),
+      );
+      expect(await db.select(db.songTracksTable).get(), isEmpty);
+      expect(await db.select(db.lyricLinesTable).get(), isEmpty);
+    });
+
+    test('returns Result.success(Unit) on an already-empty library (LIB-20)', () async {
+      final result = await repo.deleteAll();
+
+      expect(result.isSuccess, isTrue);
+    });
+  });
 }
 
 class _QueryCountInterceptor extends QueryInterceptor {
