@@ -1,6 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:drift/native.dart';
 import 'package:cantae/data/repositories/drift_song_repository.dart';
+import 'package:cantae/domain/core/failures.dart';
+import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/entities/lyric_line.dart';
 import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/naipe.dart';
@@ -9,6 +12,8 @@ import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/infrastructure/database/app_database.dart';
 
 void main() {
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+
   late AppDatabase db;
   late DriftSongRepository repo;
 
@@ -26,12 +31,12 @@ void main() {
         name: 'Complete Song',
         author: 'Fixture Author',
         version: '1.0',
-        tracks: const [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
-          SongTrack(id: 'track-c', filePath: 'contralto.mp3', naipe: Naipe.contralto),
+        tracks: [
+          SongTrack(id: 'track-s-$id', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(id: 'track-c-$id', filePath: 'contralto.mp3', naipe: Naipe.contralto),
         ],
-        playbackTrack: const SongTrack(
-          id: 'track-pb',
+        playbackTrack: SongTrack(
+          id: 'track-pb-$id',
           filePath: 'playback.mp3',
           naipe: Naipe.custom,
           isPlayback: true,
@@ -142,13 +147,13 @@ void main() {
 
           expect(song.tracks, hasLength(2));
           final trackIds = song.tracks.map((t) => t.id).toSet();
-          expect(trackIds, equals({'track-s', 'track-c'}));
-          final soprano = song.tracks.firstWhere((t) => t.id == 'track-s');
+          expect(trackIds, equals({'track-s-song-1', 'track-c-song-1'}));
+          final soprano = song.tracks.firstWhere((t) => t.id == 'track-s-song-1');
           expect(soprano.filePath, equals('soprano.mp3'));
           expect(soprano.naipe, equals(Naipe.soprano));
 
           expect(song.playbackTrack, isNotNull);
-          expect(song.playbackTrack!.id, equals('track-pb'));
+          expect(song.playbackTrack!.id, equals('track-pb-song-1'));
           expect(song.playbackTrack!.isPlayback, isTrue);
 
           expect(song.lyrics, hasLength(3));
@@ -176,4 +181,90 @@ void main() {
       );
     });
   });
+
+  group('DriftSongRepository.getAll', () {
+    test('returns exactly N songs for N saved songs (LIB-13)', () async {
+      await repo.save(fixtureSong());
+      await repo.save(fixtureSong(id: 'song-2'));
+      await repo.save(fixtureSong(id: 'song-3'));
+
+      final result = await repo.getAll();
+
+      expect(result.isSuccess, isTrue);
+      result.when(
+        success: (songs) => expect(songs, hasLength(3)),
+        failure: (_) => fail('expected success'),
+      );
+    });
+
+    test('returns an empty list (not a failure) for an empty library (LIB-14)', () async {
+      final result = await repo.getAll();
+
+      expect(result.isSuccess, isTrue);
+      result.when(
+        success: (songs) => expect(songs, isEmpty),
+        failure: (_) => fail('expected success'),
+      );
+    });
+
+    test('orders each song\'s lyrics by ascending onsetMs, stable on ties (LIB-15)', () async {
+      const song = Song(
+        id: 'song-ties',
+        name: 'Tied Lyrics',
+        author: 'Author',
+        lyrics: [
+          LyricLine(text: 'third (tie)', onsetMs: 1000),
+          LyricLine(text: 'first', onsetMs: 500),
+          LyricLine(text: 'second (tie)', onsetMs: 1000),
+        ],
+      );
+      await repo.save(song);
+
+      final firstRead = await repo.getAll();
+      final secondRead = await repo.getAll();
+
+      List<String> textsOf(Result<List<Song>, StorageFailure> result) => result.when(
+            success: (songs) => songs.single.lyrics.map((l) => l.text).toList(),
+            failure: (_) => throw StateError('expected success'),
+          );
+
+      final expectedOrder = ['first', 'third (tie)', 'second (tie)'];
+      expect(textsOf(firstRead), equals(expectedOrder));
+      expect(textsOf(secondRead), equals(expectedOrder),
+          reason: 'tie-break order must be stable across repeated calls');
+    });
+
+    test('issues a bounded number of queries independent of song count (no N+1)', () async {
+      final counter = _QueryCountInterceptor();
+      final countedDb = AppDatabase(NativeDatabase.memory().interceptWith(counter));
+      final countedRepo = DriftSongRepository(countedDb);
+      addTearDown(countedDb.close);
+
+      for (var i = 0; i < 5; i++) {
+        await countedRepo.save(fixtureSong(id: 'song-$i'));
+      }
+
+      counter.selectCount = 0;
+      final result = await countedRepo.getAll();
+
+      expect(result.isSuccess, isTrue);
+      result.when(success: (songs) => expect(songs, hasLength(5)), failure: (_) => fail('expected success'));
+      expect(counter.selectCount, equals(3),
+          reason: 'getAll() must issue exactly 3 SELECTs (songs, tracks, lyrics) regardless of song count');
+    });
+  });
+}
+
+class _QueryCountInterceptor extends QueryInterceptor {
+  int selectCount = 0;
+
+  @override
+  Future<List<Map<String, Object?>>> runSelect(
+    QueryExecutor executor,
+    String statement,
+    List<Object?> args,
+  ) {
+    selectCount++;
+    return executor.runSelect(statement, args);
+  }
 }

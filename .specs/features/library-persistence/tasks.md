@@ -357,7 +357,7 @@ T13 → T14
 
 ---
 
-### T12: Implement `DriftSongRepository.getAll()`
+### T12: Implement `DriftSongRepository.getAll()` ✅ Complete
 
 **What**: Implement `getAll()` — one `select(songs)`, one bounded `song_tracks WHERE song_id IN (...)`, one bounded `lyric_lines WHERE song_id IN (...) ORDER BY onset_ms, row_id`, grouped by `songId` in Dart; 3 queries total regardless of song count.
 **Where**: `lib/data/repositories/drift_song_repository.dart` (add `getAll` method)

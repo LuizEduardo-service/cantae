@@ -100,7 +100,53 @@ class DriftSongRepository implements SongRepository {
   }
 
   @override
-  Future<Result<List<Song>, StorageFailure>> getAll() => throw UnimplementedError();
+  Future<Result<List<Song>, StorageFailure>> getAll() async {
+    final songRows = await _db.select(_db.songsTable).get();
+    if (songRows.isEmpty) {
+      return const Result.success(<Song>[]);
+    }
+
+    final songIds = songRows.map((row) => row.id).toList();
+    final trackRows = await (_db.select(_db.songTracksTable)
+          ..where((t) => t.songId.isIn(songIds)))
+        .get();
+    final lyricRows = await (_db.select(_db.lyricLinesTable)
+          ..where((l) => l.songId.isIn(songIds))
+          ..orderBy([
+            (l) => OrderingTerm.asc(l.onsetMs),
+            (l) => OrderingTerm.asc(l.rowId),
+          ]))
+        .get();
+
+    final tracksBySong = <String, List<SongTracksTableData>>{};
+    for (final row in trackRows) {
+      tracksBySong.putIfAbsent(row.songId, () => []).add(row);
+    }
+    final lyricsBySong = <String, List<LyricLinesTableData>>{};
+    for (final row in lyricRows) {
+      lyricsBySong.putIfAbsent(row.songId, () => []).add(row);
+    }
+
+    final songs = songRows.map((songRow) {
+      final allTracks = tracksBySong[songRow.id] ?? const [];
+      final tracks = allTracks
+          .where((row) => !row.isPlaybackSlot)
+          .map(SongTrackMapper.fromRow)
+          .toList();
+      final playbackRow = allTracks.where((row) => row.isPlaybackSlot).firstOrNull;
+
+      return SongMapper.fromRow(
+        songRow,
+        tracks: tracks,
+        lyrics: (lyricsBySong[songRow.id] ?? const [])
+            .map(LyricLineMapper.fromRow)
+            .toList(),
+        playbackTrack: playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+      );
+    }).toList();
+
+    return Result.success(songs);
+  }
 
   @override
   Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
