@@ -90,7 +90,7 @@ void main() {
     }
 
     test(
-        'valid HMAC with strictly-increasing sequence is accepted and advances lastAcceptedSequence (NET-10/NET-14)',
+        'valid HMAC with strictly-increasing sequence is accepted and advances lastAcceptedSequence (NET-10/NET-13)',
         () {
       final machine = connectedMachine('device-1');
       final envelope = authenticator.sign(
@@ -171,7 +171,7 @@ void main() {
     });
 
     test(
-        'a Visitor sending a Master-only message type is rejected and state is unchanged (NET-15)',
+        'a Visitor sending a Master-only message type is rejected and state is unchanged (NET-14)',
         () {
       final machine = connectedMachine('device-1');
       final envelope = authenticator.sign(

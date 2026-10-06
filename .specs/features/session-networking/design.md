@@ -213,8 +213,8 @@ No new sealed hierarchy. Every operation returns one of the four existing `Failu
 | Join request not approved in 60s | Auto-rejected by `tick()` (NET-09) | Visitor sees "request timed out" |
 | Handshake math fails / times out >10s | `NetworkFailure(code: 'session.handshake-failed')`, participant never admitted (NET-07) | Visitor sees "could not connect securely" |
 | Envelope HMAC mismatch | Silently discarded, state untouched (NET-11) | No user-visible error — this is adversarial traffic, not a normal failure |
-| Envelope replay (sequence ≤ last accepted) | Silently discarded, state untouched (NET-13) | Same — no user-visible error |
-| Visitor sends Master-only message | `ValidationFailure(code: 'session.unauthorized-role')`, discarded (NET-15) | Visitor's client-side UI should prevent this; server-side rejection is defense-in-depth |
+| Envelope replay (sequence ≤ last accepted) | Silently discarded, state untouched (NET-12) | Same — no user-visible error |
+| Visitor sends Master-only message | `ValidationFailure(code: 'session.unauthorized-role')`, discarded (NET-14) | Visitor's client-side UI should prevent this; server-side rejection is defense-in-depth |
 | Participant silent 30 min | Expired by `tick()`, slot freed, socket closed (NET-16) | Participant sees "disconnected — rejoin" |
 | TCP socket closes (clean or abrupt) | `disconnect()` called from transport's connection-closed event, slot freed immediately (NET-17) | Same as above, but faster than waiting for TTL |
 

@@ -524,7 +524,19 @@ The independent Verifier (dispatched after T17) returned **FAIL** with 7 ranked 
 | 7 | NET-17's two halves (domain `disconnect()`, transport close detection) were proven separately but never end-to-end through the controller | Added a controller-level test: abrupt visitor-side socket kill → master detects it and calls `disconnect()` | `room_session_controller_test.dart` |
 | 8 | NET-01 precision gap: "no embedded secret" was never asserted | Added a thin test asserting the registered mDNS service carries no `txt` records (and noting `advertise()`'s signature structurally has no code parameter at all) | `nsd_room_discovery_test.dart` |
 
-**Result**: 185 tests passing (up from 172), 0 failures, `flutter analyze` clean. Design decisions recorded in design.md's "Post-Verification Fixes" addendum. Re-verification dispatched next.
+**Result**: 185 tests passing (up from 172), 0 failures, `flutter analyze` clean. Design decisions recorded in design.md's "Post-Verification Fixes" addendum. Re-verification (iteration 2) dispatched next.
+
+## Fix Tasks (Post-Verification, Round 2)
+
+Iteration-2 Verifier returned **FAIL** with 1 Major gap and 2 Minor: the discrimination sensor found fix #4 (NET-06, `reject()` closes the socket) was **not discriminating** — the test's 5s wait window let the default 5s periodic terminated-participant sweep close the same socket even with `reject()`'s own close call deleted, masking a potential regression on a security-posture criterion.
+
+| # | Gap | Fix |
+| - | --- | --- |
+| Major | NET-06 test satisfied by the tick sweep, not by `reject()` itself | Shortened the test's wait window from 5s to 1s — well under the default 5s tick period, so the sweep can't fire before the assertion resolves. (First attempt used a 1-hour `tickInterval` override instead; this caused the Dart test runner to block for the full configured duration waiting on the outstanding periodic `Timer`, a real hang. Reverted — the short-wait-window approach needs no `tickInterval` override at all.) Verified both directions locally before re-dispatching the Verifier: mutant (close call removed) → test fails in ~6s; real code → test passes in ~5s. |
+| Minor | NET id labelling drift in P2 (`design.md` + test names off-by-one: replay as NET-13 instead of NET-12, role enforcement as NET-15 instead of NET-14) | Relabelled to match spec.md's stated P2 ACs 10-15 assignment |
+| Minor | NET-02 "list every room within 5s" asserted only via a single-service fake + test timeout | Left as an acknowledged spec-precision gap (consistent with design.md's existing Risks entry on real mDNS not being exercisable in this sandbox) |
+
+**Result**: 185 tests passing, 0 failures (test count unchanged — this round strengthened an existing test and relabelled comments, added no new test). Re-verification (iteration 3 of 3 max) dispatched next. If this does not resolve cleanly, the skill's 3-iteration bound requires escalating to the user rather than looping again.
 
 ---
 

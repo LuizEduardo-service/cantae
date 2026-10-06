@@ -118,32 +118,32 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| NET-01 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-02 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-03 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-04 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-05 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-06 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-07 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-08 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-09 | P1: Discover/Join/Approve/Handshake | Design | Pending |
-| NET-10 | P2: Authenticated Envelopes | Design | Pending |
-| NET-11 | P2: Authenticated Envelopes | Design | Pending |
-| NET-12 | P2: Authenticated Envelopes | Design | Pending |
-| NET-13 | P2: Authenticated Envelopes | Design | Pending |
-| NET-14 | P2: Authenticated Envelopes | Design | Pending |
-| NET-15 | P2: Authenticated Envelopes | Design | Pending |
-| NET-16 | P3: Session Lifecycle | Design | Pending |
-| NET-17 | P3: Session Lifecycle | Design | Pending |
-| NET-18 | P3: Session Lifecycle | Design | Pending |
-| NET-19 | P3: Session Lifecycle | Design | Pending |
-| NET-20 | P3: Session Lifecycle | Design | Pending |
+| NET-01 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-02 | P1: Discover/Join/Approve/Handshake | Execute | ⚠️ Verified (spec-precision gap) |
+| NET-03 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-04 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-05 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-06 | P1: Discover/Join/Approve/Handshake | Execute | ⚠️ Fixed, pending re-verification |
+| NET-07 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-08 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-09 | P1: Discover/Join/Approve/Handshake | Execute | ✅ Verified |
+| NET-10 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-11 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-12 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-13 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-14 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-15 | P2: Authenticated Envelopes | Execute | ✅ Verified |
+| NET-16 | P3: Session Lifecycle | Execute | ✅ Verified |
+| NET-17 | P3: Session Lifecycle | Execute | ✅ Verified |
+| NET-18 | P3: Session Lifecycle | Execute | ✅ Verified |
+| NET-19 | P3: Session Lifecycle | Execute | ✅ Verified |
+| NET-20 | P3: Session Lifecycle | Execute | ✅ Verified |
 
 **ID format:** `NET-[NUMBER]`, assigned in spec order (P1 ACs 1-9, P2 ACs 10-15, P3 ACs 16-20).
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 20 total, 0 mapped to tasks, 20 unmapped ⚠️ (expected at Specify — Tasks phase will map these)
+**Coverage:** 20 total, 20 mapped to tasks (T1-T17 + fix rounds 1-2). Verification iteration 2 (`.specs/features/session-networking/validation.md`): 18 ✅ Verified, 1 ⚠️ spec-precision gap (NET-02), 1 ⚠️ fixed pending re-verification (NET-06 — was non-discriminating, see sensor mutation 3).
 
 ---
 

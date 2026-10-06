@@ -225,8 +225,16 @@ void main() {
       pending = _findPending(masterSnapshotQueue.current);
     }
 
+    // A 1s wait window, well under the default 5s tickInterval, means the
+    // periodic terminated-participant sweep (which also closes
+    // rejected/expired sockets) cannot possibly fire before this assertion
+    // resolves — any observed close must come from reject() itself. The
+    // iteration-2 validation report's sensor mutation 3 caught an earlier
+    // version of this test that used a 5s window equal to the tick period,
+    // which let the sweep's very first fire satisfy the assertion even with
+    // the close call deleted from reject().
     final visitorClosedFuture = visitorTransport.closedConnections.first
-        .timeout(const Duration(seconds: 5));
+        .timeout(const Duration(seconds: 1));
     master.reject(pending.id);
 
     final closedConnectionId = await visitorClosedFuture;

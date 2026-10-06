@@ -96,7 +96,7 @@ void main() {
       expect(result.isSuccess, isTrue);
     });
 
-    test('valid HMAC with strictly-increasing sequence is accepted (NET-14)',
+    test('valid HMAC with strictly-increasing sequence is accepted (NET-13)',
         () {
       final envelope =
           signedEnvelope(6, Uint8List.fromList(utf8.encode('hi')), key);
