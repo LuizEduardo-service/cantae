@@ -169,8 +169,8 @@ T8
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] `Envelope` class defined exactly per design.md Data Models, `const` constructor
-- [ ] Build gate passes
+- [x] `Envelope` class defined exactly per design.md Data Models, `const` constructor
+- [x] Build gate passes
 
 **Tests**: none
 **Gate**: build
