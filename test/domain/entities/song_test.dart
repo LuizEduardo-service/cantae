@@ -99,7 +99,7 @@ void main() {
         author: 'A',
         tracks: [
           _track(Naipe.soprano),
-          SongTrack(id: 'track-s2', filePath: 's2.mp3', naipe: Naipe.soprano),
+          const SongTrack(id: 'track-s2', filePath: 's2.mp3', naipe: Naipe.soprano),
           _track(Naipe.contralto),
           _track(Naipe.bass),
         ],
@@ -108,8 +108,7 @@ void main() {
     });
 
     test('empty track list returns false', () {
-      const song = Song(id: 's1', name: 'Empty', author: 'A');
-      expect(song.isComplete, isFalse);
+      expect(const Song(id: 's1', name: 'Empty', author: 'A').isComplete, isFalse);
     });
   });
 }

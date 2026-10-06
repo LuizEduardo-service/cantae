@@ -257,10 +257,10 @@ T1 → T2 → T3 → T4 → T5 → T6
 7. `generate(startMs: 0, durationMs: 0, ...)` → empty list
 
 **Done when**:
-- [ ] Tests in `test/domain/audio/metronome_test.dart` written covering all 7 failure modes (BEFORE implementation)
-- [ ] `lib/domain/audio/metronome_pulse_generator.dart` implemented with `MetronomePulse` value class and `MetronomePulseGenerator.generate()`
-- [ ] Gate check passes: `flutter analyze && flutter test test/domain/ && python scripts/check_layers.py --root .`
-- [ ] Test count: ≥ 7 assertions pass
+- [x] Tests in `test/domain/audio/metronome_test.dart` written covering all 7 failure modes (BEFORE implementation)
+- [x] `lib/domain/audio/metronome_pulse_generator.dart` implemented with `MetronomePulse` value class and `MetronomePulseGenerator.generate()`
+- [x] Gate check passes: `flutter analyze && flutter test test/domain/ && python scripts/check_layers.py --root .`
+- [x] Test count: ≥ 7 assertions pass
 
 **Tests**: unit
 **Gate**: build
