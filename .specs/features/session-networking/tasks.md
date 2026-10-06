@@ -192,10 +192,10 @@ T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: empty payload, max-size payload, key length mismatch
-- [ ] `sign(sender, sequence, payload, key)` returns an `Envelope` with a correct 32-byte HMAC verified against a hand-computed reference vector in the test
-- [ ] Unit tests cover the listed failure modes + the happy path
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: empty payload, max-size payload, key length mismatch
+- [x] `sign(sender, sequence, payload, key)` returns an `Envelope` with a correct 32-byte HMAC verified against a hand-computed reference vector in the test
+- [x] Unit tests cover the listed failure modes + the happy path
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
