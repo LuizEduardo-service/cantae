@@ -229,7 +229,7 @@ T13 → T14
 
 ---
 
-### T7: Create `SongTrackMapper`
+### T7: Create `SongTrackMapper` ✅ Complete
 
 **What**: Add `toCompanion(SongTrack, {required String songId, required bool isPlaybackSlot})` and `fromRow(SongTrackRow)` pure functions.
 **Where**: `lib/data/mappers/song_track_mapper.dart`
