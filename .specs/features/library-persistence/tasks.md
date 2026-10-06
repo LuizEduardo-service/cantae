@@ -107,7 +107,7 @@ T13 → T14
 
 ---
 
-### T2: Create `SongRepository` domain interface
+### T2: Create `SongRepository` domain interface ✅ Complete
 
 **What**: Add the abstract `SongRepository` contract (`save`, `getById`, `getAll`, `delete`, `deleteAll`) exactly as specified in design.md's Components section — pure Dart, zero `drift` import.
 **Where**: `lib/domain/repositories/song_repository.dart`
