@@ -387,10 +387,10 @@ T14
 - Skill: `flutter-clean-architecture` (confirm port lives in domain, impl in infrastructure)
 
 **Done when**:
-- [ ] Port interface matches design.md exactly
-- [ ] `TcpSessionTransport` connects two instances over real `127.0.0.1:0` (OS-assigned port), sends bytes both directions, and detects connection close (clean + abrupt socket kill) — real sockets, not mocked, per AD-010 precedent
-- [ ] Integration tests cover: connect/send/receive round-trip, clean close detected, abrupt close (socket destroyed) detected
-- [ ] Gate passes: `flutter test test/infrastructure/network/`
+- [x] Port interface matches design.md exactly (extended with `listen`/`boundPort`/`connect`/`closedConnections` — see design.md's T13 addendum; the original 4-method sketch had no way to open a connection or learn of a peer-initiated close)
+- [x] `TcpSessionTransport` connects two instances over real `127.0.0.1:0` (OS-assigned port), sends bytes both directions, and detects connection close (clean + abrupt socket kill) — real sockets, not mocked, per AD-010 precedent
+- [x] Integration tests cover: connect/send/receive round-trip, clean close detected, abrupt close (socket destroyed) detected
+- [x] Gate passes: `flutter test test/infrastructure/network/`
 
 **Tests**: integration
 **Gate**: full
