@@ -254,7 +254,7 @@ T13 → T14
 
 ---
 
-### T8: Create `LyricLineMapper`
+### T8: Create `LyricLineMapper` ✅ Complete
 
 **What**: Add `toCompanion(LyricLine, {required String songId})` and `fromRow(LyricLineRow)` pure functions.
 **Where**: `lib/data/mappers/lyric_line_mapper.dart`
