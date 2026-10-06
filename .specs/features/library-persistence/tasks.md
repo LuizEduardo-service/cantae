@@ -132,7 +132,7 @@ T13 → T14
 
 ---
 
-### T3: Create `SongsTable`
+### T3: Create `SongsTable` ✅ Complete
 
 **What**: Add the `drift` `Table` subclass for `songs` (id, name, author, version, 4 nullable metronome columns) exactly per design.md's Data Models section.
 **Where**: `lib/infrastructure/database/tables/songs_table.dart`
