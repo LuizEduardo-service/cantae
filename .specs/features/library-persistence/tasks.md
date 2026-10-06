@@ -155,7 +155,7 @@ T13 → T14
 
 ---
 
-### T4: Create `SongTracksTable`
+### T4: Create `SongTracksTable` ✅ Complete
 
 **What**: Add the `drift` `Table` subclass for `song_tracks` (id, song_id FK cascade, file_path, naipe, start_delay_ms, is_playback, is_playback_slot) per design.md.
 **Where**: `lib/infrastructure/database/tables/song_tracks_table.dart`
