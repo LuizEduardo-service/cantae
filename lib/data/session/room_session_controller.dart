@@ -9,6 +9,7 @@ import 'package:cantae/domain/session/envelope.dart';
 import 'package:cantae/domain/session/envelope_authenticator.dart';
 import 'package:cantae/domain/session/handshake_service.dart';
 import 'package:cantae/domain/session/ids.dart';
+import 'package:cantae/domain/session/participant_session.dart';
 import 'package:cantae/domain/session/room.dart';
 import 'package:cantae/domain/session/room_discovery.dart';
 import 'package:cantae/domain/session/room_session_snapshot.dart';
@@ -181,9 +182,32 @@ class RoomSessionController {
   Result<Unit, Failure> reject(ParticipantId id) {
     final result = _stateMachine!.reject(id);
     if (result.isSuccess) {
+      _closeConnectionFor(id);
       _emitSnapshot();
     }
     return result;
+  }
+
+  /// NET-20: transitions every participant to disconnected, closes every
+  /// connection, and stops mDNS advertisement.
+  Future<void> endRoom() async {
+    _stateMachine?.endRoom();
+    for (final connection in _connectionByParticipant.values.toList()) {
+      unawaited(_transport.close(connection));
+    }
+    _connectionByParticipant.clear();
+    _participantByConnection.clear();
+    _tickTimer?.cancel();
+    await _discovery.stopAdvertising();
+    _emitSnapshot();
+  }
+
+  void _closeConnectionFor(ParticipantId id) {
+    final connection = _connectionByParticipant.remove(id);
+    if (connection != null) {
+      _participantByConnection.remove(connection);
+      unawaited(_transport.close(connection));
+    }
   }
 
   Future<Result<Unit, Failure>> _sendHandshakeInit(ParticipantId id) async {
@@ -361,8 +385,28 @@ class RoomSessionController {
   void _startTicking() {
     _tickTimer = Timer.periodic(_tickInterval, (_) {
       _stateMachine?.tick(_now());
+      _closeConnectionsForTerminatedParticipants();
       _emitSnapshot();
     });
+  }
+
+  /// NET-16/NET-07: tick() may silently move a participant to `expired` (30min
+  /// inactivity) or `rejected` (a stalled handshake past its 10s timeout, or an
+  /// expired pending-approval request past 60s) without the controller's
+  /// knowledge — close their transport connection, if still open, when that
+  /// happens so a TTL expiry actually drops the socket, not just the domain state.
+  void _closeConnectionsForTerminatedParticipants() {
+    final machine = _stateMachine;
+    if (machine == null) {
+      return;
+    }
+    for (final participant in machine.allParticipants) {
+      final isTerminal = participant.state == ParticipantState.expired ||
+          participant.state == ParticipantState.rejected;
+      if (isTerminal && _connectionByParticipant.containsKey(participant.id)) {
+        _closeConnectionFor(participant.id);
+      }
+    }
   }
 
   void _emitSnapshot() {

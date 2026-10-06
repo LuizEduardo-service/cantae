@@ -198,5 +198,59 @@ void main() {
       final session = machine.participant(const ParticipantId('device-1'));
       expect(session!.lastAcceptedSequence, equals(-1));
     });
+
+    test(
+        'each participant gets a distinct session key; one participant cannot forge a message on behalf of another (NET-15)',
+        () {
+      final machine = newMachine();
+      final keyA = Uint8List.fromList(List.generate(32, (i) => i));
+      final keyB = Uint8List.fromList(List.generate(32, (i) => i + 100));
+
+      machine.requestJoin(const DeviceId('device-a'), '1234', now);
+      machine.approve(const ParticipantId('device-a'), now);
+      machine.completeHandshake(const ParticipantId('device-a'), keyA);
+
+      machine.requestJoin(const DeviceId('device-b'), '1234', now);
+      machine.approve(const ParticipantId('device-b'), now);
+      machine.completeHandshake(const ParticipantId('device-b'), keyB);
+
+      expect(
+        machine.participant(const ParticipantId('device-a'))!.sessionKey,
+        isNot(equals(
+            machine.participant(const ParticipantId('device-b'))!.sessionKey)),
+      );
+
+      // Forged: claims to be sent by device-b, but signed with device-a's key.
+      final forged = authenticator.sign(
+        const ParticipantId('device-b'),
+        1,
+        Uint8List.fromList(utf8.encode('forged-as-b')),
+        keyA,
+      );
+
+      final result = machine.acceptEnvelope(forged, now);
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, equals('session.hmac-mismatch')),
+      );
+      expect(
+        machine
+            .participant(const ParticipantId('device-b'))!
+            .lastAcceptedSequence,
+        equals(-1),
+      );
+
+      // A genuine message from device-b, signed with its OWN key, is accepted.
+      final genuine = authenticator.sign(
+        const ParticipantId('device-b'),
+        1,
+        Uint8List.fromList(utf8.encode('genuine-from-b')),
+        keyB,
+      );
+      final genuineResult = machine.acceptEnvelope(genuine, now);
+      expect(genuineResult.isSuccess, isTrue);
+    });
   });
 }

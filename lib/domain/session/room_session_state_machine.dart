@@ -13,6 +13,7 @@ class RoomSessionStateMachine {
   static const maxApprovedParticipants = 8;
   static const pendingApprovalTtl = Duration(seconds: 60);
   static const connectedInactivityTtl = Duration(minutes: 30);
+  static const handshakeTtl = Duration(seconds: 10);
 
   Room _room;
   final Map<ParticipantId, ParticipantSession> _participants = {};
@@ -34,11 +35,23 @@ class RoomSessionStateMachine {
     if (code != _room.code) {
       return Result.failure(ValidationFailure(code: 'session.invalid-code'));
     }
+
+    final participantId = ParticipantId(id.value);
+    final existing = _participants[participantId];
+    if (existing != null && !_isRejoinable(existing.state)) {
+      // A device already mid-flow or admitted cannot be reset by a fresh,
+      // unauthenticated join request for the same id (NET-18's "treat a
+      // rejoin as brand new" only applies to disconnected/expired/rejected;
+      // anyone else is already holding a slot or awaiting a decision).
+      return Result.failure(
+        ValidationFailure(code: 'session.already-joined'),
+      );
+    }
+
     if (_admittedCount() >= maxApprovedParticipants) {
       return Result.failure(ValidationFailure(code: 'session.room-full'));
     }
 
-    final participantId = ParticipantId(id.value);
     _participants[participantId] = ParticipantSession(
       id: participantId,
       role: ParticipantRole.visitor,
@@ -71,6 +84,7 @@ class RoomSessionStateMachine {
       state: ParticipantState.approved,
       lastActivityAt: now,
       clearPendingSince: true,
+      approvedSince: now,
     );
     return Result.success(id);
   }
@@ -112,6 +126,7 @@ class RoomSessionStateMachine {
     _participants[id] = session.copyWith(
       state: ParticipantState.connected,
       sessionKey: sessionKey,
+      clearApprovedSince: true,
     );
     return const Result.success(Unit());
   }
@@ -194,6 +209,19 @@ class RoomSessionStateMachine {
         );
         continue;
       }
+      final approvedSince = session.approvedSince;
+      if (session.state == ParticipantState.approved &&
+          approvedSince != null &&
+          now.difference(approvedSince) > handshakeTtl) {
+        // NET-07 / spec Edge Case 2: a handshake that never completes must
+        // not hold the slot forever — abort the join, same as a failed
+        // handshake, instead of leaving it silently "approved".
+        _participants[entry.key] = session.copyWith(
+          state: ParticipantState.rejected,
+          clearApprovedSince: true,
+        );
+        continue;
+      }
       if (session.state == ParticipantState.connected &&
           now.difference(session.lastActivityAt) > connectedInactivityTtl) {
         _participants[entry.key] = session.copyWith(
@@ -203,6 +231,11 @@ class RoomSessionStateMachine {
     }
     return const Unit();
   }
+
+  bool _isRejoinable(ParticipantState state) =>
+      state == ParticipantState.rejected ||
+      state == ParticipantState.disconnected ||
+      state == ParticipantState.expired;
 
   int _admittedCount() => _participants.values
       .where(

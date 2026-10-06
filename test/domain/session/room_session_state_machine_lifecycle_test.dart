@@ -104,6 +104,61 @@ void main() {
     });
   });
 
+  group(
+      'RoomSessionStateMachine.tick — handshake timeout (NET-07, Edge Case 2)',
+      () {
+    test(
+        'an approved participant whose handshake never completes is rejected after 10s, freeing the slot',
+        () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+      machine.approve(const ParticipantId('device-1'), now);
+
+      machine.tick(now.add(const Duration(seconds: 11)));
+
+      final session = machine.participant(const ParticipantId('device-1'));
+      expect(session!.state, equals(ParticipantState.rejected));
+    });
+
+    test('an approved participant at exactly 10s is not yet expired', () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+      machine.approve(const ParticipantId('device-1'), now);
+
+      machine.tick(now.add(const Duration(seconds: 10)));
+
+      final session = machine.participant(const ParticipantId('device-1'));
+      expect(session!.state, equals(ParticipantState.approved));
+    });
+
+    test(
+        'a stalled handshake never silently holds the slot forever: the freed slot admits a new request once the room was full',
+        () {
+      final machine = newMachine();
+      for (var i = 0; i < 7; i++) {
+        final deviceId = DeviceId('device-$i');
+        machine.requestJoin(deviceId, '1234', now);
+        machine.approve(ParticipantId('device-$i'), now);
+        machine.completeHandshake(
+          ParticipantId('device-$i'),
+          Uint8List.fromList(List.generate(32, (j) => j)),
+        );
+      }
+      // 8th participant is approved but never completes the handshake.
+      machine.requestJoin(const DeviceId('stalled-device'), '1234', now);
+      machine.approve(const ParticipantId('stalled-device'), now);
+
+      machine.tick(now.add(const Duration(seconds: 11)));
+      final afterTimeout = machine.requestJoin(
+        const DeviceId('device-9'),
+        '1234',
+        now.add(const Duration(seconds: 11)),
+      );
+
+      expect(afterTimeout.isSuccess, isTrue);
+    });
+  });
+
   group('RoomSessionStateMachine.tick — connected inactivity TTL (NET-16)', () {
     test(
         'a connected participant silent for more than 30 minutes expires and frees its slot',

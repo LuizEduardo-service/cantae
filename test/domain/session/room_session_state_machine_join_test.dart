@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/session/ids.dart';
@@ -85,6 +87,90 @@ void main() {
         success: (_) => fail('expected failure'),
         failure: (f) => expect(f.code, equals('session.room-full')),
       );
+    });
+
+    test(
+        'a fresh join request for an already-connected participant is rejected and does not reset their session (security)',
+        () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+      machine.approve(const ParticipantId('device-1'), now);
+      final key = Uint8List.fromList(List.generate(32, (i) => i));
+      machine.completeHandshake(const ParticipantId('device-1'), key);
+
+      final result = machine.requestJoin(
+        const DeviceId('device-1'),
+        '1234',
+        now,
+      );
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, equals('session.already-joined')),
+      );
+      final session = machine.participant(const ParticipantId('device-1'));
+      expect(session!.state, equals(ParticipantState.connected));
+      expect(session.sessionKey, equals(key));
+    });
+
+    test(
+        'a fresh join request for an already-approved (pre-handshake) participant is rejected and does not reset their slot',
+        () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+      machine.approve(const ParticipantId('device-1'), now);
+
+      final result = machine.requestJoin(
+        const DeviceId('device-1'),
+        '1234',
+        now,
+      );
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, equals('session.already-joined')),
+      );
+      final session = machine.participant(const ParticipantId('device-1'));
+      expect(session!.state, equals(ParticipantState.approved));
+    });
+
+    test(
+        'a fresh join request for a still-pendingApproval participant is rejected without disturbing it',
+        () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+
+      final result = machine.requestJoin(
+        const DeviceId('device-1'),
+        '1234',
+        now,
+      );
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) => expect(f.code, equals('session.already-joined')),
+      );
+    });
+
+    test(
+        'a rejoin after disconnect/expired/rejected is treated as a brand new request (not blocked)',
+        () {
+      final machine = newMachine();
+      machine.requestJoin(const DeviceId('device-1'), '1234', now);
+      machine.reject(const ParticipantId('device-1'));
+
+      final result = machine.requestJoin(
+        const DeviceId('device-1'),
+        '1234',
+        now,
+      );
+
+      expect(result.isSuccess, isTrue);
+      final session = machine.participant(const ParticipantId('device-1'));
+      expect(session!.state, equals(ParticipantState.pendingApproval));
     });
   });
 

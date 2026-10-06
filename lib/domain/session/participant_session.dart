@@ -21,6 +21,7 @@ class ParticipantSession {
   final int lastAcceptedSequence;
   final DateTime lastActivityAt;
   final DateTime? pendingSince;
+  final DateTime? approvedSince;
 
   const ParticipantSession({
     required this.id,
@@ -30,6 +31,7 @@ class ParticipantSession {
     required this.lastAcceptedSequence,
     required this.lastActivityAt,
     required this.pendingSince,
+    this.approvedSince,
   });
 
   ParticipantSession copyWith({
@@ -38,8 +40,10 @@ class ParticipantSession {
     int? lastAcceptedSequence,
     DateTime? lastActivityAt,
     DateTime? pendingSince,
+    DateTime? approvedSince,
     bool clearPendingSince = false,
     bool clearSessionKey = false,
+    bool clearApprovedSince = false,
   }) {
     return ParticipantSession(
       id: id,
@@ -50,6 +54,8 @@ class ParticipantSession {
       lastActivityAt: lastActivityAt ?? this.lastActivityAt,
       pendingSince:
           clearPendingSince ? null : (pendingSince ?? this.pendingSince),
+      approvedSince:
+          clearApprovedSince ? null : (approvedSince ?? this.approvedSince),
     );
   }
 }

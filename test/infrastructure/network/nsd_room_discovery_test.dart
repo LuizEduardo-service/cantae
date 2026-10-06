@@ -71,6 +71,20 @@ void main() {
       );
       expect(fakePlatform.registeredService!.port, equals(5001));
     });
+
+    test(
+        'never embeds a secret: advertise() has no code parameter, and the registered service carries no txt records (NET-01)',
+        () async {
+      final discovery = NsdRoomDiscovery();
+
+      await discovery.advertise(const RoomId('room-456'), 5001);
+
+      // NET-01: "advertise it ... with a service name, a random room ID, and
+      // no embedded secret." advertise()'s signature never accepts a code at
+      // all, so this is a structural guarantee, not just a runtime check —
+      // this test documents and locks that guarantee.
+      expect(fakePlatform.registeredService!.txt, isNull);
+    });
   });
 
   group('NsdRoomDiscovery.stopAdvertising', () {

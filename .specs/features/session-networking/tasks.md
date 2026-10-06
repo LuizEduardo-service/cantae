@@ -509,6 +509,25 @@ T15 → T16 → T17
 
 ---
 
+## Fix Tasks (Post-Verification, Round 1)
+
+The independent Verifier (dispatched after T17) returned **FAIL** with 7 ranked gaps. Routed back and fixed in one round before re-verification:
+
+| # | Gap | Fix | Files |
+| - | --- | --- | ----- |
+| 1 | **Security bug**: `requestJoin` unconditionally overwrote any existing session for a `deviceId`, letting a device that merely knows the (non-secret) 4-digit code reset an already-admitted victim's connection and wipe its session key | Guard: reject (`session.already-joined`) unless the existing session is `rejected`/`disconnected`/`expired` | `room_session_state_machine.dart`, `room_session_state_machine_join_test.dart` |
+| 2 | NET-07/Edge Case 2: `approve()` moved to `approved` before handshake; nothing timed that out — a stalled handshake held the slot forever | Added `ParticipantSession.approvedSince`; `tick()` rejects an `approved` participant past a 10s handshake TTL | `participant_session.dart`, `room_session_state_machine.dart`, `room_session_state_machine_lifecycle_test.dart` |
+| 3 | NET-20 had no caller: `RoomSessionController.endRoom()` didn't exist | Added `RoomSessionController.endRoom()`: calls the state machine, closes every connection, stops advertising | `room_session_controller.dart`, `room_session_controller_test.dart` |
+| 4 | NET-06: `reject()` updated domain state but never closed the participant's TCP connection | `reject()` now closes the connection via a shared `_closeConnectionFor` helper | `room_session_controller.dart`, `room_session_controller_test.dart` |
+| 5 | NET-16/07: tick-driven `expired`/`rejected` transitions never closed the socket | Controller's tick loop now sweeps terminated participants and closes their connections | `room_session_controller.dart`, `room_session_controller_test.dart` |
+| 6 | NET-15 (distinct per-participant key / no cross-forgery) had zero test coverage | Added a two-participant test: distinct keys, a forged cross-sender envelope rejected, a genuine same-key envelope accepted | `room_session_state_machine_envelope_test.dart` |
+| 7 | NET-17's two halves (domain `disconnect()`, transport close detection) were proven separately but never end-to-end through the controller | Added a controller-level test: abrupt visitor-side socket kill → master detects it and calls `disconnect()` | `room_session_controller_test.dart` |
+| 8 | NET-01 precision gap: "no embedded secret" was never asserted | Added a thin test asserting the registered mDNS service carries no `txt` records (and noting `advertise()`'s signature structurally has no code parameter at all) | `nsd_room_discovery_test.dart` |
+
+**Result**: 185 tests passing (up from 172), 0 failures, `flutter analyze` clean. Design decisions recorded in design.md's "Post-Verification Fixes" addendum. Re-verification dispatched next.
+
+---
+
 ## Phase Execution Map
 
 ```

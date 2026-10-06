@@ -138,6 +138,7 @@ graph TD
   - `Stream<DiscoveredRoom> discoverRooms()`
   - `Future<Result<Unit, Failure>> requestJoin(RoomId room, String code)`
   - `Future<Result<Unit, Failure>> approve(ParticipantId id)` / `reject(ParticipantId id)`
+  - `Future<void> endRoom()` — NET-20, filled during Verifier fix-up: the original sketch never gave the controller an end-room operation at all, leaving `RoomSessionStateMachine.endRoom()` and `RoomDiscovery.stopAdvertising()` as dead code with no caller
   - `Stream<RoomSessionSnapshot> get snapshots`
 - **Dependencies**: `RoomSessionStateMachine`, `HandshakeService`, `SessionTransport`, `RoomDiscovery`
 - **Reuses**: Riverpod DI wiring pattern already used for `SongRepository` (per `flutter-clean-architecture` skill conventions)
@@ -240,6 +241,17 @@ Design.md never specified how bytes on the `SessionTransport` connection are str
 `requiresMasterRole` travels in the clear (outside the HMAC) — this is safe because it is not a security boundary by itself: `acceptEnvelope`'s role check (T11) validates against the *stored* session role, not against whatever a sender claims, so a Visitor cannot grant itself Master privilege by setting this bit.
 
 **Visitor-side session tracking**: `RoomSessionStateMachine` is a master-only, multi-participant admission authority (capacity, approve/reject). A visitor has exactly one peer (the master) and never makes admission decisions, so the visitor side of `RoomSessionController` tracks its own session key, outgoing sequence counter, and last-accepted-from-master sequence directly, calling `EnvelopeAuthenticator`/`HandshakeService` without going through `RoomSessionStateMachine`.
+
+---
+
+## Post-Verification Fixes (addendum)
+
+The independent Verifier found 7 gaps after T1-T17 were implemented. The real defects and missing wiring (as opposed to test-coverage gaps) were:
+
+- **Pre-auth session reset (security bug).** `RoomSessionStateMachine.requestJoin` unconditionally overwrote any existing `ParticipantSession` for a `deviceId`, so a device that merely knew the (non-secret, discovery-only) 4-digit code could reset an already-admitted participant — wiping its session key and freeing its slot — without any authentication. Fixed: `requestJoin` now rejects (`session.already-joined`) unless the existing session, if any, is `rejected`/`disconnected`/`expired` (the only states NET-18 allows a fresh join to replace).
+- **NET-07 / spec Edge Case 2 (slot leak).** `approve()` moved a participant to `approved` before the handshake, but nothing ever timed that out if the handshake stalled — the slot was held forever. Fixed: `ParticipantSession` gained `approvedSince`; `tick()` now rejects (frees the slot) an `approved` participant whose handshake hasn't completed within 10s, matching the spec's stated handshake timeout.
+- **NET-20 had no caller.** `RoomSessionController.endRoom()` didn't exist — `RoomSessionStateMachine.endRoom()` and `RoomDiscovery.stopAdvertising()` were unreachable dead code. Added `RoomSessionController.endRoom()` (see Components above).
+- **NET-06 / NET-16 didn't close sockets.** `reject()` and tick-driven expiry (`expired`/`rejected`) updated domain state but never closed the participant's actual TCP connection. Fixed: both now close the transport connection via a shared `_closeConnectionFor` helper.
 
 ---
 
