@@ -113,10 +113,10 @@ T4
 - Skill: `flutter-clean-architecture` (confirm domain-purity placement)
 
 **Done when**:
-- [ ] Failure modes listed first (per AD-005): unequal length, equal length+equal bytes, equal length+unequal bytes, both empty
-- [ ] Function implemented without early-exit branching that leaks length-independent timing (compare full length always, OR accept length as a non-secret pre-check — documented inline why that's safe)
-- [ ] Unit tests cover all 4 listed failure modes
-- [ ] Gate passes: `flutter test test/domain/core/`
+- [x] Failure modes listed first (per AD-005): unequal length, equal length+equal bytes, equal length+unequal bytes, both empty
+- [x] Function implemented without early-exit branching that leaks length-independent timing (compare full length always, OR accept length as a non-secret pre-check — documented inline why that's safe)
+- [x] Unit tests cover all 4 listed failure modes
+- [x] Gate passes: `flutter test test/domain/core/`
 
 **Tests**: unit
 **Gate**: quick
