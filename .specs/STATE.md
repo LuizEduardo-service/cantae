@@ -33,6 +33,24 @@
 
 ---
 
+### AD-006 — const constructors on all domain entities
+**Decision:** All domain entity constructors are `const`. Assert conditions use `field.length > 0` (integer comparison) rather than `field.isNotEmpty` for compile-time const compatibility.
+**Rationale:** `const` entities allow fixtures and tests to be evaluated at compile time, and is required for the `prefer_const_constructors` lint rule to pass. Tests that intentionally trigger invalid-input asserts omit `const` and add `// ignore: prefer_const_constructors`.
+
+---
+
+### AD-007 — Flutter SDK path: D:\flutter\bin
+**Decision:** Flutter SDK lives at `D:\flutter\bin` (user-level PATH, not system PATH). Automation shells must prepend this to PATH before invoking `flutter`.
+**Rationale:** Flutter is installed under the user profile, not a system-wide location, so it is absent from the automation shell's inherited PATH.
+
+---
+
 ## Handoff
 
-_No active handoff — Phase 0 (Foundation Setup) in progress on branch `feat/phase-0-foundation-setup`._
+Phase 1 (Audio Domain) complete and verified on branch `feat/phase-1-audio-domain`.
+- 72 domain tests passing (all of `test/domain/`)
+- `flutter analyze`: 0 issues
+- Layer purity: clean (`check_layers.py`)
+- Verifier: PASS — 39/39 ACs, 4/4 mutations killed
+
+**Next:** merge `feat/phase-1-audio-domain` → `develop`, then start Phase 2 (Local Persistence — SQLite schema, library repo, CRUD).

@@ -71,7 +71,14 @@ class FixtureSongs {
         author: 'Fixture Author',
         tracks: [
           SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
-          SongTrack(id: 'track-invalid', filePath: '', naipe: Naipe.contralto),
+          // 'invalid' means the path points to a nonexistent file — the domain
+          // invariant only guards against empty paths; file existence is
+          // checked at the infrastructure layer.
+          SongTrack(
+            id: 'track-invalid',
+            filePath: 'audio/nonexistent_file.mp3',
+            naipe: Naipe.contralto,
+          ),
         ],
       );
 }

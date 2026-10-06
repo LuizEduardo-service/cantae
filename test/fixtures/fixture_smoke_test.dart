@@ -41,10 +41,12 @@ void main() {
   });
 
   group('Fixture: invalidTrackSong', () {
-    test('has at least one track with an empty filePath', () {
+    test('has at least one track pointing to a nonexistent file path', () {
       final song = FixtureSongs.invalidTrackSong();
-      final hasInvalid = song.tracks.any((t) => t.filePath.isEmpty);
-      expect(hasInvalid, isTrue);
+      // filePath must be non-empty (domain invariant); 'invalid' means the file
+      // won't load at the infrastructure layer (path to a nonexistent file).
+      final hasNonexistent = song.tracks.any((t) => t.filePath.contains('nonexistent'));
+      expect(hasNonexistent, isTrue);
     });
   });
 
