@@ -24,6 +24,7 @@
 ### AD-004 — All MVP dependencies declared in pubspec.yaml from Phase 0
 **Decision:** `pubspec.yaml` declares all runtime and dev dependencies from Phase 0, including dependencies not used until Phase 4 (`just_audio`, `audio_service`, `nsd`).
 **Rationale:** Late dependency additions risk version conflicts after the lock file is established. Declaring everything up front catches incompatibilities early, when they're cheap to fix.
+**Amended (Phase 2):** `sqflite` was replaced by `drift` + `sqlite3_flutter_libs` (runtime) and `drift_dev` + `build_runner` (dev) — see AD-009/AD-010. The "declare up front" principle still holds; the local-database package choice changed before any schema code was written.
 
 ---
 
@@ -45,12 +46,30 @@
 
 ---
 
+### AD-008 — `Unit` type for void-like `Result` success values
+**Decision:** `lib/domain/core/unit.dart` defines a single-value `Unit` type. Repository/use-case methods with nothing to return on success use `Result<Unit, F>` instead of `Result<void, F>`.
+**Rationale:** `void` is not a usable generic type argument in the existing sealed `Result<S, F>` pattern; `Unit` is the smallest addition that fits it without changing `Result` itself.
+
+---
+
+### AD-009 — `drift` as the local database ORM, with `stepByStep` additive-only migrations
+**Decision:** The project uses `drift` (not raw `sqflite`) for all local persistence. Tables are declared as Dart `Table` classes under `lib/infrastructure/database/tables/`; the generated database class lives in `lib/infrastructure/database/app_database.dart` (`part 'app_database.g.dart'`, built via `build_runner`). Schema evolution uses drift's `MigrationStrategy` with `stepByStep(from1To2: ..., from2To3: ...)` — each step is additive only (new tables/columns), never edits a prior step.
+**Rationale:** Superseded the original raw-`sqflite` plan (see AD-004 amendment) after comparing both: `drift` gives compile-time-checked queries, generated row classes, reactive `watch()` streams (useful for the Phase 5 library UI), and built-in, testable migration tooling (`verifySelf`) — all of which a hand-rolled `Map<String, Object?>` mapper + SQL-string migration list would have to rebuild manually. The trade-off (an extra `build_runner` codegen step) was judged worth it before any schema code existed.
+
+---
+
+### AD-010 — `NativeDatabase.memory()` for repository-layer tests
+**Decision:** Repository implementations that use `drift` are tested under plain `flutter test` by constructing the generated database with `NativeDatabase.memory()` (from `drift/native.dart`), not mocked and not deferred to integration tests.
+**Rationale:** Unlike raw `sqflite`, `drift`'s native/FFI backend runs an in-memory SQLite instance with no platform channel, so real SQL (real constraint/cascade/transaction behavior) is exercised at unit-test speed — consistent with the project's failure-first isolation-testing rule (AD-005). No `sqflite_common_ffi` dependency is needed.
+
+---
+
 ## Handoff
 
-Phase 1 (Audio Domain) complete and verified on branch `feat/phase-1-audio-domain`.
-- 72 domain tests passing (all of `test/domain/`)
-- `flutter analyze`: 0 issues
-- Layer purity: clean (`check_layers.py`)
-- Verifier: PASS — 39/39 ACs, 4/4 mutations killed
+Phase 2 (Local Persistence — library-persistence feature) complete and verified on branch `feat/phase-2-library-persistence`, HEAD `d8b2c34`.
+- All 14 tasks (T1-T14) done: `Unit` type, `SongRepository` interface, `drift` schema (songs/song_tracks/lyric_lines, v1, FK cascade), `AppDatabase` migration, 3 mappers, `DriftSongRepository` (save/getById/getAll/delete/deleteAll)
+- 110 tests passing (`flutter test`), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`)
+- Verifier: PASS — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (LIB-04, no migration exists yet to test), 3/3 discrimination-sensor mutations killed
+- Report: `.specs/features/library-persistence/validation.md`
 
-**Next:** merge `feat/phase-1-audio-domain` → `develop`, then start Phase 2 (Local Persistence — SQLite schema, library repo, CRUD).
+**Next:** merge `feat/phase-2-library-persistence` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 3 (Session & Networking — mDNS, state machine, handshake, envelope auth) or Studio if prioritized first.
