@@ -217,10 +217,10 @@ T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: tampered payload w/ stale HMAC, wrong key, replayed sequence (≤ last accepted), out-of-order-but-valid gap (sequence jump), exact boundary (sequence == last accepted)
-- [ ] `verify()` returns `NetworkFailure(code: 'session.hmac-mismatch')` on bad HMAC, `NetworkFailure(code: 'session.replay-detected')` on non-increasing sequence, success otherwise
-- [ ] Unit tests cover NET-11/12/13/14 and the Edge Case "sequence jumps by 10000+ is legal forward progress"
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: tampered payload w/ stale HMAC, wrong key, replayed sequence (≤ last accepted), out-of-order-but-valid gap (sequence jump), exact boundary (sequence == last accepted)
+- [x] `verify()` returns `NetworkFailure(code: 'session.hmac-mismatch')` on bad HMAC, `NetworkFailure(code: 'session.replay-detected')` on non-increasing sequence, success otherwise
+- [x] Unit tests cover NET-11/12/13/14 and the Edge Case "sequence jumps by 10000+ is legal forward progress"
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
