@@ -64,12 +64,22 @@
 
 ---
 
+### AD-011 — `cryptography` package added for X25519 ECDH + HKDF handshake
+**Decision:** The project adds the `cryptography` pub package (pure Dart, no platform channel) as a runtime dependency, used only inside `lib/domain/session/` for the ephemeral X25519 key exchange and HKDF-SHA256 session-key derivation in the Session & Networking feature. HMAC-SHA-256 for envelope authentication continues to use the already-declared `crypto` package — `cryptography` is not a replacement for it, only an addition for the asymmetric/KDF primitives `crypto` doesn't provide.
+**Enforced by:** `check_layers.py` (domain-purity rule, AD-001) — `cryptography` has no Flutter/plugin/`dart:io` surface, so importing it in `domain/` does not trip the layer-purity check.
+**Rationale:** Amends AD-004's "all MVP dependencies declared in `pubspec.yaml` from Phase 0" — this need was not foreseen when that list was written, the same way AD-009 amended it for `drift`. Confirmed with the user during Session & Networking's Discuss step (ECDH X25519 ephemeral handshake chosen over a PSK derived from the 4-digit code).
+
+---
+
 ## Handoff
 
-Phase 2 (Local Persistence — library-persistence feature) complete and verified on branch `feat/phase-2-library-persistence`, HEAD `d8b2c34`.
-- All 14 tasks (T1-T14) done: `Unit` type, `SongRepository` interface, `drift` schema (songs/song_tracks/lyric_lines, v1, FK cascade), `AppDatabase` migration, 3 mappers, `DriftSongRepository` (save/getById/getAll/delete/deleteAll)
-- 110 tests passing (`flutter test`), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`)
-- Verifier: PASS — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (LIB-04, no migration exists yet to test), 3/3 discrimination-sensor mutations killed
-- Report: `.specs/features/library-persistence/validation.md`
+Phase 3 (Session & Networking — session-networking feature) complete and verified on branch `feat/phase-3-session-networking`, HEAD `750b1cf` (plus two doc-only commits with the final Verifier report).
+- All 17 tasks (T1-T17) done, inline execution, one atomic commit each: discovery/handshake crypto (X25519 ECDH + HKDF), `EnvelopeAuthenticator` (HMAC-SHA-256 + replay detection), `RoomSessionStateMachine` (join/approve/reject/capacity/TTL/disconnect/endRoom), `TcpSessionTransport`, `NsdRoomDiscovery`, `RoomSessionController` orchestration, a length-prefixed wire protocol (added mid-implementation — design.md's original sketch had no framing), full E2E test.
+- Two post-Verifier fix rounds: Round 1 closed a real security bug (pre-auth session reset via a device that merely knew the non-secret 4-digit code), a slot-leak (no handshake timeout), missing `endRoom()` wiring, and 3 test-coverage gaps. Round 2 fixed a non-discriminating test (NET-06) the iteration-2 Verifier's mutation sensor caught.
+- 185 tests passing (`flutter test`, up from 110 at the Phase 2 handoff), `flutter analyze`: 0 issues, layer purity clean (`check_layers.py`), `dart analyze lib/domain/`: 0 issues.
+- Verifier: PASS (iteration 3 of 3, final) — 19/20 ACs matched spec outcome exactly, 1 acknowledged spec-precision gap (NET-02, real mDNS multicast not exercisable in this sandbox), 4/4 discrimination-sensor mutations killed including a re-run of the prior iteration's survivor.
+- Report: `.specs/features/session-networking/validation.md`
+- 2 candidate lessons recorded (`.specs/lessons.json`, `.specs/LESSONS.md`) — not yet promoted to Confirmed.
+- `integration_test/session_networking_test.dart` was first verified only via a scratch-copy VM run (no device configured). **Since closed**: generated the missing `android/`/`ios/` platform scaffolding (project never had it — `flutter create --platforms=android,ios .`), set up the Android SDK via Android Studio, connected a physical Android phone (API 33) over USB, and ran the real `integration_test` on it via `flutter test -d <device-id> integration_test/session_networking_test.dart`. **Result: `All tests passed!`**, full 16-step transition log on real hardware — first real run of the `nsd_android` plugin channel and real Android TCP/crypto path. Two environment-only issues hit and fixed along the way (Kotlin incremental-compilation crash from the project/pub-cache being on different drive letters → `kotlin.incremental=false` in `android/gradle.properties`; one-off `INSTALL_FAILED_USER_RESTRICTED` → resolved via a manual `adb install -r`). Details: tasks.md's "Real-Device Confirmation" section.
 
-**Next:** merge `feat/phase-2-library-persistence` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 3 (Session & Networking — mDNS, state machine, handshake, envelope auth) or Studio if prioritized first.
+**Next:** merge `feat/phase-3-session-networking` → `develop` (needs explicit go-ahead — not done automatically), then start Phase 4 (File Transfer & Real Audio) or Studio if prioritized first.

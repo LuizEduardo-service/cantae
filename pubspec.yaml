@@ -20,6 +20,7 @@ dependencies:
   path: ^1.9.0
   crypto: ^3.0.3
   nsd: ^3.0.0
+  cryptography: ^2.7.0
 
 dev_dependencies:
   flutter_test:
@@ -30,6 +31,9 @@ dev_dependencies:
     sdk: flutter
   drift_dev: ^2.21.0
   build_runner: ^2.4.12
+  nsd_platform_interface: ^2.2.0
+  plugin_platform_interface: ^2.1.8
+  collection: ^1.19.1
 
 flutter:
   uses-material-design: true
