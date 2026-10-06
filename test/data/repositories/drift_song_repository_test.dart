@@ -128,6 +128,25 @@ void main() {
       final songRows = await db.select(db.songsTable).get();
       expect(songRows.single.metronomeBpm, isNull);
     });
+
+    test('persists no is_playback_slot = 1 row when playbackTrack is null', () async {
+      const song = Song(
+        id: 'song-no-playback',
+        name: 'No Playback Track',
+        author: 'Author',
+        tracks: [
+          SongTrack(id: 'track-only', filePath: 'only.mp3', naipe: Naipe.soprano),
+        ],
+      );
+
+      final result = await repo.save(song);
+
+      expect(result.isSuccess, isTrue);
+      final trackRows = await db.select(db.songTracksTable).get();
+      expect(trackRows, hasLength(1));
+      expect(trackRows.every((row) => !row.isPlaybackSlot), isTrue,
+          reason: 'no row should be marked as the playback slot');
+    });
   });
 
   group('DriftSongRepository.getById', () {
@@ -177,7 +196,10 @@ void main() {
       expect(result.isFailure, isTrue);
       result.when(
         success: (_) => fail('expected failure'),
-        failure: (f) => expect(f.code, isNotEmpty),
+        failure: (f) {
+          expect(f, isA<NotFoundFailure>());
+          expect(f.code, isNotEmpty);
+        },
       );
     });
   });
@@ -289,7 +311,10 @@ void main() {
       expect(result.isFailure, isTrue);
       result.when(
         success: (_) => fail('expected failure'),
-        failure: (f) => expect(f.code, isNotEmpty),
+        failure: (f) {
+          expect(f, isA<NotFoundFailure>());
+          expect(f.code, isNotEmpty);
+        },
       );
 
       final songRows = await db.select(db.songsTable).get();
