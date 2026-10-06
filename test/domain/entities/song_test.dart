@@ -110,5 +110,21 @@ void main() {
     test('empty track list returns false', () {
       expect(const Song(id: 's1', name: 'Empty', author: 'A').isComplete, isFalse);
     });
+
+    test('duplicates of a naipe still satisfy that naipe requirement', () {
+      final song = Song(
+        id: 's1',
+        name: 'Dupes OK',
+        author: 'A',
+        tracks: [
+          _track(Naipe.soprano),
+          _track(Naipe.soprano),
+          _track(Naipe.contralto),
+          _track(Naipe.tenor),
+          _track(Naipe.bass),
+        ],
+      );
+      expect(song.isComplete, isTrue);
+    });
   });
 }
