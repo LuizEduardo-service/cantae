@@ -273,8 +273,8 @@ T9 → T10 → T11 → T12
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] `Room`, `ParticipantSession`, `ParticipantRole` enum, `ParticipantState` enum defined exactly per design.md
-- [ ] Build gate passes
+- [x] `Room`, `ParticipantSession`, `ParticipantRole` enum, `ParticipantState` enum defined exactly per design.md
+- [x] Build gate passes
 
 **Tests**: none
 **Gate**: build
