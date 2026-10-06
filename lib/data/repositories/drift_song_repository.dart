@@ -1,0 +1,75 @@
+import 'package:cantae/data/mappers/lyric_line_mapper.dart';
+import 'package:cantae/data/mappers/song_mapper.dart';
+import 'package:cantae/data/mappers/song_track_mapper.dart';
+import 'package:cantae/domain/core/failures.dart';
+import 'package:cantae/domain/core/result.dart';
+import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/repositories/song_repository.dart';
+import 'package:cantae/infrastructure/database/app_database.dart';
+
+class DriftSongRepository implements SongRepository {
+  DriftSongRepository(this._db);
+
+  final AppDatabase _db;
+
+  @override
+  Future<Result<Unit, StorageFailure>> save(Song song) async {
+    try {
+      await _db.transaction(() async {
+        await _db.into(_db.songsTable).insertOnConflictUpdate(
+              SongMapper.toCompanion(song),
+            );
+
+        await (_db.delete(_db.songTracksTable)
+              ..where((t) => t.songId.equals(song.id)))
+            .go();
+        await (_db.delete(_db.lyricLinesTable)
+              ..where((l) => l.songId.equals(song.id)))
+            .go();
+
+        for (final track in song.tracks) {
+          await _db.into(_db.songTracksTable).insert(
+                SongTrackMapper.toCompanion(
+                  track,
+                  songId: song.id,
+                  isPlaybackSlot: false,
+                ),
+              );
+        }
+        final playbackTrack = song.playbackTrack;
+        if (playbackTrack != null) {
+          await _db.into(_db.songTracksTable).insert(
+                SongTrackMapper.toCompanion(
+                  playbackTrack,
+                  songId: song.id,
+                  isPlaybackSlot: true,
+                ),
+              );
+        }
+
+        for (final line in song.lyrics) {
+          await _db.into(_db.lyricLinesTable).insert(
+                LyricLineMapper.toCompanion(line, songId: song.id),
+              );
+        }
+      });
+
+      return const Result.success(Unit());
+    } catch (_) {
+      return Result.failure(StorageFailure(code: 'song_save_failed'));
+    }
+  }
+
+  @override
+  Future<Result<Song, Failure>> getById(String id) => throw UnimplementedError();
+
+  @override
+  Future<Result<List<Song>, StorageFailure>> getAll() => throw UnimplementedError();
+
+  @override
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
+
+  @override
+  Future<Result<Unit, StorageFailure>> deleteAll() => throw UnimplementedError();
+}

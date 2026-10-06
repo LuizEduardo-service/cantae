@@ -305,7 +305,7 @@ T13 → T14
 
 ---
 
-### T10: Implement `DriftSongRepository.save()`
+### T10: Implement `DriftSongRepository.save()` ✅ Complete
 
 **What**: Implement the `save(Song)` upsert — one `db.transaction()` writing the song row, all track rows (tagging the `playbackTrack` row with `is_playback_slot: true` if present), and all lyric rows; catches DB exceptions into `Result.failure(StorageFailure)`.
 **Where**: `lib/data/repositories/drift_song_repository.dart` (new file, `save` method)
