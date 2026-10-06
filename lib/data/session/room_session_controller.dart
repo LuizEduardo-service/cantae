@@ -44,6 +44,7 @@ class RoomSessionController {
   // Visitor side: this device's single connection to the master.
   ParticipantId? _masterConnection;
   Uint8List? _visitorSessionKey;
+  int _visitorNextSequence = 0;
   int _visitorLastAcceptedFromMaster = -1;
   Completer<Result<Unit, Failure>>? _joinCompleter;
 
@@ -119,6 +120,54 @@ class RoomSessionController {
     );
 
     return _joinCompleter!.future;
+  }
+
+  /// Signs and sends an application-level envelope from this visitor to the
+  /// master (NET-10), advancing this visitor's own outgoing sequence number.
+  Future<Result<Unit, Failure>> sendEnvelope(
+    Uint8List payload, {
+    bool requiresMasterRole = false,
+  }) async {
+    final sessionKey = _visitorSessionKey;
+    final connection = _masterConnection;
+    if (sessionKey == null || connection == null) {
+      return Result.failure(
+        NetworkFailure(code: 'session.handshake-failed'),
+      );
+    }
+    final envelope = _authenticator.sign(
+      ParticipantId(_selfDeviceId.value),
+      _visitorNextSequence++,
+      payload,
+      sessionKey,
+    );
+    await _sendMessage(
+      connection,
+      EnvelopeMessage(
+        requiresMasterRole: requiresMasterRole,
+        senderId: envelope.senderId,
+        sequence: envelope.sequence,
+        hmac: envelope.hmac,
+        payload: envelope.payload,
+      ),
+    );
+    return const Result.success(Unit());
+  }
+
+  /// Test/debug only: this visitor's negotiated session key, for asserting
+  /// both sides derived the same key.
+  Uint8List? get debugSessionKey => _visitorSessionKey;
+
+  /// Test/debug only: this visitor's connection handle to the master. The
+  /// normal API (sendEnvelope) always produces well-formed frames; adversarial
+  /// integration tests need this to craft malformed ones directly.
+  ParticipantId? get debugMasterConnection => _masterConnection;
+
+  /// Test/debug only: sends an arbitrary, already-built wire message over
+  /// this visitor's connection to the master, bypassing sendEnvelope()'s
+  /// signing/sequencing — used to simulate adversarial traffic.
+  Future<void> debugSendRaw(SessionWireMessage message) {
+    return _sendMessage(_masterConnection!, message);
   }
 
   Future<Result<Unit, Failure>> approve(ParticipantId id) {

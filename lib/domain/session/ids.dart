@@ -8,6 +8,9 @@ class RoomId {
 
   @override
   int get hashCode => value.hashCode;
+
+  @override
+  String toString() => 'RoomId($value)';
 }
 
 class DeviceId {
