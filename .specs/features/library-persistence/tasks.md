@@ -179,7 +179,7 @@ T13 → T14
 
 ---
 
-### T5: Create `LyricLinesTable`
+### T5: Create `LyricLinesTable` ✅ Complete
 
 **What**: Add the `drift` `Table` subclass for `lyric_lines` (row_id autoincrement PK, song_id FK cascade, text, onset_ms, nullable naipe/dynamics) per design.md.
 **Where**: `lib/infrastructure/database/tables/lyric_lines_table.dart`
