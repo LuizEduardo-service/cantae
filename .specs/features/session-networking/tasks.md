@@ -242,10 +242,10 @@ T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: malformed/wrong-length peer public key, handshake producing a key of unexpected length (must fail, never truncate/pad — per spec Edge Case)
-- [ ] `generateEphemeralKeyPair()` and `deriveSessionKey()` implemented; two independently generated keypairs produce matching 32-byte shared session keys on both ends in the test
-- [ ] `NetworkFailure(code: 'session.handshake-failed')` returned for every listed failure mode
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: malformed/wrong-length peer public key, handshake producing a key of unexpected length (must fail, never truncate/pad — per spec Edge Case)
+- [x] `generateEphemeralKeyPair()` and `deriveSessionKey()` implemented; two independently generated keypairs produce matching 32-byte shared session keys on both ends in the test
+- [x] `NetworkFailure(code: 'session.handshake-failed')` returned for every listed failure mode
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
