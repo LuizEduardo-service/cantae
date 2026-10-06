@@ -19,7 +19,7 @@ void main() {
 
   RoomSessionStateMachine newMachine() {
     return RoomSessionStateMachine(
-      room: Room(
+      room: const Room(
         id: roomId,
         code: '1234',
         masterId: masterId,
