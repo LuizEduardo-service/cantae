@@ -38,7 +38,7 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 | File hash / content validation | Deferred to Phase 4 | Requires reading file content via the audio engine, not available yet; Phase 2 only validates `filePath` is a non-empty string (already enforced by `SongTrack`'s own assert) | y |
 | `LyricLine` row identity | DB-assigned `INTEGER PRIMARY KEY AUTOINCREMENT` (SQLite rowid), never exposed on the domain entity; load order is `ORDER BY onset_ms ASC, rowid ASC` | `LyricLine` has no domain `id` field; a stable, deterministic order on read is required for round-trip fidelity of list order | n |
 | `Song.playbackTrack` vs `Song.tracks` persistence | Both stored as rows in `song_tracks`; an extra boolean column `is_playback_slot` (distinct from the entity's own `isPlayback` field) marks the row that reconstructs into `Song.playbackTrack`. Rows with `is_playback_slot = 0` reconstruct into `Song.tracks` | `Song` carries `tracks` and `playbackTrack` as two distinct fields; without a dedicated marker, reconstruction cannot tell which `isPlayback: true` row (if several existed) is *the* `playbackTrack` | n |
-| Repository implementation test strategy | Use `sqflite_common_ffi` (new dev dependency) to run repository tests against a real SQLite engine under plain `flutter test`, without platform channels | The plugin's default SQLite binding requires a running Android/iOS platform; `sqflite_common_ffi` is the standard way to exercise real SQL logic in a fast, non-UI test per the project's failure-first isolation-testing rule | n |
+| Repository implementation test strategy | Use `drift`'s `NativeDatabase.memory()` to run repository tests against a real in-memory SQLite engine under plain `flutter test`, without platform channels | `drift`'s native/FFI backend needs no Android/iOS platform channel; this is the standard way to exercise real SQL logic in a fast, non-UI test per the project's failure-first isolation-testing rule | y |
 | Void-returning `Result` encoding | Add `lib/domain/core/unit.dart` with a singleton `Unit` type; `save`/`delete`/`deleteAll` return `Result<Unit, Failure>` | `Result<S, F>` requires a concrete success type; introducing `Unit` is the smallest addition consistent with the existing sealed-class pattern, avoiding `void` as a generic type argument | n |
 
 **Open questions:** none — all resolved above (confirmed with the user) or logged as agent defaults with rationale (unconfirmed, to be re-surfaced in Design if the user wants to revisit).
@@ -146,11 +146,11 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 
 | Requirement ID | Story | Phase | Status |
 |----------------|-------|-------|--------|
-| LIB-01 | P1: Schema & Migration | Tasks | Pending |
-| LIB-02 | P1: Schema & Migration | Tasks | Pending |
-| LIB-03 | P1: Schema & Migration | Tasks | Pending |
-| LIB-04 | P1: Schema & Migration | Tasks | Pending |
-| LIB-05 | P1: Schema & Migration | Tasks | Pending |
+| LIB-01 | P1: Schema & Migration | T3-T6 | Done |
+| LIB-02 | P1: Schema & Migration | T4, T5, T6 | Done |
+| LIB-03 | P1: Schema & Migration | T3, T4, T6 | Done |
+| LIB-04 | P1: Schema & Migration | T6 | Done (no migration exists yet to exercise beyond v1 — mechanism is in place, per spec's Out of Scope) |
+| LIB-05 | P1: Schema & Migration | T6 | Done |
 | LIB-06 | P1: Repository Save | Tasks | Pending |
 | LIB-07 | P1: Repository Save | Tasks | Pending |
 | LIB-08 | P1: Repository Save | Tasks | Pending |
@@ -173,8 +173,8 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 
 ## Success Criteria
 
-- [ ] `flutter test test/data/` and `test/infrastructure/` pass with zero failures, using `sqflite_common_ffi`
-- [ ] `python scripts/check_layers.py --root .` exits 0 (no `sqflite`/`flutter` import inside `lib/domain/`)
+- [ ] `flutter test test/data/` and `test/infrastructure/` pass with zero failures, using `drift`'s `NativeDatabase.memory()`
+- [ ] `python scripts/check_layers.py --root .` exits 0 (no `drift`/`flutter` import inside `lib/domain/`)
 - [ ] `flutter analyze` exits 0
 - [ ] All 20 ACs covered by at least one test with `file:line` evidence
 - [ ] A save → load round trip preserves every field of a fixture `Song` with tracks, a playback track, lyrics, and a metronome config

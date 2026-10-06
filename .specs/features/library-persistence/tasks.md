@@ -203,7 +203,7 @@ T13 → T14
 
 ---
 
-### T6: Create `AppDatabase` with migration and FK pragma
+### T6: Create `AppDatabase` with migration and FK pragma ✅ Complete
 
 **What**: Add the `@DriftDatabase(tables: [...])` class with `schemaVersion = 1`, `onCreate: (m) => m.createAll()`, empty `stepByStep` migration scaffold, and `beforeOpen` running `PRAGMA foreign_keys = ON;`. Run `build_runner` to generate `app_database.g.dart`.
 **Where**: `lib/infrastructure/database/app_database.dart`
