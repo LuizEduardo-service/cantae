@@ -550,6 +550,18 @@ The final allowed Verifier iteration re-derived all 20 ACs from scratch (not inh
 
 **Feature status: DONE.** Merge of `feat/phase-3-session-networking` requires explicit user go-ahead (not performed automatically, per the skill's blast-radius rule).
 
+## Real-Device Confirmation (post-merge-readiness)
+
+The scratch-copy VM run above confirmed correctness but never exercised the real `nsd` Android plugin channel or real Android networking/crypto. Closed that gap: generated the missing `android/`/`ios/` platform scaffolding (`flutter create --platforms=android,ios .` — this project never had it; CLAUDE.md targets Android 26+/iOS 14+), set up the Android SDK via Android Studio, connected a physical Android phone (API 33) over USB, and ran `integration_test/session_networking_test.dart` for real via `flutter test -d <device-id> integration_test/session_networking_test.dart`.
+
+**Result: `All tests passed!`** Full 16-step transition log printed on real hardware — mDNS-shaped discovery, join→approve→handshake with matching 32-byte session keys, all 3 adversarial cases (tampered HMAC, replay, role violation) rejected with state unchanged, 8/8 capacity enforced, 9th join rejected. This is the first time this feature's `nsd_android` plugin code and real Android TCP/crypto path actually ran.
+
+Two environment issues hit along the way, fixed and documented inline (not product bugs):
+- A Kotlin incremental-compilation crash (`RelocatableFileToPathConverter`/"different roots") caused by the project living on `D:` while pub-cache lives on `C:` — Windows can't relativize paths across drive letters. Fixed with `kotlin.incremental=false` in `android/gradle.properties` (build-speed only, no behavior change).
+- `INSTALL_FAILED_USER_RESTRICTED` on first install — resolved by installing directly via `adb install -r` once, which surfaced the on-device install-confirmation prompt that `flutter run`'s faster install path didn't give time to see.
+
+Discarded the generated `test/widget_test.dart` (default counter-app boilerplate referencing a `MyApp` class that doesn't exist in this project — would have failed `flutter test`).
+
 ---
 
 ## Phase Execution Map
