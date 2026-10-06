@@ -279,7 +279,7 @@ T13 → T14
 
 ---
 
-### T9: Create `SongMapper`
+### T9: Create `SongMapper` ✅ Complete
 
 **What**: Add `toCompanion(Song)` / `fromRow(SongRow)` pure functions for the `songs` row only — `MetronomeConfig` in/out as the 4-column group, treating "all 4 null" and "all 4 present" as the only valid states.
 **Where**: `lib/data/mappers/song_mapper.dart`

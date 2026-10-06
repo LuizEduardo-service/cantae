@@ -16,7 +16,7 @@ Flutter mobile app for vocal groups to rehearse together with synchronized, per-
 | State & DI | Riverpod |
 | Audio playback | `just_audio` (per-track) |
 | Background audio | `audio_service` |
-| Local database | `sqflite` (SQLite, additive-only migrations) |
+| Local database | `drift` (type-safe SQLite ORM, additive-only migrations via `stepByStep`) |
 | Network discovery | mDNS/Bonjour (`nsd` or `multicast_dns`) |
 | Session transport | Authenticated TCP (HMAC-SHA-256 envelopes) |
 | Secrets storage | Keystore (Android) / Keychain (iOS) |
