@@ -296,11 +296,11 @@ T9 → T10 → T11 → T12
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first: wrong code, room at 8/8 at request time, room at 8/8 at approval time (race: two pending requests, one slot), approving/rejecting an unknown participant id, approving a non-`pendingApproval` participant
-- [ ] `requestJoin`/`approve`/`reject` implemented with the above failures returning the matching typed `Failure` from design.md's code table
-- [ ] `tick(now)` expires `pendingApproval` entries older than 60s to `rejected` (NET-09)
-- [ ] Unit tests cover NET-01/02/03/04/06/08/09 and the two listed capacity-race failure modes
-- [ ] Gate passes: `flutter test test/domain/session/`
+- [x] Failure modes listed first: wrong code, room at 8/8 at request time, room at 8/8 at approval time (race: two pending requests, one slot), approving/rejecting an unknown participant id, approving a non-`pendingApproval` participant
+- [x] `requestJoin`/`approve`/`reject` implemented with the above failures returning the matching typed `Failure` from design.md's code table
+- [x] `tick(now)` expires `pendingApproval` entries older than 60s to `rejected` (NET-09)
+- [x] Unit tests cover NET-03/04/06/08/09 and the two listed capacity-race failure modes (NET-01/02 are mDNS advertise/discover — not exercisable at this pure-domain layer; deferred to T14/T15, noted as a spec-precision gap rather than a fabricated assertion)
+- [x] Gate passes: `flutter test test/domain/session/`
 
 **Tests**: unit
 **Gate**: quick
