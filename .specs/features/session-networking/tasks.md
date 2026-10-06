@@ -91,7 +91,7 @@ T4
 - Skill: NONE
 
 **Done when**:
-- [ ] AD-011 entry present and accurate (already drafted during Design; this task just confirms it ships with the dependency)
+- [x] AD-011 entry present and accurate (already drafted during Design; this task just confirms it ships with the dependency)
 
 **Tests**: none
 **Gate**: build
