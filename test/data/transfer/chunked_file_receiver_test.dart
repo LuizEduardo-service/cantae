@@ -132,7 +132,6 @@ void main() {
             trackId: 'track-happy',
             expectedSha256: expectedSha256,
             totalSizeBytes: fileBytes.length,
-            extension: 'bin',
           )
           .listen(progressEvents.add)
           .asFuture<void>();
@@ -195,7 +194,6 @@ void main() {
       final receiver = ChunkedFileReceiver(
         controller: visitor,
         storageRoot: storageRoot,
-        maxWholeTrackRetries: 2,
       );
       final progressEvents = <TransferProgress>[];
       final receiveDone = receiver
@@ -203,7 +201,6 @@ void main() {
             trackId: trackId,
             expectedSha256: declaredSha256,
             totalSizeBytes: chunkBytes.length,
-            extension: 'bin',
           )
           .listen(progressEvents.add)
           .asFuture<void>();
@@ -301,7 +298,6 @@ void main() {
             trackId: 'track-dedup',
             expectedSha256: expectedSha256,
             totalSizeBytes: 999999,
-            extension: 'bin',
           )
           .toList()
           .timeout(const Duration(seconds: 2));

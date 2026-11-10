@@ -141,7 +141,6 @@ void main() {
           trackId: track.id,
           expectedSha256: expectedSha256,
           totalSizeBytes: fileBytes.length,
-          extension: 'bin',
         )
         .listen(progressEvents.add);
 
