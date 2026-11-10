@@ -323,12 +323,12 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] A reassembled file whose SHA-256 matches the declared hash is renamed into its final path and never otherwise (hash-mismatch path never promotes a file — written and asserted before the happy-path test, per CLAUDE.md Testing Rule 3)
-- [ ] A hash mismatch triggers a fresh whole-track transfer up to 2 times, then surfaces `ValidationFailure(code: 'transfer.hash-mismatch')` and leaves no promoted file
-- [ ] A file whose SHA-256 already exists at the target path is detected before any bytes are written (dedup skip) — test asserts zero `ChunkDataMessage`-triggered writes occur for an already-present hash
-- [ ] A simulated write failure (e.g. injected via a wrapped `File` that throws on `writeAsBytes`) aborts the transfer with `StorageFailure(code: 'transfer.insufficient-storage')` without affecting any other in-flight transfer
-- [ ] E2E test (2 real loopback controllers + real temp dir) covers the full happy path end-to-end with T10's sender
-- [ ] `flutter test test/data/transfer` passes
+- [x] A reassembled file whose SHA-256 matches the declared hash is renamed into its final path and never otherwise (hash-mismatch path never promotes a file — written and asserted before the happy-path test, per CLAUDE.md Testing Rule 3)
+- [x] A hash mismatch triggers a fresh whole-track transfer up to 2 times, then surfaces `ValidationFailure(code: 'transfer.hash-mismatch')` and leaves no promoted file
+- [x] A file whose SHA-256 already exists at the target path is detected before any bytes are written (dedup skip) — test asserts zero `ChunkDataMessage`-triggered writes occur for an already-present hash
+- [x] A simulated write failure (e.g. injected via a wrapped `File` that throws on `writeAsBytes`) aborts the transfer with `StorageFailure(code: 'transfer.insufficient-storage')` without affecting any other in-flight transfer
+- [x] E2E test (2 real loopback controllers + real temp dir) covers the full happy path end-to-end with T10's sender
+- [x] `flutter test test/data/transfer` passes
 
 **Tests**: E2E
 **Gate**: full
