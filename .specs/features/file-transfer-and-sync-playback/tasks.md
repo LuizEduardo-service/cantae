@@ -225,9 +225,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] All 11 variants implement `encode()`/`decode()` round-trip
-- [ ] Unit tests cover every variant's round-trip, plus an unknown-tag and a truncated-body decode both rejected (mirrors `session_wire_message_test.dart`'s existing malformed-input coverage)
-- [ ] `flutter test test/data/session` passes
+- [x] All 11 variants implement `encode()`/`decode()` round-trip
+- [x] Unit tests cover every variant's round-trip, plus an unknown-tag and a truncated-body decode both rejected (mirrors `session_wire_message_test.dart`'s existing malformed-input coverage)
+- [x] `flutter test test/data/session` passes
 
 **Tests**: unit
 **Gate**: quick

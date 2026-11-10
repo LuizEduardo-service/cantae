@@ -121,7 +121,7 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| XFER-01 | P1: Master pushes song files | Design | Pending |
+| XFER-01 | P1: Master pushes song files | Design | Implementing |
 | XFER-02 | P1: Master pushes song files | Design | Implementing |
 | XFER-03 | P1: Master pushes song files | Design | Implementing |
 | XFER-04 | P1: Master pushes song files | Design | Implementing |
@@ -133,12 +133,12 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 | XFER-10 | P1: Master pushes song files | Design | Implementing |
 | SYNC-01 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-02 | P1: Synchronized multi-track playback | Design | Implementing |
-| SYNC-03 | P1: Synchronized multi-track playback | Design | Pending |
+| SYNC-03 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-04 | P1: Synchronized multi-track playback | Design | Pending |
-| SYNC-05 | P1: Synchronized multi-track playback | Design | Pending |
+| SYNC-05 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-06 | P1: Synchronized multi-track playback | Design | Implementing |
-| SYNC-07 | P1: Synchronized multi-track playback | Design | Pending |
-| SYNC-08 | P1: Synchronized multi-track playback | Design | Pending |
+| SYNC-07 | P1: Synchronized multi-track playback | Design | Implementing |
+| SYNC-08 | P1: Synchronized multi-track playback | Design | Implementing |
 | BG-01 | P2: Background audio | Design | Pending |
 | BG-02 | P2: Background audio | Design | Pending |
 | BG-03 | P2: Background audio | Design | Pending |
