@@ -398,11 +398,11 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `play(songId)` on a 3-device loopback room produces a distinct `PlayCommandMessage` per participant, each carrying that participant's own latency-adjusted epoch
-- [ ] `pause()`/`stop()`/`repositionToLoopStart()` follow the identical probe-then-command sequence
-- [ ] A command sent with `requiresMasterRole: true` from a non-master device is rejected at the existing envelope gate (regression-style check reusing T8's coverage, not duplicating it — assert via the same rejection path)
-- [ ] E2E test asserts the above using real loopback `RoomSessionController`s
-- [ ] `flutter test test/data/playback` passes
+- [x] `play(songId)` on a 3-device loopback room produces a distinct `PlayCommandMessage` per participant, each carrying that participant's own latency-adjusted epoch
+- [x] `pause()`/`stop()`/`repositionToLoopStart()` follow the identical probe-then-command sequence
+- [x] A command sent with `requiresMasterRole: true` from a non-master device is rejected at the existing envelope gate (regression-style check reusing T8's coverage, not duplicating it — assert via the same rejection path)
+- [x] E2E test asserts the above using real loopback `RoomSessionController`s
+- [x] `flutter test test/data/playback` passes
 
 **Tests**: E2E
 **Gate**: full
