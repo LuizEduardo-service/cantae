@@ -130,10 +130,10 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `TransferPhase` enum and `FileTransferState` class match design.md's data model
-- [ ] `advance(TransferEvent)` enforces valid transitions only (e.g. `available` is unreachable except from `validating` on a hash match; `failed` is terminal)
-- [ ] Unit tests cover every valid transition and at least one invalid-transition rejection per state (failure-modes-first, per CLAUDE.md Testing Rule 3: the failure list was written before this `Done when` item)
-- [ ] `flutter test test/domain/transfer` passes
+- [x] `TransferPhase` enum and `FileTransferState` class match design.md's data model
+- [x] `advance(TransferEvent)` enforces valid transitions only (e.g. `available` is unreachable except from `validating` on a hash match; `failed` is terminal)
+- [x] Unit tests cover every valid transition and at least one invalid-transition rejection per state (failure-modes-first, per CLAUDE.md Testing Rule 3: the failure list was written before this `Done when` item)
+- [x] `flutter test test/domain/transfer` passes
 
 **Tests**: unit
 **Gate**: quick
