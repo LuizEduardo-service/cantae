@@ -202,8 +202,8 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] Interface signatures match design.md's `MultiTrackAudioEngine` method list, with `Song` (domain entity) as the `loadSong` parameter type — no Flutter/plugin types in the signature
-- [ ] `python scripts/check_layers.py --root .` passes (zero violations)
+- [x] Interface signatures match design.md's `MultiTrackAudioEngine` method list, with `Song` (domain entity) as the `loadSong` parameter type — no Flutter/plugin types in the signature
+- [x] `python scripts/check_layers.py --root .` passes (zero violations)
 
 **Tests**: none (interface only — behavior is tested through its implementations in T15 (fake) and T16 (real))
 **Gate**: quick
