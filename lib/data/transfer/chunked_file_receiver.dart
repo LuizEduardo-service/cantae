@@ -105,6 +105,19 @@ class ChunkedFileReceiver {
     var receivedChunks = <int>{};
     Completer<_AttemptOutcome>? attemptCompleter;
 
+    // The underlying socket's flush() rejects a second concurrent call
+    // ("StreamSink is bound to a stream"). The Begin-handler's ACK and a
+    // ChunkData-handler's ACK can otherwise overlap, because Dart delivers
+    // the next stream event to an async onData callback without waiting for
+    // the previous invocation's Future to complete. Routing every outbound
+    // send through this chain serializes them.
+    var sendQueue = Future<void>.value();
+    Future<void> sendSerialized(Uint8List payload) {
+      final result = sendQueue.then((_) => _controller.sendEnvelope(payload));
+      sendQueue = result.then((_) {}, onError: (_) {});
+      return result;
+    }
+
     final subscription = _controller.applicationMessages
         .map((event) => RoomApplicationMessage.decode(event.$2))
         .listen((message) async {
@@ -113,15 +126,28 @@ class ChunkedFileReceiver {
         return;
       }
 
-      if (message is TransferBeginMessage &&
-          message.trackId == trackId &&
-          chunkSize == null) {
-        chunkSize = message.chunkSize;
-        totalChunks = ChunkPlanner.chunkCount(
-          totalSizeBytes: totalSizeBytes,
-          chunkSize: chunkSize!,
-        );
-        if (totalChunks == 0) {
+      if (message is TransferBeginMessage && message.trackId == trackId) {
+        if (chunkSize == null) {
+          chunkSize = message.chunkSize;
+          totalChunks = ChunkPlanner.chunkCount(
+            totalSizeBytes: totalSizeBytes,
+            chunkSize: chunkSize!,
+          );
+        }
+        // T12: report the current resume point back on a resend after a
+        // reconnect (some chunks already written) — the sender treats this
+        // as the resume signal. A genuinely fresh transfer stays silent
+        // here: `ChunkAckMessage.chunkIndex` is wire-encoded as an unsigned
+        // 32-bit int, so there is no in-band way to signal "-1, nothing yet"
+        // over the wire; the sender's own probe timeout already assumes a
+        // fresh start (resumeFromChunkIndex 0) when no reply arrives.
+        if (receivedChunks.isNotEmpty) {
+          final lastAcked = receivedChunks.reduce((a, b) => a > b ? a : b);
+          await sendSerialized(
+            ChunkAckMessage(trackId: trackId, chunkIndex: lastAcked).encode(),
+          );
+        }
+        if (totalChunks == 0 && !completer.isCompleted) {
           completer.complete(_AttemptOutcome.allChunksReceived);
         }
         return;
@@ -149,7 +175,7 @@ class ChunkedFileReceiver {
           phase: TransferPhase.inProgress,
           lastAckedChunkIndex: message.chunkIndex,
         ));
-        await _controller.sendEnvelope(
+        await sendSerialized(
           ChunkAckMessage(trackId: trackId, chunkIndex: message.chunkIndex)
               .encode(),
         );

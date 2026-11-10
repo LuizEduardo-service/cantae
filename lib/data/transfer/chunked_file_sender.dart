@@ -17,8 +17,16 @@ import '../session/room_session_controller.dart';
 /// Master-side orchestration for sending one track's file to one participant:
 /// `TransferBegin -> ChunkData (bounded-retry) -> TransferComplete`
 /// (design.md's `ChunkedFileSender`). Honors a caller-supplied resume offset
-/// so a prior partial transfer is not restarted from zero (XFER-04 — the
-/// automatic resume handshake itself is wired in T12).
+/// so a prior partial transfer is not restarted from zero (XFER-04).
+///
+/// T12: after every `TransferBeginMessage`, the sender briefly probes for the
+/// receiver's resume-point report (`ChunkedFileReceiver` always answers a
+/// `TransferBeginMessage` with a `ChunkAckMessage` carrying its current
+/// `lastAckedChunkIndex`, -1 for a fresh transfer) and starts from
+/// `max(resumeFromChunkIndex, ChunkPlanner.resumeFromChunkIndex(reported))` —
+/// so a transfer resumed after a reconnect (a fresh `sendTrack` call for a
+/// track the receiver already partially has) does not resend chunks the
+/// receiver already ACKed, even if the caller didn't know that index itself.
 ///
 /// SPEC_DEVIATION: design.md's interface sketch for `sendTrack` took only
 /// `{track, to, resumeFromChunkIndex}` with no `songId`/hash parameter, but
@@ -34,12 +42,14 @@ class ChunkedFileSender {
   final int chunkSize;
   final int maxAttemptsPerChunk;
   final Duration ackTimeout;
+  final Duration resumeProbeTimeout;
 
   ChunkedFileSender({
     required RoomSessionController controller,
     this.chunkSize = 64 * 1024,
     this.maxAttemptsPerChunk = 5,
     this.ackTimeout = const Duration(seconds: 2),
+    this.resumeProbeTimeout = const Duration(milliseconds: 300),
   }) : _controller = controller;
 
   /// Sends [track]'s file to participant [to], starting from
@@ -61,6 +71,10 @@ class ChunkedFileSender {
       chunkSize: chunkSize,
     );
 
+    // Start listening for the receiver's resume-point report before sending
+    // TransferBegin, so a fast reply can never be missed.
+    final resumeReportFuture = _awaitResumeReport(to, track.id);
+
     await _controller.sendEnvelopeTo(
       to,
       TransferBeginMessage(
@@ -72,7 +86,15 @@ class ChunkedFileSender {
       ).encode(),
     );
 
-    for (var chunkIndex = resumeFromChunkIndex;
+    final resumeReport = await resumeReportFuture;
+    final reportedLastAcked =
+        resumeReport is ChunkAckMessage ? resumeReport.chunkIndex : -1;
+    final effectiveResumeFrom = max(
+      resumeFromChunkIndex,
+      ChunkPlanner.resumeFromChunkIndex(lastAckedChunkIndex: reportedLastAcked),
+    );
+
+    for (var chunkIndex = effectiveResumeFrom;
         chunkIndex < totalChunks;
         chunkIndex++) {
       final start = chunkIndex * chunkSize;
@@ -124,6 +146,29 @@ class ChunkedFileSender {
       }
     }
     return false;
+  }
+
+  /// Waits (bounded by [resumeProbeTimeout]) for the next `ChunkAckMessage`
+  /// from [to] for [trackId] — the receiver's resume-point report, always
+  /// sent right after it processes a `TransferBeginMessage`. Returns `null`
+  /// on timeout (treated as "nothing to resume").
+  Future<ChunkAckMessage?> _awaitResumeReport(
+    ParticipantId to,
+    String trackId,
+  ) async {
+    try {
+      final message = await _controller.applicationMessages
+          .where((event) => event.$1 == to)
+          .map((event) => RoomApplicationMessage.decode(event.$2))
+          .firstWhere(
+            (message) =>
+                message is ChunkAckMessage && message.trackId == trackId,
+          )
+          .timeout(resumeProbeTimeout);
+      return message as ChunkAckMessage;
+    } on TimeoutException {
+      return null;
+    }
   }
 
   Future<bool> _waitForAck({

@@ -350,8 +350,8 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] E2E test: start a transfer over a real loopback TCP connection, close the receiver's socket mid-transfer (simulating a Wi-Fi drop), reconnect within the test's simulated session, confirm the number of `ChunkDataMessage`s sent after reconnect is strictly less than the file's total chunk count, and the final reassembled file still hash-matches
-- [ ] `flutter test test/data/transfer` passes; full suite green
+- [x] E2E test: start a transfer over a real loopback TCP connection, close the receiver's socket mid-transfer (simulating a Wi-Fi drop), reconnect within the test's simulated session, confirm the number of `ChunkDataMessage`s sent after reconnect is strictly less than the file's total chunk count, and the final reassembled file still hash-matches
+- [x] `flutter test test/data/transfer` passes; full suite green
 
 **Tests**: E2E
 **Gate**: full
