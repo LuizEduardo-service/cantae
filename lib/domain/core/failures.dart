@@ -22,3 +22,7 @@ class StorageFailure extends Failure {
 class NetworkFailure extends Failure {
   NetworkFailure({required super.code});
 }
+
+class PlaybackFailure extends Failure {
+  PlaybackFailure({required super.code});
+}
