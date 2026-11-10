@@ -155,9 +155,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `estimateOneWayDelayMs` implemented exactly as signed in design.md
-- [ ] Unit tests cover: zero RTT, typical LAN RTT (a few ms), and an asserted-invalid input (echoed-before-sent clock skew) handled per an explicit failure-modes list written before the test
-- [ ] `flutter test test/domain/playback` passes
+- [x] `estimateOneWayDelayMs` implemented exactly as signed in design.md
+- [x] Unit tests cover: zero RTT, typical LAN RTT (a few ms), and an asserted-invalid input (echoed-before-sent clock skew) handled per an explicit failure-modes list written before the test
+- [x] `flutter test test/domain/playback` passes
 
 **Tests**: unit
 **Gate**: quick
