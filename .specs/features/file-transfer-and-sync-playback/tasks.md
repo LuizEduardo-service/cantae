@@ -299,9 +299,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `sendTrack` sends exactly `ChunkPlanner.chunkCount(...) - resumeFromChunkIndex` chunks and emits a `Result.failure(NetworkFailure(code: 'transfer.chunk-delivery-failed'))` after 5 unACKed attempts on one chunk
-- [ ] E2E test (2 real loopback `RoomSessionController`s + a real temp file) covers: full send of a multi-chunk file, receiver ACKing every chunk in order
-- [ ] `flutter test test/data/transfer` passes
+- [x] `sendTrack` sends exactly `ChunkPlanner.chunkCount(...) - resumeFromChunkIndex` chunks and emits a `Result.failure(NetworkFailure(code: 'transfer.chunk-delivery-failed'))` after 5 unACKed attempts on one chunk
+- [x] E2E test (2 real loopback `RoomSessionController`s + a real temp file) covers: full send of a multi-chunk file, receiver ACKing every chunk in order
+- [x] `flutter test test/data/transfer` passes
 
 **Tests**: E2E
 **Gate**: full
