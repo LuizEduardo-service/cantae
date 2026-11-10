@@ -274,10 +274,10 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `trackFilePath({required Directory root, required String sha256, required String extension})` returns the content-addressed path; a second call with the same hash returns the identical path (dedup is "same path" by construction)
-- [ ] `resolveLibraryRoot()` wraps `path_provider.getApplicationDocumentsDirectory()` and appends `library/tracks/`, creating the directory if absent
-- [ ] Unit test uses `Directory.systemTemp.createTempSync()` as the injected root (no platform-channel fake needed) to verify path shape and dedup-by-construction
-- [ ] `flutter test test/data/transfer` passes
+- [x] `trackFilePath({required Directory root, required String sha256, required String extension})` returns the content-addressed path; a second call with the same hash returns the identical path (dedup is "same path" by construction)
+- [x] `resolveLibraryRoot()` wraps `path_provider.getApplicationDocumentsDirectory()` and appends `library/tracks/`, creating the directory if absent
+- [x] Unit test uses `Directory.systemTemp.createTempSync()` as the injected root (no platform-channel fake needed) to verify path shape and dedup-by-construction
+- [x] `flutter test test/data/transfer` passes
 
 **Tests**: unit
 **Gate**: quick
