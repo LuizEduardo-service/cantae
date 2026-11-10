@@ -106,9 +106,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `chunkCount`, `resumeFromChunkIndex`, `exceedsMaxSize` implemented exactly as signed in design.md
-- [ ] Unit tests cover: exact multiple of chunk size, remainder chunk, zero-size file (0 chunks), `lastAckedChunkIndex == -1` → resume at 0, `lastAckedChunkIndex == N` → resume at N+1, size at/under/over the 100 MB cap boundary
-- [ ] `flutter test test/domain/transfer` passes
+- [x] `chunkCount`, `resumeFromChunkIndex`, `exceedsMaxSize` implemented exactly as signed in design.md
+- [x] Unit tests cover: exact multiple of chunk size, remainder chunk, zero-size file (0 chunks), `lastAckedChunkIndex == -1` → resume at 0, `lastAckedChunkIndex == N` → resume at N+1, size at/under/over the 100 MB cap boundary
+- [x] `flutter test test/domain/transfer` passes
 
 **Tests**: unit
 **Gate**: quick

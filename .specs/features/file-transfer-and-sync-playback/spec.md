@@ -122,9 +122,9 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
 | XFER-01 | P1: Master pushes song files | Design | Pending |
-| XFER-02 | P1: Master pushes song files | Design | Pending |
-| XFER-03 | P1: Master pushes song files | Design | Pending |
-| XFER-04 | P1: Master pushes song files | Design | Pending |
+| XFER-02 | P1: Master pushes song files | Design | Implementing |
+| XFER-03 | P1: Master pushes song files | Design | Implementing |
+| XFER-04 | P1: Master pushes song files | Design | Implementing |
 | XFER-05 | P1: Master pushes song files | Design | Pending |
 | XFER-06 | P1: Master pushes song files | Design | Pending |
 | XFER-07 | P1: Master pushes song files | Design | Pending |
