@@ -179,8 +179,8 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `PlaybackPhase` enum and `RoomPlaybackSnapshot` class defined exactly per design.md
-- [ ] `flutter analyze` reports 0 new issues; `const` constructor per AD-006 where applicable
+- [x] `PlaybackPhase` enum and `RoomPlaybackSnapshot` class defined exactly per design.md
+- [x] `flutter analyze` reports 0 new issues; `const` constructor per AD-006 where applicable
 
 **Tests**: none (plain value type/enum — no behavior; same precedent as `RoomSessionSnapshot`, which also has no dedicated unit test file)
 **Gate**: quick

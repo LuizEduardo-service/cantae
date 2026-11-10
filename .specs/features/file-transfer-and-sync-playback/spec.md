@@ -136,7 +136,7 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 | SYNC-03 | P1: Synchronized multi-track playback | Design | Pending |
 | SYNC-04 | P1: Synchronized multi-track playback | Design | Pending |
 | SYNC-05 | P1: Synchronized multi-track playback | Design | Pending |
-| SYNC-06 | P1: Synchronized multi-track playback | Design | Pending |
+| SYNC-06 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-07 | P1: Synchronized multi-track playback | Design | Pending |
 | SYNC-08 | P1: Synchronized multi-track playback | Design | Pending |
 | BG-01 | P2: Background audio | Design | Pending |
