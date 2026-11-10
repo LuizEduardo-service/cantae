@@ -373,10 +373,10 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `syncSongToRoom` sends every track to every connected participant (not just one) in a 2+ participant E2E scenario
-- [ ] A song with one track over 100 MB is rejected with `ValidationFailure(code: 'transfer.file-too-large')` before any chunk is sent (asserted via a zero-`ChunkDataMessage` check)
-- [ ] Calling `syncSongToRoom` again while a transfer is in flight queues rather than interleaving — asserted by observing song B's transfer starts only after song A's completes
-- [ ] `flutter test test/data/transfer` passes
+- [x] `syncSongToRoom` sends every track to every connected participant (not just one) in a 2+ participant E2E scenario
+- [x] A song with one track over 100 MB is rejected with `ValidationFailure(code: 'transfer.file-too-large')` before any chunk is sent (asserted via a zero-`ChunkDataMessage` check)
+- [x] Calling `syncSongToRoom` again while a transfer is in flight queues rather than interleaving — asserted by observing song B's transfer starts only after song A's completes
+- [x] `flutter test test/data/transfer` passes
 
 **Tests**: E2E
 **Gate**: full
