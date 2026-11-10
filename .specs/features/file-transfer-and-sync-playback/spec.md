@@ -129,7 +129,7 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 | XFER-06 | P1: Master pushes song files | Design | Implementing |
 | XFER-07 | P1: Master pushes song files | Design | Pending |
 | XFER-08 | P1: Master pushes song files | Design | Pending |
-| XFER-09 | P1: Master pushes song files | Design | Pending |
+| XFER-09 | P1: Master pushes song files | Design | Implementing |
 | XFER-10 | P1: Master pushes song files | Design | Implementing |
 | SYNC-01 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-02 | P1: Synchronized multi-track playback | Design | Implementing |

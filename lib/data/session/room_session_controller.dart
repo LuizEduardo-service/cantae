@@ -34,6 +34,8 @@ class RoomSessionController {
 
   final _snapshotsController =
       StreamController<RoomSessionSnapshot>.broadcast();
+  final _applicationMessagesController =
+      StreamController<(ParticipantId, Uint8List)>.broadcast();
   final Map<RoomId, DiscoveredRoom> _knownRooms = {};
   final Map<ParticipantId, FrameReassembler> _reassemblers = {};
 
@@ -41,6 +43,7 @@ class RoomSessionController {
   final Map<ParticipantId, ParticipantId> _connectionByParticipant = {};
   final Map<ParticipantId, ParticipantId> _participantByConnection = {};
   final Map<ParticipantId, EphemeralKeyPair> _pendingMasterKeyPairs = {};
+  final Map<ParticipantId, int> _masterNextSequenceByParticipant = {};
 
   // Visitor side: this device's single connection to the master.
   ParticipantId? _masterConnection;
@@ -68,6 +71,13 @@ class RoomSessionController {
         _random = random ?? Random.secure();
 
   Stream<RoomSessionSnapshot> get snapshots => _snapshotsController.stream;
+
+  /// Emits (sender, payload) only after the inbound envelope has passed the
+  /// existing verification gate — `acceptEnvelope` on the master side,
+  /// `_authenticator.verify` on the visitor side. A rejected (bad HMAC,
+  /// replay, or wrong-role) envelope never reaches this stream.
+  Stream<(ParticipantId, Uint8List)> get applicationMessages =>
+      _applicationMessagesController.stream;
 
   Future<Result<RoomId, Failure>> createRoom() async {
     await _transport.listen(0);
@@ -153,6 +163,69 @@ class RoomSessionController {
       ),
     );
     return const Result.success(Unit());
+  }
+
+  /// Master-side counterpart to the visitor's `sendEnvelope`: signs and sends
+  /// an application-level envelope to exactly one connected participant,
+  /// advancing that participant's own outgoing sequence number.
+  Future<Result<Unit, Failure>> sendEnvelopeTo(
+    ParticipantId participant,
+    Uint8List payload, {
+    bool requiresMasterRole = false,
+  }) async {
+    final session = _stateMachine?.participant(participant);
+    final sessionKey = session?.sessionKey;
+    final connection = _connectionByParticipant[participant];
+    if (session == null ||
+        session.state != ParticipantState.connected ||
+        sessionKey == null ||
+        connection == null) {
+      return Result.failure(
+        NotFoundFailure(code: 'session.participant-not-found'),
+      );
+    }
+
+    final sequence = _masterNextSequenceByParticipant[participant] ?? 0;
+    _masterNextSequenceByParticipant[participant] = sequence + 1;
+    final envelope = _authenticator.sign(
+      ParticipantId(_selfDeviceId.value),
+      sequence,
+      payload,
+      sessionKey,
+    );
+    await _sendMessage(
+      connection,
+      EnvelopeMessage(
+        requiresMasterRole: requiresMasterRole,
+        senderId: envelope.senderId,
+        sequence: envelope.sequence,
+        hmac: envelope.hmac,
+        payload: envelope.payload,
+      ),
+    );
+    return const Result.success(Unit());
+  }
+
+  /// Master-side broadcast: sends the same application-level envelope to
+  /// every currently-connected participant, each signed with that
+  /// participant's own session key and sequence counter.
+  Future<void> broadcastEnvelope(
+    Uint8List payload, {
+    bool requiresMasterRole = false,
+  }) async {
+    final machine = _stateMachine;
+    if (machine == null) {
+      return;
+    }
+    final connected = machine.allParticipants
+        .where((p) => p.state == ParticipantState.connected);
+    for (final participant in connected) {
+      await sendEnvelopeTo(
+        participant.id,
+        payload,
+        requiresMasterRole: requiresMasterRole,
+      );
+    }
   }
 
   /// Test/debug only: this visitor's negotiated session key, for asserting
@@ -296,11 +369,14 @@ class RoomSessionController {
         payload: message.payload,
         hmac: message.hmac,
       );
-      _stateMachine!.acceptEnvelope(
+      final result = _stateMachine!.acceptEnvelope(
         envelope,
         _now(),
         requiresMasterRole: message.requiresMasterRole,
       );
+      if (result.isSuccess) {
+        _applicationMessagesController.add((message.senderId, message.payload));
+      }
       _emitSnapshot();
     }
   }
@@ -352,7 +428,11 @@ class RoomSessionController {
         _visitorLastAcceptedFromMaster,
       );
       result.when(
-        success: (_) => _visitorLastAcceptedFromMaster = message.sequence,
+        success: (_) {
+          _visitorLastAcceptedFromMaster = message.sequence;
+          _applicationMessagesController
+              .add((message.senderId, message.payload));
+        },
         failure: (_) {},
       );
     }
@@ -430,5 +510,6 @@ class RoomSessionController {
   void dispose() {
     _tickTimer?.cancel();
     unawaited(_snapshotsController.close());
+    unawaited(_applicationMessagesController.close());
   }
 }

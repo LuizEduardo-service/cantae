@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:collection/collection.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -431,6 +432,241 @@ void main() {
     }
     expect(disconnected.state, equals(ParticipantState.disconnected));
   });
+
+  test(
+      'a verified envelope payload surfaces on applicationMessages for both the master and the visitor (T8)',
+      () async {
+    final bus = StreamController<DiscoveredRoom>.broadcast();
+    final master = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('master-device'),
+    );
+    final visitor = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('visitor-device'),
+    );
+    addTearDown(() {
+      master.dispose();
+      visitor.dispose();
+      bus.close();
+    });
+
+    final pending = await _connectAndApprove(master, visitor, bus);
+
+    final masterPayload = Uint8List.fromList([1, 2, 3]);
+    final masterApplicationMessage =
+        master.applicationMessages.first.timeout(const Duration(seconds: 5));
+    final sendFromVisitor = await visitor.sendEnvelope(masterPayload);
+    expect(sendFromVisitor.isSuccess, isTrue);
+    final (visitorSender, receivedByMaster) = await masterApplicationMessage;
+    expect(visitorSender, equals(pending.id));
+    expect(receivedByMaster, equals(masterPayload));
+
+    final visitorPayload = Uint8List.fromList([9, 8, 7]);
+    final visitorApplicationMessage =
+        visitor.applicationMessages.first.timeout(const Duration(seconds: 5));
+    final sendFromMaster = await master.sendEnvelopeTo(pending.id, visitorPayload);
+    expect(sendFromMaster.isSuccess, isTrue);
+    final (masterSender, receivedByVisitor) = await visitorApplicationMessage;
+    expect(masterSender, equals(const ParticipantId('master-device')));
+    expect(receivedByVisitor, equals(visitorPayload));
+  });
+
+  test(
+      'a role-violating envelope (requiresMasterRole from a non-master visitor) never reaches applicationMessages (T8)',
+      () async {
+    final bus = StreamController<DiscoveredRoom>.broadcast();
+    final master = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('master-device'),
+    );
+    final visitor = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('visitor-device'),
+    );
+    addTearDown(() {
+      master.dispose();
+      visitor.dispose();
+      bus.close();
+    });
+
+    await _connectAndApprove(master, visitor, bus);
+
+    final received = <(ParticipantId, Uint8List)>[];
+    master.applicationMessages.listen(received.add);
+
+    final sendResult = await visitor.sendEnvelope(
+      Uint8List.fromList([4, 5, 6]),
+      requiresMasterRole: true,
+    );
+    expect(sendResult.isSuccess, isTrue, reason: 'the wire send itself succeeds; rejection happens at the role gate on receipt');
+
+    // Give the loopback TCP round trip time to complete, well under the
+    // test's own timeout, then assert nothing was ever published.
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+    expect(received, isEmpty);
+  });
+
+  test(
+      'broadcastEnvelope reaches every connected participant; sendEnvelopeTo reaches exactly the targeted one (T8)',
+      () async {
+    final bus = StreamController<DiscoveredRoom>.broadcast();
+    final master = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('master-device'),
+    );
+    final visitorA = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('visitor-a'),
+    );
+    final visitorB = RoomSessionController(
+      transport: TcpSessionTransport(),
+      discovery: _FakeRoomDiscovery(bus),
+      handshakeService: HandshakeService(),
+      selfDeviceId: const DeviceId('visitor-b'),
+    );
+    addTearDown(() {
+      master.dispose();
+      visitorA.dispose();
+      visitorB.dispose();
+      bus.close();
+    });
+
+    final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+    master.snapshots.listen(masterSnapshots.add);
+    final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
+
+    final discoveredForA = StreamController<DiscoveredRoom>.broadcast();
+    visitorA.discoverRooms().listen(discoveredForA.add);
+    final discoveredForAFuture = discoveredForA.stream.first;
+    final discoveredForB = StreamController<DiscoveredRoom>.broadcast();
+    visitorB.discoverRooms().listen(discoveredForB.add);
+    final discoveredForBFuture = discoveredForB.stream.first;
+
+    await master.createRoom();
+    await masterSnapshotQueue.moveNext();
+    final code = masterSnapshotQueue.current.room.code;
+
+    final discoveredRoomA =
+        await discoveredForAFuture.timeout(const Duration(seconds: 5));
+    final discoveredRoomB =
+        await discoveredForBFuture.timeout(const Duration(seconds: 5));
+
+    final joinA = visitorA.requestJoin(discoveredRoomA.id, code);
+    ParticipantSession? pendingA;
+    while (pendingA == null) {
+      await masterSnapshotQueue.moveNext();
+      pendingA = _findPending(masterSnapshotQueue.current);
+    }
+    await master.approve(pendingA.id);
+    await joinA.timeout(const Duration(seconds: 5));
+
+    final joinB = visitorB.requestJoin(discoveredRoomB.id, code);
+    ParticipantSession? pendingB;
+    while (pendingB == null) {
+      await masterSnapshotQueue.moveNext();
+      pendingB = masterSnapshotQueue.current.participants
+          .where((p) =>
+              p.state == ParticipantState.pendingApproval && p.id != pendingA!.id)
+          .firstOrNull;
+    }
+    await master.approve(pendingB.id);
+    await joinB.timeout(const Duration(seconds: 5));
+
+    // Wait until both participants show connected before broadcasting.
+    bool bothConnected = false;
+    while (!bothConnected) {
+      await masterSnapshotQueue.moveNext();
+      final snapshot = masterSnapshotQueue.current;
+      bothConnected = snapshot.participants
+              .where((p) =>
+                  p.id == pendingA!.id && p.state == ParticipantState.connected)
+              .isNotEmpty &&
+          snapshot.participants
+              .where((p) =>
+                  p.id == pendingB!.id && p.state == ParticipantState.connected)
+              .isNotEmpty;
+    }
+
+    final broadcastPayload = Uint8List.fromList([7, 7, 7]);
+    final aMessage =
+        visitorA.applicationMessages.first.timeout(const Duration(seconds: 5));
+    final bMessage =
+        visitorB.applicationMessages.first.timeout(const Duration(seconds: 5));
+    await master.broadcastEnvelope(broadcastPayload);
+    final (_, receivedByA) = await aMessage;
+    final (_, receivedByB) = await bMessage;
+    expect(receivedByA, equals(broadcastPayload));
+    expect(receivedByB, equals(broadcastPayload));
+
+    // sendEnvelopeTo(A only) must not also reach B.
+    final targetedPayload = Uint8List.fromList([1, 1, 1]);
+    final bReceivedTargeted = <Uint8List>[];
+    visitorB.applicationMessages.listen((event) => bReceivedTargeted.add(event.$2));
+    final targetedMessage =
+        visitorA.applicationMessages.first.timeout(const Duration(seconds: 5));
+    await master.sendEnvelopeTo(pendingA.id, targetedPayload);
+    final (_, receivedTargeted) = await targetedMessage;
+    expect(receivedTargeted, equals(targetedPayload));
+    await Future<void>.delayed(const Duration(milliseconds: 300));
+    expect(bReceivedTargeted, isEmpty);
+  });
+}
+
+/// Shared setup for the T8 applicationMessages tests: creates a room on
+/// [master], requests + approves a join from [visitor] over real loopback
+/// TCP, and waits until the master's snapshot shows the participant
+/// connected (handshake complete). Returns the connected participant's
+/// session as seen by the master.
+Future<ParticipantSession> _connectAndApprove(
+  RoomSessionController master,
+  RoomSessionController visitor,
+  StreamController<DiscoveredRoom> bus,
+) async {
+  final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+  master.snapshots.listen(masterSnapshots.add);
+  final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
+
+  final discoveredRooms = StreamController<DiscoveredRoom>.broadcast();
+  visitor.discoverRooms().listen(discoveredRooms.add);
+  final discoveredRoomFuture = discoveredRooms.stream.first;
+
+  await master.createRoom();
+  await masterSnapshotQueue.moveNext();
+  final code = masterSnapshotQueue.current.room.code;
+
+  final discoveredRoom =
+      await discoveredRoomFuture.timeout(const Duration(seconds: 5));
+  final joinResultFuture = visitor.requestJoin(discoveredRoom.id, code);
+
+  ParticipantSession? pending;
+  while (pending == null) {
+    await masterSnapshotQueue.moveNext();
+    pending = _findPending(masterSnapshotQueue.current);
+  }
+  await master.approve(pending.id);
+  await joinResultFuture.timeout(const Duration(seconds: 5));
+
+  ParticipantSession? connected;
+  while (connected == null || connected.state != ParticipantState.connected) {
+    await masterSnapshotQueue.moveNext();
+    connected = masterSnapshotQueue.current.participants
+        .where((p) => p.id == pending!.id)
+        .firstOrNull;
+  }
+  return connected;
 }
 
 class _RecordingRoomDiscovery implements RoomDiscovery {

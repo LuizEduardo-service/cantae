@@ -249,10 +249,10 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `applicationMessages` stream emits only after successful envelope verification on both master and visitor paths; a bad-HMAC/replay/wrong-role envelope never reaches it (reuses the exact rejection paths Phase 3's `NET` tests already proved)
-- [ ] `sendEnvelopeTo`/`broadcastEnvelope` sign with the correct per-connection sequence and reach every currently-connected participant (broadcast) or exactly one (targeted)
-- [ ] Extended `test/data/session/room_session_controller_test.dart` covers: a verified payload surfaces on `applicationMessages`; a role-violating envelope does not; `broadcastEnvelope` reaches 2+ connected participants in a 3-device loopback scenario
-- [ ] `flutter test test/data/session` passes; full suite still green (`flutter test`)
+- [x] `applicationMessages` stream emits only after successful envelope verification on both master and visitor paths; a bad-HMAC/replay/wrong-role envelope never reaches it (reuses the exact rejection paths Phase 3's `NET` tests already proved)
+- [x] `sendEnvelopeTo`/`broadcastEnvelope` sign with the correct per-connection sequence and reach every currently-connected participant (broadcast) or exactly one (targeted)
+- [x] Extended `test/data/session/room_session_controller_test.dart` covers: a verified payload surfaces on `applicationMessages`; a role-violating envelope does not; `broadcastEnvelope` reaches 2+ connected participants in a 3-device loopback scenario
+- [x] `flutter test test/data/session` passes; full suite still green (`flutter test`)
 
 **Tests**: E2E (loopback TCP, two/three real `RoomSessionController`s)
 **Gate**: full
