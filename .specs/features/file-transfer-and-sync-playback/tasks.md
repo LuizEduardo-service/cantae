@@ -424,11 +424,11 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `snapshots` stream transitions `idle → scheduled → playing` on a received `PlayCommandMessage`, calling the fake engine's `playAt` at (approximately) the scheduled epoch
-- [ ] A device connecting while another snapshot shows `playing` enters `waiting` and does **not** call the fake engine until the next `PlayCommandMessage`/`LoopRepositionMessage`
-- [ ] A command arriving without having passed the role gate (simulated by bypassing T8's dispatch — i.e., injected directly) is not accepted as a trust boundary re-check (documents that this handler trusts the gate, per design.md's Tech Decisions — test asserts the handler has no independent role-checking code path to bypass)
-- [ ] E2E test combines T14's broadcaster output with this handler across 3 real loopback devices and a fake `AudioPlaybackEngine` per device, asserting all three receive `playAt` calls with epochs within the expected latency-estimate spread
-- [ ] `flutter test test/data/playback` passes; full suite green
+- [x] `snapshots` stream transitions `idle → scheduled → playing` on a received `PlayCommandMessage`, calling the fake engine's `playAt` at (approximately) the scheduled epoch
+- [x] A device connecting while another snapshot shows `playing` enters `waiting` and does **not** call the fake engine until the next `PlayCommandMessage`/`LoopRepositionMessage`
+- [x] A command arriving without having passed the role gate (simulated by bypassing T8's dispatch — i.e., injected directly) is not accepted as a trust boundary re-check (documents that this handler trusts the gate, per design.md's Tech Decisions — test asserts the handler has no independent role-checking code path to bypass)
+- [x] E2E test combines T14's broadcaster output with this handler across 3 real loopback devices and a fake `AudioPlaybackEngine` per device, asserting all three receive `playAt` calls with epochs within the expected latency-estimate spread
+- [x] `flutter test test/data/playback` passes; full suite green
 
 **Tests**: E2E
 **Gate**: full

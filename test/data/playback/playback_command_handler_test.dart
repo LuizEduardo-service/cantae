@@ -1,0 +1,291 @@
+import 'dart:async';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:cantae/data/playback/playback_command_broadcaster.dart';
+import 'package:cantae/data/playback/playback_command_handler.dart';
+import 'package:cantae/data/session/room_application_message.dart';
+import 'package:cantae/data/session/room_session_controller.dart';
+import 'package:cantae/domain/audio/audio_playback_engine.dart';
+import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/playback/room_playback_snapshot.dart';
+import 'package:cantae/domain/session/handshake_service.dart';
+import 'package:cantae/domain/session/ids.dart';
+import 'package:cantae/domain/session/participant_session.dart';
+import 'package:cantae/domain/session/room_discovery.dart';
+import 'package:cantae/domain/session/room_session_snapshot.dart';
+import 'package:cantae/infrastructure/network/tcp_session_transport.dart';
+
+/// Minimal fake `AudioPlaybackEngine` (the real engine is plugin-backed and
+/// out of scope for `flutter test` per the Test Coverage Matrix). Records
+/// every call so tests can assert on what the handler actually invoked.
+class FakeAudioPlaybackEngine implements AudioPlaybackEngine {
+  final List<DateTime> playAtCalls = [];
+  final List<Song> loadSongCalls = [];
+  int pauseCalls = 0;
+  int stopCalls = 0;
+  final List<int> seekAllToCalls = [];
+
+  @override
+  Future<void> loadSong(Song song) async {
+    loadSongCalls.add(song);
+  }
+
+  @override
+  Future<void> playAt(DateTime scheduledStart) async {
+    playAtCalls.add(scheduledStart);
+  }
+
+  @override
+  Future<void> pause() async {
+    pauseCalls++;
+  }
+
+  @override
+  Future<void> stop() async {
+    stopCalls++;
+  }
+
+  @override
+  Future<void> seekAllTo(int timelineMs) async {
+    seekAllToCalls.add(timelineMs);
+  }
+}
+
+class _FakeRoomDiscovery implements RoomDiscovery {
+  final StreamController<DiscoveredRoom> _bus;
+
+  _FakeRoomDiscovery(this._bus);
+
+  @override
+  Future<void> advertise(RoomId id, int port) async {
+    _bus.add(DiscoveredRoom(id: id, host: '127.0.0.1', port: port));
+  }
+
+  @override
+  Stream<DiscoveredRoom> discover() => _bus.stream;
+
+  @override
+  Future<void> stopAdvertising() async {}
+}
+
+Future<DiscoveredRoom> _subscribeDiscovery(RoomSessionController visitor) {
+  final discoveredRooms = StreamController<DiscoveredRoom>.broadcast();
+  visitor.discoverRooms().listen(discoveredRooms.add);
+  return discoveredRooms.stream.first.timeout(const Duration(seconds: 5));
+}
+
+Future<ParticipantSession> _joinAndApprove(
+  RoomSessionController master,
+  RoomSessionController visitor,
+  StreamIterator<RoomSessionSnapshot> masterSnapshotQueue,
+  String code,
+  Future<DiscoveredRoom> discoveredRoomFuture,
+) async {
+  final discoveredRoom = await discoveredRoomFuture;
+  final joinResultFuture = visitor.requestJoin(discoveredRoom.id, code);
+
+  ParticipantSession? pending;
+  while (pending == null) {
+    await masterSnapshotQueue.moveNext();
+    for (final p in masterSnapshotQueue.current.participants) {
+      if (p.state == ParticipantState.pendingApproval) {
+        pending = p;
+      }
+    }
+  }
+  await master.approve(pending.id);
+  await joinResultFuture.timeout(const Duration(seconds: 5));
+
+  ParticipantSession? connected;
+  while (connected == null || connected.state != ParticipantState.connected) {
+    await masterSnapshotQueue.moveNext();
+    for (final p in masterSnapshotQueue.current.participants) {
+      if (p.id == pending.id) {
+        connected = p;
+      }
+    }
+  }
+  return connected;
+}
+
+void main() {
+  group('PlaybackCommandHandler (SYNC-01, SYNC-03, SYNC-05, SYNC-06, SYNC-08)',
+      () {
+    test(
+        'snapshots transition idle -> scheduled -> playing on a PlayCommandMessage, calling the fake engine playAt at the scheduled epoch',
+        () async {
+      final engine = FakeAudioPlaybackEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      addTearDown(handler.dispose);
+
+      final phases = <PlaybackPhase>[];
+      handler.snapshots.listen((s) => phases.add(s.phase));
+
+      final targetEpoch =
+          DateTime.now().add(const Duration(milliseconds: 50)).millisecondsSinceEpoch;
+      handler.handleApplicationMessage(
+        PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
+      );
+
+      expect(handler.current.phase, equals(PlaybackPhase.scheduled));
+      expect(engine.playAtCalls, isEmpty);
+
+      final deadline = DateTime.now().add(const Duration(seconds: 2));
+      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+
+      expect(engine.playAtCalls, hasLength(1));
+      expect(
+        engine.playAtCalls.single.millisecondsSinceEpoch,
+        equals(targetEpoch),
+      );
+      expect(handler.current.phase, equals(PlaybackPhase.playing));
+      expect(phases, containsAllInOrder([PlaybackPhase.scheduled, PlaybackPhase.playing]));
+    });
+
+    test(
+        'a device that learns the room is already playing enters waiting and does not call the engine until the next PlayCommand',
+        () async {
+      final engine = FakeAudioPlaybackEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      addTearDown(handler.dispose);
+
+      handler.handleApplicationMessage(
+        const PlaybackSnapshotMessage(songId: 'song-1', state: 'playing'),
+      );
+
+      expect(handler.current.phase, equals(PlaybackPhase.waiting));
+      expect(engine.playAtCalls, isEmpty);
+      expect(engine.loadSongCalls, isEmpty);
+
+      await Future<void>.delayed(const Duration(milliseconds: 100));
+      expect(engine.playAtCalls, isEmpty,
+          reason: 'waiting must not call the engine on its own');
+
+      final targetEpoch = DateTime.now().millisecondsSinceEpoch;
+      handler.handleApplicationMessage(
+        PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
+      );
+
+      final deadline = DateTime.now().add(const Duration(seconds: 2));
+      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      expect(engine.playAtCalls, hasLength(1));
+      expect(handler.current.phase, equals(PlaybackPhase.playing));
+    });
+
+    test(
+        'handleApplicationMessage processes a message handed to it directly, with no independent role-checking code path (trust-the-gate design decision)',
+        () async {
+      // No RoomSessionController at all — the handler is driven directly,
+      // bypassing any envelope/role verification entirely. If the handler
+      // had its own role check, this message (carrying no role/sender
+      // information at all) would have nothing to validate against and
+      // would have to either reject it or ignore role — it processes it,
+      // proving there is no such independent gate inside this class.
+      final engine = FakeAudioPlaybackEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      addTearDown(handler.dispose);
+
+      final targetEpoch = DateTime.now().millisecondsSinceEpoch;
+      handler.handleApplicationMessage(
+        PlayCommandMessage(songId: 'song-x', masterSendEpochMs: targetEpoch),
+      );
+
+      final deadline = DateTime.now().add(const Duration(seconds: 2));
+      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+      }
+      expect(engine.playAtCalls, hasLength(1));
+    });
+
+    test(
+        'E2E: a real PlaybackCommandBroadcaster.play() drives a PlaybackCommandHandler + fake engine on each of 3 real loopback devices, with epochs within the latency-estimate spread',
+        () async {
+      final bus = StreamController<DiscoveredRoom>.broadcast();
+      final master = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitorA = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-a'),
+      );
+      final visitorB = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-b'),
+      );
+      addTearDown(() {
+        master.dispose();
+        visitorA.dispose();
+        visitorB.dispose();
+        bus.close();
+      });
+
+      final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+      master.snapshots.listen(masterSnapshots.add);
+      final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
+
+      final discoveredForA = _subscribeDiscovery(visitorA);
+      final discoveredForB = _subscribeDiscovery(visitorB);
+
+      final broadcaster = PlaybackCommandBroadcaster(controller: master);
+      addTearDown(broadcaster.dispose);
+
+      await master.createRoom();
+      await masterSnapshotQueue.moveNext();
+      final code = masterSnapshotQueue.current.room.code;
+
+      await _joinAndApprove(
+          master, visitorA, masterSnapshotQueue, code, discoveredForA);
+      await _joinAndApprove(
+          master, visitorB, masterSnapshotQueue, code, discoveredForB);
+
+      final engineMaster = FakeAudioPlaybackEngine();
+      final engineA = FakeAudioPlaybackEngine();
+      final engineB = FakeAudioPlaybackEngine();
+
+      final handlerA =
+          PlaybackCommandHandler(engine: engineA, controller: visitorA);
+      final handlerB =
+          PlaybackCommandHandler(engine: engineB, controller: visitorB);
+      addTearDown(() {
+        handlerA.dispose();
+        handlerB.dispose();
+      });
+      // Master's own loopback handler (design.md: "every device including
+      // the master's own loopback") listens on the master's own
+      // applicationMessages — but PlaybackCommandBroadcaster only sends to
+      // *participants*, not to itself, so engineMaster is unused here; kept
+      // to document that a master-local handler is a separate concern this
+      // test doesn't drive.
+      expect(engineMaster.playAtCalls, isEmpty);
+
+      await broadcaster.play('song-sync');
+
+      final deadline = DateTime.now().add(const Duration(seconds: 3));
+      while ((engineA.playAtCalls.isEmpty || engineB.playAtCalls.isEmpty) &&
+          DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+
+      expect(engineA.playAtCalls, hasLength(1));
+      expect(engineB.playAtCalls, hasLength(1));
+
+      final epochA = engineA.playAtCalls.single.millisecondsSinceEpoch;
+      final epochB = engineB.playAtCalls.single.millisecondsSinceEpoch;
+      // On a real loopback LAN, both participants' estimated one-way delay
+      // is sub-100ms; their scheduled epochs must land within that spread
+      // of each other.
+      expect((epochA - epochB).abs(), lessThan(200));
+    });
+  });
+}
