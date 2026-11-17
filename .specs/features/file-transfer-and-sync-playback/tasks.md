@@ -450,9 +450,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] Implements every `AudioPlaybackEngine` method; `package:just_audio` is imported nowhere else in the codebase (`check_layers.py` would also catch an accidental domain import, but this confirms the infra-only boundary by inspection)
-- [ ] Device integration test (Phase 6, T18) is the verification vehicle — this task's "done" is compile-clean + manual smoke confirmation is deferred to T18, consistent with the plugin-backed row in the Test Coverage Matrix
-- [ ] `flutter analyze` reports 0 new issues; `python scripts/check_layers.py --root .` still passes
+- [x] Implements every `AudioPlaybackEngine` method; `package:just_audio` is imported nowhere else in the codebase (`check_layers.py` would also catch an accidental domain import, but this confirms the infra-only boundary by inspection)
+- [x] Device integration test (Phase 6, T18) is the verification vehicle — this task's "done" is compile-clean + manual smoke confirmation is deferred to T18, consistent with the plugin-backed row in the Test Coverage Matrix
+- [x] `flutter analyze` reports 0 new issues; `python scripts/check_layers.py --root .` still passes
 
 **Tests**: e2e (deferred to T18's real-device integration_test — this task has no standalone `flutter test` coverage per the matrix, since `just_audio` requires platform channels unavailable there)
 **Gate**: build
