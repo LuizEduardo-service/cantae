@@ -139,9 +139,9 @@ Phases 1-3 built the audio domain math (mix, loop, metronome, timeline), the loc
 | SYNC-06 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-07 | P1: Synchronized multi-track playback | Design | Implementing |
 | SYNC-08 | P1: Synchronized multi-track playback | Design | Implementing |
-| BG-01 | P2: Background audio | Design | Pending |
-| BG-02 | P2: Background audio | Design | Pending |
-| BG-03 | P2: Background audio | Design | Pending |
+| BG-01 | P2: Background audio | Design | Implementing |
+| BG-02 | P2: Background audio | Design | Implementing |
+| BG-03 | P2: Background audio | Design | Implementing |
 | BG-04 | P2: Background audio | Design | Implementing |
 
 **ID format:** `[CATEGORY]-[NUMBER]` — `XFER` (file transfer), `SYNC` (synchronized playback), `BG` (background audio).

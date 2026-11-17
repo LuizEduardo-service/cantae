@@ -474,9 +474,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `play()`/`pause()`/`stop()` call into `PlaybackCommandBroadcaster`, not the engine directly (a visitor-role background tap is therefore rejected by the same gate as an in-app one — no separate check needed here)
-- [ ] Focus-loss handling pauses locally only (verified in T18, not here — no platform channel under `flutter test`)
-- [ ] `flutter analyze` reports 0 new issues; `python scripts/check_layers.py --root .` still passes
+- [x] `play()`/`pause()`/`stop()` call into `PlaybackCommandBroadcaster`, not the engine directly (a visitor-role background tap is therefore rejected by the same gate as an in-app one — no separate check needed here)
+- [x] Focus-loss handling pauses locally only (verified in T18, not here — no platform channel under `flutter test`)
+- [x] `flutter analyze` reports 0 new issues; `python scripts/check_layers.py --root .` still passes
 
 **Tests**: e2e (deferred to T18, same plugin constraint as T16)
 **Gate**: build
