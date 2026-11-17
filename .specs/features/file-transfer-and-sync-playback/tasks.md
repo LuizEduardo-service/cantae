@@ -522,9 +522,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `python scripts/check_layers.py --root .` exits 0
-- [ ] `dart analyze lib/domain/` reports 0 issues
-- [ ] `flutter analyze && flutter test` (full suite) both pass
+- [x] `python scripts/check_layers.py --root .` exits 0
+- [x] `dart analyze lib/domain/` reports 0 issues
+- [x] `flutter analyze && flutter test` (full suite) both pass
 
 **Tests**: none (verification-only task)
 **Gate**: build
