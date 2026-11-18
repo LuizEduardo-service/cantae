@@ -34,6 +34,7 @@ class RoomSessionController {
 
   final _snapshotsController =
       StreamController<RoomSessionSnapshot>.broadcast();
+  RoomSessionSnapshot? _lastSnapshot;
   final _applicationMessagesController =
       StreamController<(ParticipantId, Uint8List)>.broadcast();
   final Map<RoomId, DiscoveredRoom> _knownRooms = {};
@@ -71,6 +72,13 @@ class RoomSessionController {
         _random = random ?? Random.secure();
 
   Stream<RoomSessionSnapshot> get snapshots => _snapshotsController.stream;
+
+  /// The most recently emitted [RoomSessionSnapshot], if any — lets a late
+  /// subscriber (e.g. [PlaybackCommandBroadcaster] constructed after the
+  /// room's participants are already connected) read the current room state
+  /// synchronously instead of waiting for the next broadcast-stream event,
+  /// which `StreamController.broadcast()` never replays to new listeners.
+  RoomSessionSnapshot? get currentSnapshot => _lastSnapshot;
 
   /// Emits (sender, payload) only after the inbound envelope has passed the
   /// existing verification gate — `acceptEnvelope` on the master side,
@@ -494,10 +502,12 @@ class RoomSessionController {
     if (machine == null) {
       return;
     }
-    _snapshotsController.add(
-      RoomSessionSnapshot(
-          room: machine.room, participants: machine.allParticipants),
+    final snapshot = RoomSessionSnapshot(
+      room: machine.room,
+      participants: machine.allParticipants,
     );
+    _lastSnapshot = snapshot;
+    _snapshotsController.add(snapshot);
   }
 
   String _generateRoomId() => List.generate(

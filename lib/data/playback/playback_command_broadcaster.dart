@@ -40,6 +40,14 @@ class PlaybackCommandBroadcaster {
   })  : _controller = controller,
         _now = now ?? DateTime.now,
         _random = random ?? Random.secure() {
+    // Seed synchronously from whatever room state already exists: a
+    // broadcast stream never replays past events to a new listener, so a
+    // broadcaster constructed after participants are already connected
+    // (e.g. the master's post-join playback-command wiring, or this
+    // controller simply having been alive for a while) would otherwise sit
+    // with an empty participant list — and silently broadcast to nobody —
+    // until the next unrelated snapshot event happens to fire.
+    _latestSnapshot = _controller.currentSnapshot;
     _snapshotSubscription = _controller.snapshots.listen((snapshot) {
       _latestSnapshot = snapshot;
     });

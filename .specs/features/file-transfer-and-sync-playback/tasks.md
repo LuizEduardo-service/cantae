@@ -498,9 +498,9 @@ T18, then T19 (dependencies shown in the Phase Execution Map below).
 - Skill: NONE
 
 **Done when**:
-- [ ] `flutter test -d <device-id> integration_test/file_transfer_and_sync_playback_test.dart` reports `All tests passed!` on a connected physical device
-- [ ] Test log captures: real transfer completing with a hash-validated file in the library, real `playAt` producing audible output, real background continuation after screen lock, a lock-screen control tap pausing playback
-- [ ] The multi-device timing limitation is written into the test file's doc comment and will be carried into `validation.md` by the Verifier
+- [x] `flutter test -d <device-id> integration_test/file_transfer_and_sync_playback_test.dart` reports `All tests passed!` on a connected physical device
+- [x] Test log captures: real transfer completing with a hash-validated file in the library, real `playAt` producing audible output, real background continuation after screen lock, a lock-screen control tap pausing playback
+- [x] The multi-device timing limitation is written into the test file's doc comment and will be carried into `validation.md` by the Verifier
 
 **Tests**: e2e (real device)
 **Gate**: device
