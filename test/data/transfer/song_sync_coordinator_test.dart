@@ -377,40 +377,112 @@ void main() {
     });
 
     test(
-        'a coordinator built on a visitor-role controller (no state machine) sends nothing (XFER-09: cannot initiate a transfer)',
+        'a visitor that IS connected to a real room is still rejected when it attempts to initiate a transfer (XFER-09: role-gate rejection, not a no-op)',
         () async {
+      // The original version of this test drove a visitor controller that
+      // never created/joined a room, so `connectedParticipants` was
+      // trivially empty and `syncSongToRoom` "succeeded" by having nothing
+      // to do — that proves "nothing to send to", not an active role-gate
+      // rejection. This version connects the visitor to a real master room
+      // (full join + approve + handshake, same as every other test in this
+      // file) and then has that connected visitor directly attempt to send
+      // a track via its own `ChunkedFileSender`, exercising the actual
+      // enforcement mechanism: a visitor's `RoomSessionController` never
+      // runs `createRoom()`, so it never has a `_stateMachine`, so every
+      // `sendEnvelopeTo` call `ChunkedFileSender.sendTrack` makes (to
+      // deliver `TransferBeginMessage`/`ChunkDataMessage`) fails with
+      // `NotFoundFailure(code: 'session.participant-not-found')` and never
+      // touches the transport — `sendTrack` itself doesn't check that
+      // per-send result, so it surfaces as a retry-exhaustion
+      // `NetworkFailure(code: 'transfer.chunk-delivery-failed')` once no
+      // ACK ever arrives, but the master-side proof is sharper: nothing the
+      // visitor sends ever reaches `master.applicationMessages`, because it
+      // never left the visitor's controller in the first place.
+      //
+      // (A `SongSyncCoordinator` built on the visitor's own controller
+      // would still be a no-op for a different, structural reason: a
+      // visitor's `snapshots` stream never emits at all, because
+      // `_emitSnapshot()` short-circuits when `_stateMachine` is null — so
+      // routing this through the coordinator would silently reproduce the
+      // same vacuous "nothing to send to" shape this fix is removing.
+      // Calling `sendTrack` directly is what actually exercises the gate.)
       final bus = StreamController<DiscoveredRoom>.broadcast();
-      final visitorOnly = RoomSessionController(
+      final master = RoomSessionController(
         transport: TcpSessionTransport(),
         discovery: _FakeRoomDiscovery(bus),
         handshakeService: HandshakeService(),
-        selfDeviceId: const DeviceId('visitor-only-device'),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitor = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-device'),
       );
       addTearDown(() {
-        visitorOnly.dispose();
+        master.dispose();
+        visitor.dispose();
         bus.close();
       });
 
-      final sender = ChunkedFileSender(controller: visitorOnly);
-      final coordinator =
-          SongSyncCoordinator(controller: visitorOnly, sender: sender);
-      addTearDown(coordinator.dispose);
+      final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+      master.snapshots.listen(masterSnapshots.add);
+      final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
 
-      final sourceDir = Directory.systemTemp.createTempSync('sync_visitor_only');
-      addTearDown(() => sourceDir.deleteSync(recursive: true));
-      final file = _writeSmallFile(sourceDir, 'track.bin', 10);
-      final song = Song(
-        id: 'song-visitor-only',
-        name: 'Visitor Only Song',
-        author: 'test',
-        tracks: [SongTrack(id: 'track-x', filePath: file.path, naipe: Naipe.soprano)],
+      final discoveredRoomFuture = _subscribeDiscovery(visitor);
+      await master.createRoom();
+      await masterSnapshotQueue.moveNext();
+      final code = masterSnapshotQueue.current.room.code;
+
+      // Full join/approve/handshake — the visitor really is `connected`,
+      // not just instantiated.
+      await _joinAndApprove(
+          master, visitor, masterSnapshotQueue, code, discoveredRoomFuture);
+
+      // Short timeouts/one attempt: the rejection happens instantly inside
+      // `sendEnvelopeTo` (no `_stateMachine`), so there is nothing to
+      // actually wait out — these just bound how long the test spends
+      // watching `sendTrack` run through its (doomed) retry loop.
+      final sender = ChunkedFileSender(
+        controller: visitor,
+        maxAttemptsPerChunk: 1,
+        ackTimeout: const Duration(milliseconds: 100),
+        resumeProbeTimeout: const Duration(milliseconds: 50),
       );
 
-      // No room was ever created on this controller, so it never has a
-      // connected-participant snapshot to fan out to — the structural
-      // enforcement of "a visitor device cannot initiate a transfer".
-      final result = await coordinator.syncSongToRoom(song);
-      expect(result.isSuccess, isTrue, reason: 'no participants to send to is a trivial success, not an error');
+      final masterReceived = <RoomApplicationMessage>[];
+      master.applicationMessages.listen(
+        (event) => masterReceived.add(RoomApplicationMessage.decode(event.$2)),
+      );
+
+      final sourceDir = Directory.systemTemp.createTempSync('sync_visitor_connected');
+      addTearDown(() => sourceDir.deleteSync(recursive: true));
+      final file = _writeSmallFile(sourceDir, 'track.bin', 10);
+      final track = SongTrack(
+        id: 'track-x',
+        filePath: file.path,
+        naipe: Naipe.soprano,
+      );
+
+      final result = await sender.sendTrack(
+        songId: 'song-visitor-initiated',
+        track: track,
+        to: const ParticipantId('master-device'),
+      );
+
+      expect(result.isFailure, isTrue,
+          reason: 'a connected visitor must still be rejected when it '
+              'tries to initiate a transfer, not merely have nothing to '
+              'send to');
+      result.when(
+        success: (_) => fail('expected a failure, got success'),
+        failure: (f) =>
+            expect(f.code, equals('transfer.chunk-delivery-failed')),
+      );
+      expect(masterReceived, isEmpty,
+          reason: 'the real role-gate proof: nothing the rejected visitor '
+              'attempted to send ever reached the master at all — this is '
+              'an active structural rejection, not "nothing to send to"');
     });
   });
 }
