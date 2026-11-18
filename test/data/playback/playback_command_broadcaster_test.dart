@@ -297,5 +297,81 @@ void main() {
       await Future<void>.delayed(const Duration(milliseconds: 500));
       expect(received, isEmpty);
     });
+
+    test(
+        'regression: a PlaybackCommandBroadcaster constructed AFTER a participant has already joined and connected still reaches that participant on the very first play() call',
+        () async {
+      // Reproduces the exact ordering the production race fix
+      // (`RoomSessionController.currentSnapshot` + the broadcaster's
+      // constructor-time synchronous seed from it) guards against: every
+      // other test in this file constructs the broadcaster BEFORE
+      // createRoom()/joins happen, so none of them would catch a
+      // regression of that fix. Here the join/approve/connect sequence
+      // completes FIRST, and the broadcaster is only constructed
+      // afterwards — if `currentSnapshot`/the synchronous seed were
+      // removed, the broadcaster would see an empty participant list
+      // (the broadcast `snapshots` stream never replays past events to a
+      // new listener) and `play()` would silently reach nobody.
+      final bus = StreamController<DiscoveredRoom>.broadcast();
+      final master = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitor = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-device'),
+      );
+      addTearDown(() {
+        master.dispose();
+        visitor.dispose();
+        bus.close();
+      });
+
+      final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+      master.snapshots.listen(masterSnapshots.add);
+      final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
+
+      final discoveredRoomFuture = _subscribeDiscovery(visitor);
+
+      // No broadcaster yet — the room is created and the participant joins
+      // and is approved all the way to `connected` with no
+      // `PlaybackCommandBroadcaster` in existence.
+      await master.createRoom();
+      await masterSnapshotQueue.moveNext();
+      final code = masterSnapshotQueue.current.room.code;
+      await _joinAndApprove(
+          master, visitor, masterSnapshotQueue, code, discoveredRoomFuture);
+
+      _attachLatencyProbeResponder(visitor);
+
+      final received = <RoomApplicationMessage>[];
+      visitor.applicationMessages.listen((event) {
+        received.add(RoomApplicationMessage.decode(event.$2));
+      });
+
+      // Constructed only now, strictly after the participant is already
+      // connected.
+      final broadcaster = PlaybackCommandBroadcaster(controller: master);
+      addTearDown(broadcaster.dispose);
+
+      await broadcaster.play('song-race');
+
+      final deadline = DateTime.now().add(const Duration(seconds: 3));
+      while (received.whereType<PlayCommandMessage>().isEmpty &&
+          DateTime.now().isBefore(deadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+
+      final playCommands = received.whereType<PlayCommandMessage>().toList();
+      expect(playCommands, hasLength(1),
+          reason: 'the already-connected participant must still receive '
+              'the PlayCommandMessage — zero would mean the broadcaster '
+              'saw an empty participant list at construction time');
+      expect(playCommands.single.songId, equals('song-race'));
+    });
   });
 }
