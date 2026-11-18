@@ -287,5 +287,100 @@ void main() {
       // of each other.
       expect((epochA - epochB).abs(), lessThan(200));
     });
+
+    test(
+        'E2E (SYNC-06): a participant that joins AFTER the master already called play() receives a production-sent PlaybackSnapshotMessage and enters waiting, without the test driving handleApplicationMessage directly',
+        () async {
+      final bus = StreamController<DiscoveredRoom>.broadcast();
+      final master = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitorA = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-a'),
+      );
+      final visitorB = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-b'),
+      );
+      addTearDown(() {
+        master.dispose();
+        visitorA.dispose();
+        visitorB.dispose();
+        bus.close();
+      });
+
+      final masterSnapshots = StreamController<RoomSessionSnapshot>.broadcast();
+      master.snapshots.listen(masterSnapshots.add);
+      final masterSnapshotQueue = StreamIterator(masterSnapshots.stream);
+
+      final discoveredForA = _subscribeDiscovery(visitorA);
+      // visitorB subscribes to discovery now too, even though it only joins
+      // later: the fake discovery bus is a plain broadcast stream that
+      // never replays past events, and `createRoom()` advertises exactly
+      // once — a subscription started after that call would never see it.
+      final discoveredForB = _subscribeDiscovery(visitorB);
+
+      final broadcaster = PlaybackCommandBroadcaster(controller: master);
+      addTearDown(broadcaster.dispose);
+
+      await master.createRoom();
+      await masterSnapshotQueue.moveNext();
+      final code = masterSnapshotQueue.current.room.code;
+
+      // Only visitorA is connected when play() fires.
+      await _joinAndApprove(
+          master, visitorA, masterSnapshotQueue, code, discoveredForA);
+
+      final engineA = FakeAudioPlaybackEngine();
+      final handlerA =
+          PlaybackCommandHandler(engine: engineA, controller: visitorA);
+      addTearDown(handlerA.dispose);
+
+      await broadcaster.play('song-late');
+
+      final aPlayedDeadline = DateTime.now().add(const Duration(seconds: 3));
+      while (engineA.playAtCalls.isEmpty &&
+          DateTime.now().isBefore(aPlayedDeadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+      expect(engineA.playAtCalls, hasLength(1),
+          reason: 'sanity check: the room really is playing before B joins');
+
+      // visitorB requests to join only now, strictly after the play
+      // command above — this is the late-join scenario SYNC-06 covers. Its
+      // handler is wired before the join completes so it is listening when
+      // the master's PlaybackSnapshotMessage (sent automatically by
+      // production code on the new-connection snapshot event, not by this
+      // test) arrives.
+      final engineB = FakeAudioPlaybackEngine();
+      final handlerB =
+          PlaybackCommandHandler(engine: engineB, controller: visitorB);
+      addTearDown(handlerB.dispose);
+
+      await _joinAndApprove(
+          master, visitorB, masterSnapshotQueue, code, discoveredForB);
+
+      final waitingDeadline = DateTime.now().add(const Duration(seconds: 3));
+      while (handlerB.current.phase != PlaybackPhase.waiting &&
+          DateTime.now().isBefore(waitingDeadline)) {
+        await Future<void>.delayed(const Duration(milliseconds: 20));
+      }
+
+      expect(handlerB.current.phase, equals(PlaybackPhase.waiting),
+          reason: 'B must learn the room is already playing and wait, '
+              'via production wiring — this test never calls '
+              'handleApplicationMessage itself');
+      expect(handlerB.current.activeSongId, equals('song-late'));
+      expect(engineB.playAtCalls, isEmpty,
+          reason: 'a late joiner must not cut into mid-stream audio');
+    });
   });
 }

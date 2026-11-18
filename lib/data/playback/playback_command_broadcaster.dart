@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:cantae/domain/playback/latency_estimator.dart';
 import 'package:cantae/domain/session/ids.dart';
@@ -32,6 +33,25 @@ class PlaybackCommandBroadcaster {
   late final StreamSubscription<RoomSessionSnapshot> _snapshotSubscription;
   int _probeCounter = 0;
 
+  // SYNC-06: the master's own view of "is a song currently playing", kept
+  // in sync with the commands this broadcaster has sent out. This is the
+  // source of truth design.md's PlaybackSnapshotMessage reports to a
+  // (re)connecting participant — there is no other place on the master
+  // side that tracks it (each device's own PlaybackCommandHandler only
+  // knows its own state, not the room's).
+  String _lastKnownState = 'idle';
+  String? _lastKnownSongId;
+
+  // Serializes every outgoing `sendEnvelopeTo` call this broadcaster makes
+  // per participant. A newly-connected participant's snapshot send (fired
+  // from the snapshot-stream listener, not awaited by any caller) could
+  // otherwise race against an in-flight `_broadcastCommand` write to that
+  // same participant's socket — two concurrent writes on one
+  // `TcpSessionTransport` connection corrupt the frame stream. Chaining
+  // through this map keeps every send to a given participant strictly
+  // sequential regardless of which call site issued it.
+  final Map<ParticipantId, Future<void>> _sendQueueByParticipant = {};
+
   PlaybackCommandBroadcaster({
     required RoomSessionController controller,
     DateTime Function()? now,
@@ -49,21 +69,74 @@ class PlaybackCommandBroadcaster {
     // until the next unrelated snapshot event happens to fire.
     _latestSnapshot = _controller.currentSnapshot;
     _snapshotSubscription = _controller.snapshots.listen((snapshot) {
+      final previouslyConnected = _connectedIdsOf(_latestSnapshot).toSet();
       _latestSnapshot = snapshot;
+      final nowConnected = _connectedIdsOf(snapshot).toSet();
+      final newlyConnected = nowConnected.difference(previouslyConnected);
+      for (final participantId in newlyConnected) {
+        unawaited(_sendSnapshotTo(participantId));
+      }
     });
   }
 
-  Future<void> play(String songId) => _broadcastCommand(
-        (epoch) => PlayCommandMessage(songId: songId, masterSendEpochMs: epoch),
-      );
+  /// SYNC-06: sends the room's current playback state to one
+  /// newly-(re)connected participant, per design.md's Error Handling
+  /// Strategy ("On connect, RoomSessionController (master side) sends a
+  /// PlaybackSnapshotMessage reflecting current state"). The participant's
+  /// own `PlaybackCommandHandler` decides from this whether to enter
+  /// `waiting` (if `playing`) or stay `idle`.
+  Future<void> _sendSnapshotTo(ParticipantId participantId) {
+    return _sendTo(
+      participantId,
+      PlaybackSnapshotMessage(
+        songId: _lastKnownSongId,
+        state: _lastKnownState,
+      ).encode(),
+      requiresMasterRole: true,
+    );
+  }
+
+  /// Routes every outgoing send through [_sendQueueByParticipant] so sends
+  /// to the same participant from different call sites (a command
+  /// broadcast vs. a new-connection snapshot) never overlap on the wire.
+  Future<void> _sendTo(
+    ParticipantId participantId,
+    Uint8List payload, {
+    bool requiresMasterRole = false,
+  }) {
+    final previous =
+        _sendQueueByParticipant[participantId] ?? Future<void>.value();
+    final next = previous
+        .then((_) => _controller.sendEnvelopeTo(
+              participantId,
+              payload,
+              requiresMasterRole: requiresMasterRole,
+            ))
+        .then((_) {});
+    final guarded = next.catchError((_) {});
+    _sendQueueByParticipant[participantId] = guarded;
+    return guarded;
+  }
+
+  Future<void> play(String songId) {
+    _lastKnownState = 'playing';
+    _lastKnownSongId = songId;
+    return _broadcastCommand(
+      (epoch) => PlayCommandMessage(songId: songId, masterSendEpochMs: epoch),
+    );
+  }
 
   Future<void> pause() => _broadcastCommand(
         (epoch) => PauseCommandMessage(masterSendEpochMs: epoch),
       );
 
-  Future<void> stop() => _broadcastCommand(
-        (epoch) => StopCommandMessage(masterSendEpochMs: epoch),
-      );
+  Future<void> stop() {
+    _lastKnownState = 'idle';
+    _lastKnownSongId = null;
+    return _broadcastCommand(
+      (epoch) => StopCommandMessage(masterSendEpochMs: epoch),
+    );
+  }
 
   Future<void> repositionToLoopStart() => _broadcastCommand(
         (epoch) => LoopRepositionMessage(masterSendEpochMs: epoch),
@@ -77,7 +150,7 @@ class PlaybackCommandBroadcaster {
     for (final participantId in connected) {
       final estimatedDelayMs = await _probeLatency(participantId);
       final scheduledEpoch = masterSendTime + estimatedDelayMs;
-      await _controller.sendEnvelopeTo(
+      await _sendTo(
         participantId,
         buildMessage(scheduledEpoch).encode(),
         requiresMasterRole: true,
@@ -91,7 +164,7 @@ class PlaybackCommandBroadcaster {
 
     final replyFuture = _awaitProbeReply(participant, probeId);
 
-    await _controller.sendEnvelopeTo(
+    await _sendTo(
       participant,
       LatencyProbeMessage(probeId: probeId, masterSendEpochMs: sentAt).encode(),
     );
@@ -128,8 +201,10 @@ class PlaybackCommandBroadcaster {
     }
   }
 
-  List<ParticipantId> _connectedParticipantIds() {
-    final snapshot = _latestSnapshot;
+  List<ParticipantId> _connectedParticipantIds() =>
+      _connectedIdsOf(_latestSnapshot);
+
+  List<ParticipantId> _connectedIdsOf(RoomSessionSnapshot? snapshot) {
     if (snapshot == null) {
       return const [];
     }
