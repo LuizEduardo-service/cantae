@@ -146,6 +146,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 **Tests**: unit
 **Gate**: quick
 
+**Status**: ✅ Complete — 8/8 tests pass (`flutter test test/presentation/theme/`).
+
 ---
 
 ### T5: VoicePartColors
