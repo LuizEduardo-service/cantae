@@ -96,6 +96,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 **Tests**: unit
 **Gate**: quick
 
+**Status**: ✅ Complete — 2/2 tests pass (`flutter test test/presentation/theme/`).
+
 ---
 
 ### T3: CantaeColors ThemeExtension
