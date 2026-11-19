@@ -1,6 +1,7 @@
 import 'package:cantae/domain/entities/lyric_line.dart';
 import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/naipe.dart';
+import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 
 class Song {
@@ -12,6 +13,8 @@ class Song {
   final List<LyricLine> lyrics;
   final MetronomeConfig? metronomeConfig;
   final SongTrack? playbackTrack;
+  final SongOrigin origin;
+  final DateTime? lastRehearsedAt;
 
   const Song({
     required this.id,
@@ -22,6 +25,8 @@ class Song {
     this.lyrics = const [],
     this.metronomeConfig,
     this.playbackTrack,
+    this.origin = SongOrigin.created,
+    this.lastRehearsedAt,
   })  : assert(id.length > 0, 'Song.id must not be empty'),
         assert(name.length > 0, 'Song.name must not be empty');
 

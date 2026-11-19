@@ -124,13 +124,14 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `Song(id: ..., name: ..., author: ...)` (no `origin`/`lastRehearsedAt` passed) still compiles and `origin == SongOrigin.created`, `lastRehearsedAt == null`
-- [ ] A unit test confirms both defaults and an explicit-value round-trip
-- [ ] Gate check passes: `flutter test test/domain/`
-- [ ] Test count: 1+ new test, all existing `Song` tests still pass unmodified
+- [x] `Song(id: ..., name: ..., author: ...)` (no `origin`/`lastRehearsedAt` passed) still compiles and `origin == SongOrigin.created`, `lastRehearsedAt == null`
+- [x] A unit test confirms both defaults and an explicit-value round-trip
+- [x] Gate check passes: `flutter test test/domain/`
+- [x] Test count: 1+ new test, all existing `Song` tests still pass unmodified
 
 **Tests**: unit
 **Gate**: quick
+**Status**: Done
 
 ---
 
