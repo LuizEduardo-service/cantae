@@ -171,6 +171,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 **Tests**: unit
 **Gate**: quick
 
+**Status**: ✅ Complete — 14/14 new assertions (all 7 parts × 2 brightness values), 22/22 total pass (`flutter test test/presentation/theme/`).
+
 ---
 
 ### T6: AppTheme assembly
