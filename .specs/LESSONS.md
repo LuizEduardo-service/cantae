@@ -44,6 +44,30 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: test/data/transfer/song_sync_coordinator_test.dart:379-414 (XFER-09) (data/transfer)
 - last seen: 2026-11-18T01:28:10Z
 
+### L-006 - When a spec AC states an exact token/field count, recount the referenced design-doc table before writing it down; a miscounted prose number creates a false discrepancy signal for the Verifier even when the implementation is correct.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `presentation/theme` · harmful: 0
+- features: theme-tokens
+- evidence: THEME-01 (presentation/theme)
+- last seen: 2026-11-19T08:21:43Z
+
+### L-007 - When a design doc gives a size/weight range instead of a single value for a token, the spec AC should say 'within the documented range' explicitly, or pin one exact value, so the Verifier isn't left guessing whether a point value chosen by the implementer is a faithful reading or a silent narrowing.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `presentation/theme` · harmful: 0
+- features: theme-tokens
+- evidence: THEME-04 (presentation/theme)
+- last seen: 2026-11-19T08:21:43Z
+
+### L-008 - When a color-token design doc omits a dark-mode row for a token, reuse the nearest semantically-equivalent token's dark value (not an invented hex) and mark it with a SPEC_DEVIATION comment naming the exact row that's missing, so a future design-doc update can fill the gap deliberately instead of silently diverging further.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `presentation/theme` · harmful: 0
+- features: theme-tokens
+- evidence: lib/presentation/theme/cantae_colors.dart:112-115 (textDisabled) (presentation/theme)
+- last seen: 2026-11-19T08:21:44Z
+
+### L-009 - Two independent tokens missing the same kind of dark-mode row (textDisabled, warningInline) is a signal to flag the gap in DESIGN_SYSTEM.md itself as a follow-up, not just patch each call site with its own SPEC_DEVIATION comment.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `presentation/theme` · harmful: 0
+- features: theme-tokens
+- evidence: lib/presentation/theme/cantae_colors.dart:123-125 (warningInline) (presentation/theme)
+- last seen: 2026-11-19T08:21:45Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

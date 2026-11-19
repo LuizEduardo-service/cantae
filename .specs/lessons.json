@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 6,
+  "next_id": 10,
   "lessons": [
     {
       "id": "L-001",
@@ -94,6 +94,78 @@
       ],
       "created": "2026-11-18T01:28:10Z",
       "last_seen": "2026-11-18T01:28:10Z"
+    },
+    {
+      "id": "L-006",
+      "key": "spec_precision_gap::when a spec ac states an exact token field count recount the referenced design doc table before writing it down a miscounted prose number creates a false discrepancy signal for the verifier even when the implementation is correct",
+      "text": "When a spec AC states an exact token/field count, recount the referenced design-doc table before writing it down; a miscounted prose number creates a false discrepancy signal for the Verifier even when the implementation is correct.",
+      "signal": "spec_precision_gap",
+      "scope": "presentation/theme",
+      "status": "candidate",
+      "features": [
+        "theme-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "THEME-01 (presentation/theme)"
+      ],
+      "created": "2026-11-19T08:21:43Z",
+      "last_seen": "2026-11-19T08:21:43Z"
+    },
+    {
+      "id": "L-007",
+      "key": "spec_precision_gap::when a design doc gives a size weight range instead of a single value for a token the spec ac should say within the documented range explicitly or pin one exact value so the verifier isn t left guessing whether a point value chosen by the implementer is a faithful reading or a silent narrowing",
+      "text": "When a design doc gives a size/weight range instead of a single value for a token, the spec AC should say 'within the documented range' explicitly, or pin one exact value, so the Verifier isn't left guessing whether a point value chosen by the implementer is a faithful reading or a silent narrowing.",
+      "signal": "spec_precision_gap",
+      "scope": "presentation/theme",
+      "status": "candidate",
+      "features": [
+        "theme-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "THEME-04 (presentation/theme)"
+      ],
+      "created": "2026-11-19T08:21:43Z",
+      "last_seen": "2026-11-19T08:21:43Z"
+    },
+    {
+      "id": "L-008",
+      "key": "spec_deviation::when a color token design doc omits a dark mode row for a token reuse the nearest semantically equivalent token s dark value not an invented hex and mark it with a spec deviation comment naming the exact row that s missing so a future design doc update can fill the gap deliberately instead of silently diverging further",
+      "text": "When a color-token design doc omits a dark-mode row for a token, reuse the nearest semantically-equivalent token's dark value (not an invented hex) and mark it with a SPEC_DEVIATION comment naming the exact row that's missing, so a future design-doc update can fill the gap deliberately instead of silently diverging further.",
+      "signal": "spec_deviation",
+      "scope": "presentation/theme",
+      "status": "candidate",
+      "features": [
+        "theme-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "lib/presentation/theme/cantae_colors.dart:112-115 (textDisabled) (presentation/theme)"
+      ],
+      "created": "2026-11-19T08:21:44Z",
+      "last_seen": "2026-11-19T08:21:44Z"
+    },
+    {
+      "id": "L-009",
+      "key": "spec_deviation::two independent tokens missing the same kind of dark mode row textdisabled warninginline is a signal to flag the gap in design system md itself as a follow up not just patch each call site with its own spec deviation comment",
+      "text": "Two independent tokens missing the same kind of dark-mode row (textDisabled, warningInline) is a signal to flag the gap in DESIGN_SYSTEM.md itself as a follow-up, not just patch each call site with its own SPEC_DEVIATION comment.",
+      "signal": "spec_deviation",
+      "scope": "presentation/theme",
+      "status": "candidate",
+      "features": [
+        "theme-tokens"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "lib/presentation/theme/cantae_colors.dart:123-125 (warningInline) (presentation/theme)"
+      ],
+      "created": "2026-11-19T08:21:45Z",
+      "last_seen": "2026-11-19T08:21:45Z"
     }
   ]
 }
