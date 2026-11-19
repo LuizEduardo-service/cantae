@@ -146,11 +146,12 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Method signature added to the abstract class
-- [ ] Gate check passes: `flutter analyze` (interface-only change; no logic to unit-test here — the implementation's tests live in T7)
+- [x] Method signature added to the abstract class
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ⚠️ Deviation — **merged forward into T7's commit**, per `implement.md`'s "Resolving compilation dependencies" rule. Discovered mid-execution: adding this abstract method makes `DriftSongRepository` a non-abstract class with a missing concrete implementation, so `flutter analyze` (this task's own gate) cannot pass in isolation — it only passes once T7 also exists. The code change itself is written (interface method present), but it is committed together with T7's implementation, not on its own. `tasks.md` corrected to document this rather than silently diverging from the "no task produces unverified code" rule.
 
 ---
 
@@ -219,8 +220,8 @@ T20 -> T21
 
 ### T7: `DriftSongRepository.markRehearsed`
 
-**What**: Implements the interface method: not-found check (reusing `delete`'s existence-check pattern) → single-column `update` via a `SongsTableCompanion` that touches only `lastRehearsedAt`.
-**Where**: `lib/data/repositories/drift_song_repository.dart`
+**What**: Implements the interface method: not-found check (reusing `delete`'s existence-check pattern) → single-column `update` via a `SongsTableCompanion` that touches only `lastRehearsedAt`. **This commit also includes T3's interface-method addition** (see T3's Status note — merged forward because T3 cannot pass its own gate alone).
+**Where**: `lib/data/repositories/drift_song_repository.dart`, `lib/domain/repositories/song_repository.dart` (T3's change, committed here)
 **Depends on**: T3, T5, T6
 **Reuses**: the existing not-found-check pattern from `delete`
 **Requirement**: LIB-13, LIB-14
