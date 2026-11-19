@@ -121,6 +121,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 **Tests**: unit
 **Gate**: quick
 
+**Status**: ✅ Complete — 5/5 tests pass (`flutter test test/presentation/theme/`). Two `SPEC_DEVIATION` markers added for `textDisabled`/`warningInline` dark-mode values, which DESIGN_SYSTEM.md §2.2 doesn't give a dedicated row for.
+
 ---
 
 ### T4: CantaeTypography
