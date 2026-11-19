@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 3,
+  "next_id": 6,
   "lessons": [
     {
       "id": "L-001",
@@ -40,6 +40,60 @@
       ],
       "created": "2026-10-06T20:55:30Z",
       "last_seen": "2026-10-06T20:55:30Z"
+    },
+    {
+      "id": "L-003",
+      "key": "ac_gap::when a design doc specifies that one component sends a message another component reacts to verify both the sender and the receiver exist in production code not just a unit test that hand constructs the message for the receiver",
+      "text": "When a design doc specifies that one component sends a message another component reacts to, verify both the sender and the receiver exist in production code, not just a unit test that hand-constructs the message for the receiver.",
+      "signal": "ac_gap",
+      "scope": "data/playback",
+      "status": "candidate",
+      "features": [
+        "file-transfer-and-sync-playback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md SYNC-06; lib/data/playback/playback_command_handler.dart:94-103 (data/playback)"
+      ],
+      "created": "2026-11-18T01:28:08Z",
+      "last_seen": "2026-11-18T01:28:08Z"
+    },
+    {
+      "id": "L-004",
+      "key": "ac_gap::when a mid implementation production bug is fixed e g a race between object construction and the next stream event add a regression test that reproduces the exact ordering that caused the bug not just tests that already avoid that ordering",
+      "text": "When a mid-implementation production bug is fixed (e.g. a race between object construction and the next stream event), add a regression test that reproduces the exact ordering that caused the bug, not just tests that already avoid that ordering.",
+      "signal": "ac_gap",
+      "scope": "data/playback",
+      "status": "candidate",
+      "features": [
+        "file-transfer-and-sync-playback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "lib/data/playback/playback_command_broadcaster.dart constructor (currentSnapshot seeding); test/data/playback/playback_command_broadcaster_test.dart (data/playback)"
+      ],
+      "created": "2026-11-18T01:28:09Z",
+      "last_seen": "2026-11-18T01:28:09Z"
+    },
+    {
+      "id": "L-005",
+      "key": "spec_precision_gap::a test asserting a no op success on an empty degenerate input does not prove a role gate rejection assert on the actual failure rejection path the spec describes even when a structural shortcut also happens to produce the same observable outcome",
+      "text": "A test asserting a no-op success on an empty/degenerate input does not prove a role-gate rejection; assert on the actual Failure/rejection path the spec describes, even when a structural shortcut also happens to produce the same observable outcome.",
+      "signal": "spec_precision_gap",
+      "scope": "data/transfer",
+      "status": "candidate",
+      "features": [
+        "file-transfer-and-sync-playback"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "test/data/transfer/song_sync_coordinator_test.dart:379-414 (XFER-09) (data/transfer)"
+      ],
+      "created": "2026-11-18T01:28:10Z",
+      "last_seen": "2026-11-18T01:28:10Z"
     }
   ]
 }
