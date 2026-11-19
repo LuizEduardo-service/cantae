@@ -1,3 +1,5 @@
+@AGENTS.md
+
 # Cantaê — Project Guide for AI Agents
 
 ## What is Cantaê?
@@ -124,3 +126,11 @@ Song loadSong(SongId id) throws SongNotFoundException { ... }
 - A file only becomes visible in the library after its final hash validates.
 - Background audio works on both Android and iOS (locked screen, tray controls).
 - Full local data deletion is possible without a server call.
+
+---
+
+## Claude Code
+
+- Antes de criar ou alterar qualquer tela ou widget, leia `docs/design/UI_SPEC.md` (seção da tela) e `docs/design/COMPONENTS.md`. Para cores, fontes e espaçamentos, consulte `docs/design/DESIGN_SYSTEM.md`.
+- Em tarefas grandes de interface (várias telas ou um componente compartilhado novo), proponha um plano curto antes de editar.
+- Ao terminar, rode os testes de widget e passe pelo checklist da seção 7 do `AGENTS.md`.
