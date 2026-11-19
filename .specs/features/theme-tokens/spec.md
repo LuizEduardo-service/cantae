@@ -71,14 +71,14 @@
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| THEME-01 | P1 | Design (inline) | Implementing |
-| THEME-02 | P1 | Design (inline) | Implementing |
-| THEME-03 | P1 | Design (inline) | Implementing |
-| THEME-04 | P1 | Design (inline) | Implementing |
-| THEME-05 | P1 | Design (inline) | Implementing |
-| THEME-06 | P1 | Design (inline) | Implementing |
-| THEME-07 | P1 | Design (inline) | Implementing |
-| THEME-08 | P1 | Design (inline) | Implementing |
+| THEME-01 | P1 | Design (inline) | ✅ Verified |
+| THEME-02 | P1 | Design (inline) | ✅ Verified |
+| THEME-03 | P1 | Design (inline) | ✅ Verified |
+| THEME-04 | P1 | Design (inline) | ✅ Verified |
+| THEME-05 | P1 | Design (inline) | ✅ Verified |
+| THEME-06 | P1 | Design (inline) | ✅ Verified |
+| THEME-07 | P1 | Design (inline) | ✅ Verified |
+| THEME-08 | P1 | Design (inline) | ✅ Verified |
 
 **ID format:** `THEME-NN`, one per numbered AC under P1 (no P2/P3 — this feature has a single, non-splittable story).
 
