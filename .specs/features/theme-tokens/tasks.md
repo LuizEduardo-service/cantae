@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: inline (Medium scope per the skill's auto-sizing table — no separate `design.md`; design decisions live in `spec.md`'s Assumptions table)
-**Status**: Approved
+**Status**: Done (all 7 tasks complete; feature-level Verifier pending)
 
 ---
 
@@ -221,6 +221,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 
 **Tests**: widget
 **Gate**: build
+
+**Status**: ✅ Complete — 3/3 widget tests pass. Full build gate: `flutter analyze` 0 issues, `flutter test` 282/282 (up from 252 at feature start — +30 new tests), `check_layers.py` clean, `dart analyze lib/domain/` clean. One pre-existing, unrelated flaky test (`song_sync_coordinator_test.dart`'s queue test, a real-loopback-TCP timing test from the file-transfer-and-sync-playback feature) failed once in a full-suite run and passed on re-run and in isolation — not touched by this feature, not caused by it.
 
 ---
 
