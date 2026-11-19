@@ -71,6 +71,12 @@
 
 ---
 
+### AD-012 — `go_router` adopted as the project's router, named routes only
+**Decision:** `go_router` (`^18.1.4`) is the project's router from the `library-screen` feature onward. One `GoRouter` instance, exposed via a Riverpod `Provider<GoRouter>` (`routerProvider`), created once and never rebuilt per navigation. Routes are always named (`context.goNamed(...)`), never raw path strings. `main.dart`'s `MaterialApp` becomes `MaterialApp.router`.
+**Rationale:** The project's own `flutter-routing` skill already documented this exact shape before any screen existed to use it; adopting it now (at the first screen) avoids re-plumbing navigation when the second screen lands. Room-code "deep links" are a 4-digit code typed by the user, not a URL scheme, so no `app_links`/platform-channel URI handling is added alongside this.
+
+---
+
 ## Handoff
 
 Phase 5 (UI) has started: **theme-tokens** feature complete and verified on branch `feature/phase-5-theme-tokens` (not yet merged to `develop`), HEAD `4cba44f`. Project now follows **Gitflow** (user decision, 2026-11-18): `develop` is integration, `master` only receives `release/*`/`hotfix/*`, new work branches as `feature/<name>`.
