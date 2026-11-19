@@ -197,6 +197,8 @@ Executed in listed order (T5, T6, T7); see the Phase Execution Map below for the
 **Tests**: unit
 **Gate**: quick
 
+**Status**: ✅ Complete — 5 new tests in `test/presentation/theme/app_theme_resolution_test.dart` (renamed from the template's `app_theme_test.dart` to avoid colliding with T7's widget-level test, which keeps that filename), 27/27 total pass (`flutter test test/presentation/theme/`).
+
 ---
 
 ### T7: Theme-to-widget integration test
