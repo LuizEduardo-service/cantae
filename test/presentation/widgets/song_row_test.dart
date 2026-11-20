@@ -2,7 +2,6 @@ import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
-import 'package:cantae/presentation/theme/cantae_colors.dart';
 import 'package:cantae/presentation/widgets/song_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';

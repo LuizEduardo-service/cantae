@@ -12,10 +12,10 @@ void main() {
     testWidgets('renders top slots and body, no footer', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CantaeScaffold(
-            topLeft: const Text('Biblioteca'),
-            topRight: const Text('Importar'),
-            body: const Text('conteudo'),
+          const CantaeScaffold(
+            topLeft: Text('Biblioteca'),
+            topRight: Text('Importar'),
+            body: Text('conteudo'),
           ),
           theme: AppTheme.light,
         ),
@@ -30,9 +30,9 @@ void main() {
     testWidgets('renders a footer when provided', (tester) async {
       await tester.pumpWidget(
         _wrap(
-          CantaeScaffold(
-            body: const Text('conteudo'),
-            footer: const Text('rodape'),
+          const CantaeScaffold(
+            body: Text('conteudo'),
+            footer: Text('rodape'),
           ),
           theme: AppTheme.light,
         ),
@@ -45,7 +45,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(CantaeScaffold(body: const Text('conteudo')), theme: AppTheme.light),
+        _wrap(const CantaeScaffold(body: Text('conteudo')), theme: AppTheme.light),
       );
 
       expect(find.text('rodape'), findsNothing);
@@ -55,7 +55,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(CantaeScaffold(body: const Text('conteudo')), theme: AppTheme.light),
+        _wrap(const CantaeScaffold(body: Text('conteudo')), theme: AppTheme.light),
       );
 
       final safeAreaFinder = find.ancestor(
@@ -70,10 +70,10 @@ void main() {
     ) async {
       await tester.pumpWidget(
         _wrap(
-          CantaeScaffold(
-            topLeft: const Text('Biblioteca'),
-            body: const Text('conteudo'),
-            footer: const Text('rodape'),
+          const CantaeScaffold(
+            topLeft: Text('Biblioteca'),
+            body: Text('conteudo'),
+            footer: Text('rodape'),
           ),
           theme: AppTheme.dark,
         ),

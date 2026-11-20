@@ -51,7 +51,7 @@ void main() {
 
     testWidgets('disabled state (no onPressed) blocks taps', (tester) async {
       await tester.pumpWidget(
-        _wrap(PrimaryButton(label: 'Indisponível'), theme: AppTheme.light),
+        _wrap(const PrimaryButton(label: 'Indisponível'), theme: AppTheme.light),
       );
 
       final semantics = tester.getSemantics(find.byType(PrimaryButton));
