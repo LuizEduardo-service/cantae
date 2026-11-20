@@ -35,6 +35,7 @@ dev_dependencies:
   nsd_platform_interface: ^2.2.0
   plugin_platform_interface: ^2.1.8
   collection: ^1.19.1
+  sqlite3: ^3.5.2
 
 flutter:
   uses-material-design: true

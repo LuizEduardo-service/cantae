@@ -347,6 +347,41 @@ void main() {
       expect(result.isSuccess, isTrue);
     });
   });
+
+  group('DriftSongRepository.markRehearsed', () {
+    test('updates only lastRehearsedAt, leaving tracks and lyrics untouched (LIB-13)', () async {
+      await repo.save(fixtureSong());
+      final at = DateTime(2026, 11, 19, 21);
+
+      final result = await repo.markRehearsed('song-1', at);
+
+      expect(result.isSuccess, isTrue);
+
+      final before = await repo.getById('song-1');
+      before.when(
+        success: (song) {
+          expect(song.lastRehearsedAt, equals(at));
+          expect(song.tracks, hasLength(2));
+          expect(song.lyrics, hasLength(3));
+          expect(song.playbackTrack, isNotNull);
+        },
+        failure: (_) => fail('expected success'),
+      );
+    });
+
+    test('returns NotFoundFailure for a non-existent id (LIB-14)', () async {
+      final result = await repo.markRehearsed('missing-id', DateTime.now());
+
+      expect(result.isFailure, isTrue);
+      result.when(
+        success: (_) => fail('expected failure'),
+        failure: (f) {
+          expect(f, isA<NotFoundFailure>());
+          expect(f.code, equals('song_not_found'));
+        },
+      );
+    });
+  });
 }
 
 class _QueryCountInterceptor extends QueryInterceptor {

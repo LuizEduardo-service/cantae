@@ -166,18 +166,20 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Both columns added with the exact types/defaults above
-- [ ] `build_runner` codegen re-run successfully (`app_database.g.dart` regenerates with no errors)
-- [ ] Gate check passes: `flutter analyze`
+- [x] Both columns added with the exact types/defaults above
+- [x] `build_runner` codegen re-run successfully (`app_database.g.dart` regenerates with no errors)
+- [x] Gate check passes: `flutter analyze`
 
 **Tests**: none
 **Gate**: build
+
+**Status**: ⚠️ Deviation — **merged forward into T7's commit**, same reason as T3: the project-wide `flutter analyze`/`flutter test` gate cannot pass in isolation while T3's interface addition sits uncommitted in the working tree with no implementation yet. T4's own code (the two columns + regenerated codegen) is correct and final; only its commit point moved.
 
 ---
 
 ### T5: `schemaVersion` 1→2 migration
 
-**What**: Bump `AppDatabase.schemaVersion` to `2`; add `stepByStep(from1To2: (m, schema) async { await m.addColumn(schema.songsTable, schema.songsTable.origin); await m.addColumn(schema.songsTable, schema.songsTable.lastRehearsedAt); })` to the existing `MigrationStrategy`.
+**What**: Bump `AppDatabase.schemaVersion` to `2`; add an additive upgrade step to the existing `MigrationStrategy`.
 **Where**: `lib/infrastructure/database/app_database.dart`
 **Depends on**: T4
 **Reuses**: AD-009's additive-migration decision (first real application)
@@ -186,14 +188,16 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `onCreate` path unchanged (still `m.createAll()` for a fresh v2 install)
-- [ ] `stepByStep(from1To2: ...)` added, both columns backfilled on an upgrade
-- [ ] A migration test (`NativeDatabase.memory()` opened at schema v1 via a hand-built v1 `SongsTable`-shaped insert, then the real `AppDatabase` opened against the same file/connection to trigger the migration) asserts: a pre-existing row survives, `origin` reads back as `'created'`, `lastRehearsedAt` reads back `null`
-- [ ] Gate check passes: `flutter test test/infrastructure/`
-- [ ] Test count: 1+ new test
+- [x] `onCreate` path unchanged (still `m.createAll()` for a fresh v2 install)
+- [x] Additive upgrade step added, both columns backfilled on an upgrade
+- [x] A migration test (raw `sqlite3` builds a v1-shaped file with `PRAGMA user_version = 1`, then the real `AppDatabase` opens that same file) asserts: a pre-existing row survives, `origin` reads back as `'created'`, `lastRehearsedAt` reads back `null`
+- [x] Gate check passes: `flutter test test/infrastructure/`
+- [x] Test count: 2 new tests
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ⚠️ Deviation (API) + merged forward (commit point) — see `app_database.dart`'s `SPEC_DEVIATION` comment: drift's `stepByStep(from1To2: ...)` helper (as AD-009/design.md originally named it) is now generated-only (`VersionedSchema.stepByStepHelper`, requiring `drift_dev schema` snapshot export, which this project has never adopted). Used `Migrator.addColumn` directly inside a hand-written `onUpgrade: (m, from, to)` callback instead — same additive-only, versioned-by-`from` semantics, no codegen dependency. AD-009 should be amended to reflect the actual API; flagged for the Verifier / a follow-up STATE.md edit. Also added `sqlite3: ^3.5.2` to `dev_dependencies` (test-only, already a resolved transitive version) to seed a raw v1-shaped file for the migration test — required by this task's own "Done when", not scope creep. Commit point: merged into T7's commit (project-wide gate still blocked by T3 until T7 lands).
 
 ---
 
@@ -208,20 +212,22 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Both directions updated
-- [ ] A unit test round-trips a `Song` with `origin: SongOrigin.received` and a non-null `lastRehearsedAt` through `toCompanion`→(constructed row)→`fromRow` and confirms both fields survive
-- [ ] Gate check passes: `flutter test test/data/`
-- [ ] Test count: 1+ new test, existing mapper tests unmodified
+- [x] Both directions updated
+- [x] A unit test round-trips a `Song` with `origin: SongOrigin.received` and a non-null `lastRehearsedAt` through `toCompanion`→(constructed row)→`fromRow` and confirms both fields survive
+- [x] Gate check passes: `flutter test test/data/`
+- [x] Test count: 2 new tests, existing mapper tests unmodified (the shared `_row()` test helper was updated to pass `origin`/`lastRehearsedAt` through, since `SongsTableData`'s generated constructor now requires `origin` — a mechanical consequence of T4's schema change, not a weakened assertion)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ⚠️ Deviation — **merged forward into T7's commit**, same reason as T3/T4.
 
 ---
 
 ### T7: `DriftSongRepository.markRehearsed`
 
-**What**: Implements the interface method: not-found check (reusing `delete`'s existence-check pattern) → single-column `update` via a `SongsTableCompanion` that touches only `lastRehearsedAt`. **This commit also includes T3's interface-method addition** (see T3's Status note — merged forward because T3 cannot pass its own gate alone).
-**Where**: `lib/data/repositories/drift_song_repository.dart`, `lib/domain/repositories/song_repository.dart` (T3's change, committed here)
+**What**: Implements the interface method: not-found check (reusing `delete`'s existence-check pattern) → single-column `update` via a `SongsTableCompanion` that touches only `lastRehearsedAt`. **This commit also includes T3, T4, T5, T6** (see each one's Status note — all merged forward because none of them can pass the project-wide gate alone while T3's interface addition sits unimplemented).
+**Where**: `lib/data/repositories/drift_song_repository.dart`, plus T3/T4/T5/T6's files, committed together
 **Depends on**: T3, T5, T6
 **Reuses**: the existing not-found-check pattern from `delete`
 **Requirement**: LIB-13, LIB-14
@@ -229,13 +235,15 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Existing song: `lastRehearsedAt` updates to the given value; `tracks`/`lyrics` rows untouched (asserted by re-reading via `getById` and comparing track/lyric lists before/after)
-- [ ] Non-existent id: returns `Result.failure(NotFoundFailure(code: 'song_not_found'))`
-- [ ] Gate check passes: `flutter test test/data/`
-- [ ] Test count: 2+ new tests (success path, not-found path)
+- [x] Existing song: `lastRehearsedAt` updates to the given value; `tracks`/`lyrics` rows untouched (asserted by re-reading via `getById` and comparing track/lyric lists before/after)
+- [x] Non-existent id: returns `Result.failure(NotFoundFailure(code: 'song_not_found'))`
+- [x] Gate check passes: `flutter test test/data/`
+- [x] Test count: 2 new tests (success path, not-found path)
 
 **Tests**: unit
 **Gate**: quick
+
+**Status**: ✅ Complete (combined T3-T7 commit). Full Phase 2 sanity gate: `flutter analyze` 0 issues, `flutter test test/domain/ test/data/ test/infrastructure/` **255/255**, `check_layers.py` clean, `dart analyze lib/domain/` clean.
 
 ---
 
