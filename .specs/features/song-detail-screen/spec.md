@@ -146,27 +146,27 @@ Documentado para evitar scope creep.
 | --- | --- | --- | --- |
 | DETAIL-01 | P1: Ver o hub da música | Design | Pending |
 | DETAIL-02 | P1: Ver o hub da música | Design | Implementing |
-| DETAIL-03 | P1: Ver o hub da música | Design | Pending |
+| DETAIL-03 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-04 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-05 | P1: Ver o hub da música | Design | Implementing |
-| DETAIL-06 | P1: Ver o hub da música | Design | Pending |
-| DETAIL-07 | P1: Ver o hub da música | Design | Pending |
-| DETAIL-08 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-09 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-10 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-11 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-12 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-13 | P1: Preparar e ensaiar | Design | Pending |
-| DETAIL-14 | P1: Modo somente leitura | Design | Pending |
-| DETAIL-15 | P1: Modo somente leitura | Design | Pending |
-| DETAIL-16 | P1: Modo somente leitura | Design | Pending |
+| DETAIL-06 | P1: Ver o hub da música | Design | Implementing |
+| DETAIL-07 | P1: Ver o hub da música | Design | Implementing |
+| DETAIL-08 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-09 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-10 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-11 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-12 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-13 | P1: Preparar e ensaiar | Design | Implementing |
+| DETAIL-14 | P1: Modo somente leitura | Design | Implementing |
+| DETAIL-15 | P1: Modo somente leitura | Design | Implementing |
+| DETAIL-16 | P1: Modo somente leitura | Design | Implementing |
 | DETAIL-17 | P1: Excluir música | Design | Implementing |
 | DETAIL-18 | P1: Excluir música | Design | Implementing |
-| DETAIL-19 | P1: Excluir música | Design | Pending |
-| DETAIL-20 | P1: Excluir música | Design | Pending |
-| DETAIL-21 | P1: Excluir música | Design | Pending |
-| DETAIL-22 | P2: Exportar | Design | Pending |
-| DETAIL-23 | P2: Exportar | Design | Pending |
+| DETAIL-19 | P1: Excluir música | Design | Implementing |
+| DETAIL-20 | P1: Excluir música | Design | Implementing |
+| DETAIL-21 | P1: Excluir música | Design | Implementing |
+| DETAIL-22 | P2: Exportar | Design | Implementing |
+| DETAIL-23 | P2: Exportar | Design | Implementing |
 
 **Coverage:** 23 total, 0 mapped to tasks, 23 unmapped ⚠️ (esperado antes da fase Tasks)
 

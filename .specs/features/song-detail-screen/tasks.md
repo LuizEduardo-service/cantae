@@ -152,20 +152,21 @@ T4 --> T5
 **Tools**: MCP: NONE · Skill: `flutter-ui-ux` (final screen-assembly pass — layout/accessibility checklist)
 
 **Done when**:
-- [ ] Carregando: esqueleto, sem naipes/rodapé (DETAIL-03)
-- [ ] Não encontrada (`id` inexistente ou `'new'`): `EmptyState` + ação "Voltar à Biblioteca", sem cabeçalho/naipes/rodapé (DETAIL-04)
-- [ ] Erro (falha de repositório que não seja `NotFoundFailure`): `InlineBanner` erro + "Tentar de novo" invalidando `songByIdProvider(id)` (DETAIL-05)
-- [ ] Populada: cabeçalho "Autor · Origem"; 4 `VoicePartBadge` (preenchido/tracejado por naipe real); naipe faltante mostra "Enviar faixa" → `goNamed('track-upload')` (DETAIL-02, 06, 07)
-- [ ] Seção "Preparar" (4 linhas) → `goNamed` para `studio`/`track-align`/`lyrics-editor`/`song-history` respectivamente (DETAIL-08, 09)
-- [ ] Rodapé: `SecondaryButton` "Ensaiar só" → `goNamed('solo-player')`; `PrimaryButton` "Ensaiar em grupo" → `goNamed('room-create')` (DETAIL-10, 11, 12, 13)
-- [ ] `origin == received`: oculta "Preparar" por completo e a ação "Enviar faixa" (selo tracejado continua visível); mantém "Ensaiar só"/"Ensaiar em grupo"/"Apagar desta música" (DETAIL-14, 15, 16)
-- [ ] "Apagar desta música" (`DestructiveButton` tonal) → `ConfirmSheet.show(steps: 1)`; confirmar chama `songRepositoryProvider.delete(id)`; sucesso invalida `songsProvider` e navega para `library`; falha mantém a tela e mostra `InlineBanner` erro; cancelar não chama `delete` (DETAIL-17, 18, 19, 20, 21)
-- [ ] Widget tests: uma por estado acima + exclusão (confirmar/cancelar/falha) + pelo menos uma navegação de cada seção + um spot-check em tema escuro — usando um `GoRouter` de teste com builders stub (mesmo padrão de `library_screen_test.dart`), não um stack de navegação real
-- [ ] Gate check passes: `flutter test test/presentation/screens/`
-- [ ] Test count: 12+ new tests
+- [x] Carregando: esqueleto, sem naipes/rodapé (DETAIL-03)
+- [x] Não encontrada (`id` inexistente ou `'new'`): `EmptyState` + ação "Voltar à Biblioteca", sem cabeçalho/naipes/rodapé (DETAIL-04)
+- [x] Erro (falha de repositório que não seja `NotFoundFailure`): `InlineBanner` erro + "Tentar de novo" invalidando `songByIdProvider(id)` (DETAIL-05)
+- [x] Populada: cabeçalho "Autor · Origem"; 4 `VoicePartBadge` (preenchido/tracejado por naipe real); naipe faltante mostra "Enviar faixa" → `goNamed('track-upload')` (DETAIL-02, 06, 07)
+- [x] Seção "Preparar" (4 linhas) → `goNamed` para `studio`/`track-align`/`lyrics-editor`/`song-history` respectivamente (DETAIL-08, 09)
+- [x] Rodapé: `SecondaryButton` "Ensaiar só" → `goNamed('solo-player')`; `PrimaryButton` "Ensaiar em grupo" → `goNamed('room-create')` (DETAIL-10, 11, 12, 13)
+- [x] `origin == received`: oculta "Preparar" por completo e a ação "Enviar faixa" (selo tracejado continua visível); mantém "Ensaiar só"/"Ensaiar em grupo"/"Apagar desta música" (DETAIL-14, 15, 16)
+- [x] "Apagar desta música" (`DestructiveButton` tonal) → `ConfirmSheet.show(steps: 1)`; confirmar chama `songRepositoryProvider.delete(id)`; sucesso invalida `songsProvider` e navega para `library`; falha mantém a tela e mostra `InlineBanner` erro; cancelar não chama `delete` (DETAIL-17, 18, 19, 20, 21)
+- [x] Widget tests: uma por estado acima + exclusão (confirmar/cancelar/falha) + pelo menos uma navegação de cada seção + um spot-check em tema escuro — usando um `GoRouter` de teste com builders stub (mesmo padrão de `library_screen_test.dart`), não um stack de navegação real
+- [x] Gate check passes: `flutter test test/presentation/screens/`
+- [x] Test count: 12+ new tests
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 15/15 new tests pass (added a test for the P2 Exportar `NavPill`, implemented alongside the rest of the hub since it's trivial wiring — DETAIL-22/23 were otherwise implemented but untested). Section headers ("Naipes"/"Preparar") rendered as a small private `_SectionLabel` (caption/text2) rather than a new shared `SectionLabel` widget — `COMPONENTS.md` documents one, but it wasn't in design.md's Components list for this feature and is a 1-line `Text`; same for the "Preparar" rows (plain `InkWell` rows, not a new `GroupedList`/`ListRow` component). Both deferred to whichever future screen first needs a second consumer, consistent with the naipe-mapping duplication risk already accepted in design.md. `flutter test` required `scrollUntilVisible` (not `ensureVisible`) for the delete button in the 3 exclusão tests — `CantaeScaffold`'s `body` is a plain (eager) `ListView`, but Flutter's sliver viewport still only *mounts* elements within the viewport + cache extent, so a finder for an off-screen item matches zero elements until scrolled.
 
 ---
 
