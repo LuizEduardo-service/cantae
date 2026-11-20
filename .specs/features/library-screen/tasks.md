@@ -427,12 +427,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: `flutter-clean-architecture` (confirm provider file doesn't leak infra types into widgets)
 
 **Done when**:
-- [ ] `songRepositoryProvider` resolves to a working `SongRepository` backed by a real file-based `AppDatabase`
-- [ ] A unit test overrides this provider with an in-memory `AppDatabase` (via `ProviderContainer(overrides: [...])`) and confirms `songRepositoryProvider` resolves without throwing
-- [ ] Gate check passes: `flutter test test/presentation/providers/`
+- [x] `songRepositoryProvider` resolves to a working `SongRepository` backed by a real file-based `AppDatabase`
+- [x] A unit test overrides this provider with an in-memory `AppDatabase` (via `ProviderContainer(overrides: [...])`) and confirms `songRepositoryProvider` resolves without throwing
+- [x] Gate check passes: `flutter test test/presentation/providers/`
 
 **Tests**: unit
 **Gate**: quick
+**Status**: ✅ Complete. 1/1 new test passes. `appDatabaseProvider` builds the real on-device database lazily via `LazyDatabase`/`NativeDatabase.createInBackground` under the app documents directory; test overrides it with `NativeDatabase.memory()` and confirms `songRepositoryProvider.getAll()` succeeds (not just non-null).
 
 ---
 
