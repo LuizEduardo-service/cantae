@@ -523,13 +523,14 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] All 6 named routes resolve; `library` is `/`; the other 5 render `ComingSoonScreen` with an appropriate title
-- [ ] Widget test: pumping a `MaterialApp.router` with this router shows `LibraryScreen` at `/`, and `router.goNamed('room-create')` (etc., for all 5) shows `ComingSoonScreen`
-- [ ] Gate check passes: `flutter test test/presentation/routing/`
-- [ ] Test count: 6+ new tests (one per route)
+- [x] All 6 named routes resolve; `library` is `/`; the other 5 render `ComingSoonScreen` with an appropriate title
+- [x] Widget test: pumping a `MaterialApp.router` with this router shows `LibraryScreen` at `/`, and `router.goNamed('room-create')` (etc., for all 5) shows `ComingSoonScreen`
+- [x] Gate check passes: `flutter test test/presentation/routing/`
+- [x] Test count: 6+ new tests (one per route)
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 6/6 new tests pass (113/113 whole `test/presentation/` suite). `go_router: ^18.1.4`'s `pubspec.yaml` line was already added in T19's commit (see T19's Status note) — not re-added here, since re-adding an existing dependency line isn't a code change.
 
 ---
 
