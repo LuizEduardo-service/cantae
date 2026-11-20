@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/library-screen/design.md`
-**Status**: Approved
+**Status**: Done — all 21 tasks (T1-T21) complete across 3 batches. Full BUILD gate green (`flutter analyze` 0 issues, `flutter test` 375/375 clean, `check_layers.py` OK, `dart analyze lib/domain/` clean). Awaiting independent Verifier pass.
 
 ---
 
@@ -545,13 +545,16 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] App boots to the Biblioteca screen (not the Flutter starter placeholder)
-- [ ] Smoke widget test: pump `CantaeApp`, confirm `LibraryScreen` (or its loading/empty state) is visible, no exception thrown
-- [ ] Full BUILD gate check passes (last task of the feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
-- [ ] Test count: 1+ new test; total suite count ≥ 282 (count at this feature's start) + all new tests from T1-T21
+- [x] App boots to the Biblioteca screen (not the Flutter starter placeholder)
+- [x] Smoke widget test: pump `CantaeApp`, confirm `LibraryScreen` (or its loading/empty state) is visible, no exception thrown
+- [x] Full BUILD gate check passes (last task of the feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
+- [x] Test count: 1+ new test; total suite count ≥ 282 (count at this feature's start) + all new tests from T1-T21
 
 **Tests**: widget
 **Gate**: build
+**Status**: ✅ Complete. 1/1 new test passes; full suite 375/375 on a clean run. `CantaeApp` is now `ConsumerWidget` reading `routerProvider`; `MaterialApp` → `MaterialApp.router` with `theme`/`darkTheme` from `AppTheme`. `themeMode` is left unset rather than passed as `AppTheme.defaultThemeMode` — both resolve to `ThemeMode.system`, and passing it explicitly trips `avoid_redundant_argument_values`; documented inline in `main.dart`.
+
+Full BUILD gate (final run): `flutter analyze` — 0 issues. `flutter test` — 375/375 on a clean run; two pre-existing, unrelated full-suite-only flakes were observed across two runs (`song_sync_coordinator_test.dart`'s queue test per this batch's known-flake note, and `chunked_file_receiver_test.dart`'s concurrent-write test, both real-timing/concurrency tests from the Session/Transfer features) — each re-ran 4/4 clean in isolation, confirming neither is a regression from this batch (no file this batch touched is anywhere near `lib/data/transfer/` or `lib/data/session/`). `check_layers.py --root .` — OK, no forbidden imports in `lib/domain/`. `dart analyze lib/domain/` — no issues.
 
 ---
 

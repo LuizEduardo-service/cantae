@@ -95,26 +95,26 @@
 
 ## Requirement Traceability
 
-| Requirement ID | Story | Phase | Status |
+| Requirement ID | Story | Covered by | Status |
 | --- | --- | --- | --- |
-| LIB-01 | P1 | Design | Pending |
-| LIB-02 | P1 | Design | Pending |
-| LIB-03 | P1 | Design | Pending |
-| LIB-04 | P1 | Design | Pending |
-| LIB-05 | P1 | Design | Pending |
-| LIB-06 | P1 | Design | Pending |
-| LIB-07 | P1 | Design | Pending |
-| LIB-08 | P1 | Design | Pending |
-| LIB-09 | P1 | Design | Pending |
-| LIB-10 | P1 | Design | Pending |
-| LIB-11 | P1 | Design | Pending |
-| LIB-12 | P2 | Design | Pending |
-| LIB-13 | P2 | Design | Pending |
-| LIB-14 | P2 | Design | Pending |
+| LIB-01 | P1 | T19 (`library_screen_test.dart` loading test) | Done |
+| LIB-02 | P1 | T19 (populated test) | Done |
+| LIB-03 | P1 | T19 (empty test) | Done |
+| LIB-04 | P1 | T17/T19 (search tests) | Done |
+| LIB-05 | P1 | T17/T19 (search tests) | Done |
+| LIB-06 | P1 | T17/T19 (origin filter tests) | Done |
+| LIB-07 | P1 | T17 (sort order tests) | Done |
+| LIB-08 | P1 | T17 (highlight tests) | Done |
+| LIB-09 | P1 | T19/T20 (navigation + route tests) | Done |
+| LIB-10 | P1 | T18/T19/T20 (nav tests) | Done |
+| LIB-11 | P1 | T19 (error/retry test) | Done |
+| LIB-12 | P2 | T2/T4/T5/T6 (`song_test.dart`, mapper/migration tests) | Done |
+| LIB-13 | P2 | T3/T7 (`drift_song_repository_test.dart` markRehearsed tests) | Done |
+| LIB-14 | P2 | T3/T7 (not-found test) | Done |
 
 **ID format:** `LIB-NN`, numbered across both stories in document order (LIB-01..11 = P1's 11 ACs, LIB-12..14 = P2's 3 ACs).
 
-**Coverage:** 14 total, 0 mapped yet (Design/Tasks not yet written), 14 unmapped ⚠️ (expected at this stage).
+**Coverage:** 14 total, 14 mapped, 0 unmapped.
 
 ---
 
