@@ -363,13 +363,14 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Complete song: no status text. Missing 1 naipe: "Falta {Naipe}". Missing 2+: "Faltam {N} naipes"
-- [ ] `highlighted: true` renders the `surface` background treatment
-- [ ] Widget test: all three status variants, highlighted vs. not, tap callback fires, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Complete song: no status text. Missing 1 naipe: "Falta {Naipe}". Missing 2+: "Faltam {N} naipes"
+- [x] `highlighted: true` renders the `surface` background treatment
+- [x] Widget test: all three status variants, highlighted vs. not, tap callback fires, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 38/38 widget tests pass (whole suite). Subtitle is a `RichText` (author span + optional `warningInline` status span) — tests read its flattened plain text since `find.text` only matches plain `Text` widgets.
 
 ---
 
