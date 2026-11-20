@@ -385,12 +385,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Renders with/without the secondary action; primary action always present and tappable
-- [ ] Widget test: both action configurations, tap callbacks fire, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Renders with/without the secondary action; primary action always present and tappable
+- [x] Widget test: both action configurations, tap callbacks fire, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 44/44 widget tests pass (whole suite). SPEC_DEVIATION noted inline: `COMPONENTS.md`'s 28/700 title has no exact typography-scale match; used `titleSheet` (26/700), the closest documented token. Actions are a small private `_Action` helper (not T15's `PrimaryButton`/`SecondaryButton` — T14 has no dependency on T15 per the Phase 3 execution plan).
 
 ---
 
