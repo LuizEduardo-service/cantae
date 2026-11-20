@@ -471,12 +471,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Renders the given `title`, a "Voltar" `NavPill`, and an `EmptyState`-style "Em breve" message
-- [ ] Widget test: renders with an arbitrary title, back pill present, both themes
-- [ ] Gate check passes: `flutter test test/presentation/screens/`
+- [x] Renders the given `title`, a "Voltar" `NavPill`, and an `EmptyState`-style "Em breve" message
+- [x] Widget test: renders with an arbitrary title, back pill present, both themes
+- [x] Gate check passes: `flutter test test/presentation/screens/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 3/3 new tests pass (94/94 whole `test/presentation/` suite). `onPrimary`/back pill both call `Navigator.of(context).maybePop()` — a no-op in the test harness (no route to pop), which is fine since the test only asserts render/presence, not pop behavior (no route stack exists yet for this placeholder to navigate within).
 
 ---
 
