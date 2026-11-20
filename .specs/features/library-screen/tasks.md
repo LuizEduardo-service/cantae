@@ -406,12 +406,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Both render at pill height 54, correct colors per `COMPONENTS.md`; `PrimaryButton` supports a `loading` state (indicator + text) and `disabled` state
-- [ ] Widget test: normal/pressed-visual/loading/disabled for `PrimaryButton`, normal for `SecondaryButton`, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Both render at pill height 54, correct colors per `COMPONENTS.md`; `PrimaryButton` supports a `loading` state (indicator + text) and `disabled` state
+- [x] Widget test: normal/pressed-visual/loading/disabled for `PrimaryButton`, normal for `SecondaryButton`, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 52/52 widget tests pass — full `test/presentation/widgets/` suite for all of Phase 3 (T8-T15). `loading` both shows the indicator and blocks taps (no separate non-interactive-but-not-loading state exists per spec). "Pressed-visual" relies on `InkWell`'s built-in splash/highlight (Material's standard press feedback); not separately pixel-tested, since `COMPONENTS.md` doesn't specify a custom pressed treatment beyond the stock −6% luminosity `InkWell` already provides.
 
 ---
 
