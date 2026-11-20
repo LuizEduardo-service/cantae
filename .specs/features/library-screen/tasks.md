@@ -321,12 +321,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Generic over a list of `(label, value)` options; exposes tab/radio semantics; selecting a segment calls `onChanged` with that value
-- [ ] Widget test: selection changes visual state and fires callback, semantics exposed, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Generic over a list of `(label, value)` options; exposes tab/radio semantics; selecting a segment calls `onChanged` with that value
+- [x] Widget test: selection changes visual state and fires callback, semantics exposed, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 23/23 widget tests pass (whole suite). `Semantics(inMutuallyExclusiveGroup: true, selected: ...)` gives the radio-group semantics; `AnimatedContainer`'s `segmentSelected` fill + shadow carries the visual state.
 
 ---
 
