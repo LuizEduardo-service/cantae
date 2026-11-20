@@ -448,14 +448,15 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `visibleSongsProvider` combines search (case-insensitive substring on name/author) + origin filter + sort (name A-Z / lastRehearsedAt desc-with-nulls-last) correctly for every combination
-- [ ] `highlightedSongIdProvider` returns the id of the song with the latest non-null `lastRehearsedAt` across the full list (ties → first in list order), or `null` if none
-- [ ] Unit tests (`ProviderContainer`) cover: each sort order, origin filter alone, search alone, combined filter+search, the highlight tie-break rule, and the "all null → no highlight" case
-- [ ] Gate check passes: `flutter test test/presentation/providers/`
-- [ ] Test count: 8+ new tests
+- [x] `visibleSongsProvider` combines search (case-insensitive substring on name/author) + origin filter + sort (name A-Z / lastRehearsedAt desc-with-nulls-last) correctly for every combination
+- [x] `highlightedSongIdProvider` returns the id of the song with the latest non-null `lastRehearsedAt` across the full list (ties → first in list order), or `null` if none
+- [x] Unit tests (`ProviderContainer`) cover: each sort order, origin filter alone, search alone, combined filter+search, the highlight tie-break rule, and the "all null → no highlight" case
+- [x] Gate check passes: `flutter test test/presentation/providers/`
+- [x] Test count: 8+ new tests
 
 **Tests**: unit
 **Gate**: quick
+**Status**: ✅ Complete. 8/8 new tests pass (9 total in `test/presentation/providers/` with T16's). `songsProvider` unwraps a `Failure` by throwing a `StateError(failure.code)`, which `FutureProvider` turns into `AsyncError` for `LibraryScreen`'s `.when(error: ...)` branch (T19). `highlightedSongIdProvider` uses strict `isAfter` so a tie never overwrites the first-seen song, matching the spec's edge case.
 
 ---
 
