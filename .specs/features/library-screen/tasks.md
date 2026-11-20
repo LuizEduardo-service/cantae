@@ -300,12 +300,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Renders with placeholder; `onChanged` fires with the typed text; supports a `enabled: false` state (for the loading-state Edge Case)
-- [ ] Widget test: text entry triggers callback, disabled state blocks input, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Renders with placeholder; `onChanged` fires with the typed text; supports a `enabled: false` state (for the loading-state Edge Case)
+- [x] Widget test: text entry triggers callback, disabled state blocks input, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 18/18 widget tests pass (whole `test/presentation/widgets/` suite). `enabled: false` maps directly to `TextField.enabled`, which both blocks interaction and skips `onChanged`.
 
 ---
 
