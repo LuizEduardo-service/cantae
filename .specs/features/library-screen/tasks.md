@@ -266,6 +266,8 @@ T20 -> T21
 **Gate**: full
 **Status**: ✅ Complete. 5/5 widget tests pass (`flutter test test/presentation/widgets/`). `topLeft`/`topRight` wrapped in `Flexible` to keep the top row from overflowing — needed because `flutter_test`'s fallback font metrics render plain text far wider than the real Geist font, a test-harness artifact (not a real-device issue) that applies to every Row-of-text widget in this batch.
 
+**Follow-up fix (post-Verifier, before merge):** The body wrapper changed from a plain `Container(color: ...)` to `Material(color: ...)`, so any descendant `InkWell`/ripple works without a per-screen workaround — see T19's Status note for the latent gap this closed.
+
 ---
 
 ### T9: `NavPill`
@@ -509,6 +511,8 @@ T20 -> T21
 2. **`InlineBanner` built as a private widget inside `library_screen.dart`, not a new shared `lib/presentation/widgets/` file.** `spec.md`/`UI_SPEC.md` require it for the error state, but no task in Phase 3 (T8-T15) created it as a shared component, and T19's own `Where` doesn't list a new widgets file. Kept in-scope by building `_ErrorBody` as a private widget matching `COMPONENTS.md`'s documented `InlineBanner` shape (raio 16, padding 14-16, `dangerBg`, 17/700 title, 15pt body, tonal action) rather than skipping the error state or inventing a new shared-widget task.
 3. **`CantaeScaffold` has no `Material` ancestor of its own**, and `SongRow`'s/the error banner's/filtered-empty's `InkWell`s don't carry their own (unlike `NavPill`/`PrimaryButton`/`SecondaryButton`, which do) — this only surfaced now because T19 is the first consumer to combine them. Fixed by wrapping this screen's own return value in `Material(type: MaterialType.transparency, ...)` inside `library_screen.dart`, not by editing the already-shipped `CantaeScaffold` (T8, out of this task's `Where`).
 4. **"Nada encontrado" copy for the origin-filter-only empty case** (no search query) is a spec-precision gap — `spec.md` only defines the exact copy for the search-query case. Falls back to the same message without the quoted query; noted inline.
+
+**Follow-up fix (post-Verifier, same branch, before merge):** The independent Verifier flagged deviations #2 and #3 above as reasonable but real forward debt (see `validation.md`). Both fixed per the user's explicit go-ahead: `CantaeScaffold` (T8) now wraps its body in `Material(color: colors.bg, ...)` instead of a plain `Container`, so any future screen's `InkWell`/ripple children work without a per-screen workaround — `library_screen.dart`'s local `Material(type: transparency)` wrapper was removed accordingly. `InlineBanner` was extracted to `lib/presentation/widgets/inline_banner.dart` as a proper shared, 4-variant (`info`/`success`/`warning`/`error`) component with its own widget test (`test/presentation/widgets/inline_banner_test.dart`, 3 tests), and `_ErrorBody` now composes it instead of duplicating its shape. Full gate re-run clean after both fixes: `flutter analyze` 0 issues, `flutter test` 377/377 (full suite; one known pre-existing flake — `song_sync_coordinator_test.dart`'s queue test — confirmed untouched and passing in isolation), `check_layers.py` + `dart analyze lib/domain/` clean.
 
 ---
 

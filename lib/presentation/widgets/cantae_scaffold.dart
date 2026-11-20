@@ -30,7 +30,7 @@ class CantaeScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<CantaeColors>()!;
 
-    return Container(
+    return Material(
       color: colors.bg,
       child: SafeArea(
         child: Column(

@@ -11,6 +11,7 @@ import '../../theme/cantae_typography.dart';
 import '../../widgets/buttons.dart';
 import '../../widgets/cantae_scaffold.dart';
 import '../../widgets/empty_state.dart';
+import '../../widgets/inline_banner.dart';
 import '../../widgets/nav_pill.dart';
 import '../../widgets/search_field.dart';
 import '../../widgets/segmented_control.dart';
@@ -27,60 +28,50 @@ class LibraryScreen extends ConsumerWidget {
     final colors = Theme.of(context).extension<CantaeColors>()!;
     final songsAsync = ref.watch(songsProvider);
 
-    // SPEC_DEVIATION: `CantaeScaffold` (T8) has no `Material` ancestor of
-    // its own (it's a plain `Container`/`Column`), but this screen's body
-    // uses `InkWell`s that don't carry their own `Material` (`SongRow`, the
-    // error banner's and filtered-empty's text links) — unlike `NavPill`/
-    // `PrimaryButton`/`SecondaryButton`, which already wrap their own.
-    // Wrapping here (not editing the shared, already-shipped `CantaeScaffold`)
-    // keeps the fix inside this task's own file.
-    return Material(
-      type: MaterialType.transparency,
-      child: CantaeScaffold(
-        topLeft: Text(
-          'Biblioteca',
-          style: CantaeTypography.titlePage.copyWith(color: colors.text),
-        ),
-        topRight: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            NavPill(
-              variant: NavPillVariant.action,
-              label: 'Importar',
-              onTap: () => context.goNamed('package-import'),
-            ),
-            const SizedBox(width: CantaeSpacing.space2),
-            _AvatarButton(onTap: () => context.goNamed('profile')),
-          ],
-        ),
-        body: songsAsync.when(
-          loading: () => const _LoadingBody(),
-          error: (error, stackTrace) =>
-              _ErrorBody(onRetry: () => ref.invalidate(songsProvider)),
-          data: (songs) {
-            if (songs.isEmpty) {
-              return _EmptyBody(
-                // SPEC_DEVIATION: no named route exists yet for "cadastrar uma
-                // música" (song editor is out of this feature's scope per
-                // spec.md). Reuses `song-detail` (the nav map's own next step
-                // from Biblioteca) with a placeholder id so the button has a
-                // real, non-empty callback; not one of T19's required
-                // navigation assertions.
-                onCreateSong: () => context.goNamed(
-                  'song-detail',
-                  pathParameters: const {'id': 'new'},
-                ),
-                onOpenPackage: () => context.goNamed('package-import'),
-                onJoinRoom: () => context.goNamed('room-join'),
-              );
-            }
-            return const _PopulatedBody();
-          },
-        ),
-        footer: songsAsync.maybeWhen(
-          data: (songs) => songs.isEmpty ? null : _buildFooter(context),
-          orElse: () => _buildFooter(context),
-        ),
+    return CantaeScaffold(
+      topLeft: Text(
+        'Biblioteca',
+        style: CantaeTypography.titlePage.copyWith(color: colors.text),
+      ),
+      topRight: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          NavPill(
+            variant: NavPillVariant.action,
+            label: 'Importar',
+            onTap: () => context.goNamed('package-import'),
+          ),
+          const SizedBox(width: CantaeSpacing.space2),
+          _AvatarButton(onTap: () => context.goNamed('profile')),
+        ],
+      ),
+      body: songsAsync.when(
+        loading: () => const _LoadingBody(),
+        error: (error, stackTrace) =>
+            _ErrorBody(onRetry: () => ref.invalidate(songsProvider)),
+        data: (songs) {
+          if (songs.isEmpty) {
+            return _EmptyBody(
+              // SPEC_DEVIATION: no named route exists yet for "cadastrar uma
+              // música" (song editor is out of this feature's scope per
+              // spec.md). Reuses `song-detail` (the nav map's own next step
+              // from Biblioteca) with a placeholder id so the button has a
+              // real, non-empty callback; not one of T19's required
+              // navigation assertions.
+              onCreateSong: () => context.goNamed(
+                'song-detail',
+                pathParameters: const {'id': 'new'},
+              ),
+              onOpenPackage: () => context.goNamed('package-import'),
+              onJoinRoom: () => context.goNamed('room-join'),
+            );
+          }
+          return const _PopulatedBody();
+        },
+      ),
+      footer: songsAsync.maybeWhen(
+        data: (songs) => songs.isEmpty ? null : _buildFooter(context),
+        orElse: () => _buildFooter(context),
       ),
     );
   }
@@ -175,8 +166,6 @@ class _SkeletonRow extends StatelessWidget {
   }
 }
 
-/// `COMPONENTS.md`'s `InlineBanner`, `error` variant: `dangerBg`, 17/700
-/// title, 15 body text, tonal "Tentar de novo" action.
 class _ErrorBody extends StatelessWidget {
   const _ErrorBody({required this.onRetry});
 
@@ -184,49 +173,16 @@ class _ErrorBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<CantaeColors>()!;
     return Align(
       alignment: Alignment.topCenter,
-      child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: CantaeSpacing.space4),
-        padding: const EdgeInsets.all(CantaeSpacing.space4),
-        decoration: BoxDecoration(
-          color: colors.dangerBg,
-          borderRadius: BorderRadius.circular(CantaeRadii.radiusLg),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Não foi possível carregar sua biblioteca',
-              style: CantaeTypography.listTitle.copyWith(
-                color: colors.onDanger,
-              ),
-            ),
-            const SizedBox(height: CantaeSpacing.space1),
-            Text(
-              'Verifique o armazenamento do aparelho e tente de novo.',
-              style: CantaeTypography.bodySmall.copyWith(
-                color: colors.onDanger,
-              ),
-            ),
-            const SizedBox(height: CantaeSpacing.space3),
-            Semantics(
-              button: true,
-              label: 'Tentar de novo',
-              child: InkWell(
-                onTap: onRetry,
-                child: Text(
-                  'Tentar de novo',
-                  style: CantaeTypography.label.copyWith(
-                    color: colors.onDanger,
-                  ),
-                ),
-              ),
-            ),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.only(top: CantaeSpacing.space4),
+        child: InlineBanner(
+          variant: InlineBannerVariant.error,
+          title: 'Não foi possível carregar sua biblioteca',
+          message: 'Verifique o armazenamento do aparelho e tente de novo.',
+          actionLabel: 'Tentar de novo',
+          onAction: onRetry,
         ),
       ),
     );
