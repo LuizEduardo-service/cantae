@@ -492,18 +492,23 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: `flutter-ui-ux` (final screen-assembly pass — layout/accessibility checklist)
 
 **Done when**:
-- [ ] Loading: 5-row skeleton, `SearchField` disabled
-- [ ] Populated: search/filter/sort/count/list all functional per spec ACs LIB-02, 05, 06, 07, 08
-- [ ] Empty (zero songs): `EmptyState` per §6.2b, no search/filter UI
-- [ ] Filtered-empty (search or filter yields zero of a non-empty library): "Nada encontrado para "{query}"" + "Limpar busca"
-- [ ] Error: `InlineBanner` (error variant) + "Tentar de novo" invalidating `songsProvider`
-- [ ] Tapping a row calls `context.goNamed('song-detail', pathParameters: {'id': song.id})`; footer/top actions call the other 4 named routes
-- [ ] Widget tests for all 5 states + at least one dark-theme spot-check + navigation calls (using a fake `GoRouter`/route-observer, not a real navigation stack)
-- [ ] Gate check passes: `flutter test test/presentation/screens/`
-- [ ] Test count: 8+ new tests (one per state minimum, plus interaction tests)
+- [x] Loading: 5-row skeleton, `SearchField` disabled
+- [x] Populated: search/filter/sort/count/list all functional per spec ACs LIB-02, 05, 06, 07, 08
+- [x] Empty (zero songs): `EmptyState` per §6.2b, no search/filter UI
+- [x] Filtered-empty (search or filter yields zero of a non-empty library): "Nada encontrado para "{query}"" + "Limpar busca"
+- [x] Error: `InlineBanner` (error variant) + "Tentar de novo" invalidating `songsProvider`
+- [x] Tapping a row calls `context.goNamed('song-detail', pathParameters: {'id': song.id})`; footer/top actions call the other 4 named routes
+- [x] Widget tests for all 5 states + at least one dark-theme spot-check + navigation calls (using a fake `GoRouter`/route-observer, not a real navigation stack)
+- [x] Gate check passes: `flutter test test/presentation/screens/`
+- [x] Test count: 8+ new tests (one per state minimum, plus interaction tests)
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 13/13 new tests pass (107/107 whole `test/presentation/` suite). Two deviations, both documented inline with `SPEC_DEVIATION` comments in `library_screen.dart`:
+1. **`go_router` dependency moved to this commit.** `pubspec.yaml`'s `go_router: ^18.1.4` line (nominally T20's deliverable) had to land with T19, not T20 — `context.goNamed(...)` won't compile without it. Same "can't gate in isolation" issue as Phase 2's T3-T6, resolved the same way (moved to the commit that actually needs it to compile). T20 does not re-add it.
+2. **`InlineBanner` built as a private widget inside `library_screen.dart`, not a new shared `lib/presentation/widgets/` file.** `spec.md`/`UI_SPEC.md` require it for the error state, but no task in Phase 3 (T8-T15) created it as a shared component, and T19's own `Where` doesn't list a new widgets file. Kept in-scope by building `_ErrorBody` as a private widget matching `COMPONENTS.md`'s documented `InlineBanner` shape (raio 16, padding 14-16, `dangerBg`, 17/700 title, 15pt body, tonal action) rather than skipping the error state or inventing a new shared-widget task.
+3. **`CantaeScaffold` has no `Material` ancestor of its own**, and `SongRow`'s/the error banner's/filtered-empty's `InkWell`s don't carry their own (unlike `NavPill`/`PrimaryButton`/`SecondaryButton`, which do) — this only surfaced now because T19 is the first consumer to combine them. Fixed by wrapping this screen's own return value in `Material(type: MaterialType.transparency, ...)` inside `library_screen.dart`, not by editing the already-shipped `CantaeScaffold` (T8, out of this task's `Where`).
+4. **"Nada encontrado" copy for the origin-filter-only empty case** (no search query) is a spec-precision gap — `spec.md` only defines the exact copy for the search-query case. Falls back to the same message without the quoted query; noted inline.
 
 ---
 
