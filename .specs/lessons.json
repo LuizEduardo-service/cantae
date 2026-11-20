@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 10,
+  "next_id": 13,
   "lessons": [
     {
       "id": "L-001",
@@ -166,6 +166,60 @@
       ],
       "created": "2026-11-19T08:21:45Z",
       "last_seen": "2026-11-19T08:21:45Z"
+    },
+    {
+      "id": "L-010",
+      "key": "spec_precision_gap::when a spec defines exact empty result copy only for the search query case explicitly define the origin filter only empty result copy too instead of leaving it to a silent fallback",
+      "text": "When a spec defines exact empty-result copy only for the search-query case, explicitly define the origin/filter-only empty-result copy too, instead of leaving it to a silent fallback.",
+      "signal": "spec_precision_gap",
+      "scope": "presentation",
+      "status": "candidate",
+      "features": [
+        "library-screen"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "LIB-04 / lib/presentation/screens/library/library_screen.dart:396-397 (presentation)"
+      ],
+      "created": "2026-11-20T01:53:56Z",
+      "last_seen": "2026-11-20T01:53:56Z"
+    },
+    {
+      "id": "L-011",
+      "key": "spec_deviation::give shared scaffold shell widgets a material ancestor up front so every screen s bare inkwell based children work without a per screen material wrapper workaround",
+      "text": "Give shared scaffold/shell widgets a Material ancestor up front so every screen's bare InkWell-based children work without a per-screen Material wrapper workaround.",
+      "signal": "spec_deviation",
+      "scope": "presentation",
+      "status": "candidate",
+      "features": [
+        "library-screen"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "lib/presentation/widgets/cantae_scaffold.dart:33-75 (worked around in lib/presentation/screens/library/library_screen.dart:37-38) (presentation)"
+      ],
+      "created": "2026-11-20T01:53:57Z",
+      "last_seen": "2026-11-20T01:53:57Z"
+    },
+    {
+      "id": "L-012",
+      "key": "spec_deviation::build a component named in components md as its own shared widget file as soon as a second screen will plausibly need it not as a screen private widget to avoid future duplication",
+      "text": "Build a component named in COMPONENTS.md as its own shared widget file as soon as a second screen will plausibly need it, not as a screen-private widget, to avoid future duplication.",
+      "signal": "spec_deviation",
+      "scope": "presentation",
+      "status": "candidate",
+      "features": [
+        "library-screen"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "lib/presentation/screens/library/library_screen.dart (private _ErrorBody, T19 Status note) (presentation)"
+      ],
+      "created": "2026-11-20T01:53:58Z",
+      "last_seen": "2026-11-20T01:53:58Z"
     }
   ]
 }

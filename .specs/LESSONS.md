@@ -68,6 +68,24 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: lib/presentation/theme/cantae_colors.dart:123-125 (warningInline) (presentation/theme)
 - last seen: 2026-11-19T08:21:45Z
 
+### L-010 - When a spec defines exact empty-result copy only for the search-query case, explicitly define the origin/filter-only empty-result copy too, instead of leaving it to a silent fallback.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `presentation` · harmful: 0
+- features: library-screen
+- evidence: LIB-04 / lib/presentation/screens/library/library_screen.dart:396-397 (presentation)
+- last seen: 2026-11-20T01:53:56Z
+
+### L-011 - Give shared scaffold/shell widgets a Material ancestor up front so every screen's bare InkWell-based children work without a per-screen Material wrapper workaround.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `presentation` · harmful: 0
+- features: library-screen
+- evidence: lib/presentation/widgets/cantae_scaffold.dart:33-75 (worked around in lib/presentation/screens/library/library_screen.dart:37-38) (presentation)
+- last seen: 2026-11-20T01:53:57Z
+
+### L-012 - Build a component named in COMPONENTS.md as its own shared widget file as soon as a second screen will plausibly need it, not as a screen-private widget, to avoid future duplication.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `presentation` · harmful: 0
+- features: library-screen
+- evidence: lib/presentation/screens/library/library_screen.dart (private _ErrorBody, T19 Status note) (presentation)
+- last seen: 2026-11-20T01:53:58Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
