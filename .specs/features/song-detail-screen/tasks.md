@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/song-detail-screen/design.md`
-**Status**: Done — all 5 tasks (T1-T5) complete. Full BUILD gate green (`flutter analyze` 0 issues, `flutter test` 410/410, `check_layers.py` OK, `dart analyze lib/domain/` clean). Awaiting independent Verifier pass.
+**Status**: Done and Verified. All 5 tasks (T1-T5) complete; one Verifier fix→re-verify cycle (iteration 1 FAIL — evidence-or-zero gap on 4 of 23 ACs, closed by a test-only follow-up commit — iteration 2 PASS, 23/23 ACs, 414/414 tests, 3/3 sensor mutations killed). Report: `.specs/features/song-detail-screen/validation.md`.
 
 ---
 

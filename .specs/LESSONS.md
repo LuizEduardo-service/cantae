@@ -86,6 +86,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: lib/presentation/screens/library/library_screen.dart (private _ErrorBody, T19 Status note) (presentation)
 - last seen: 2026-11-20T01:53:58Z
 
+### L-013 - When a screen has two symmetric footer/row actions wired the same way (e.g. two buttons both calling goNamed), write a navigation-assertion test for each one individually, not just the first — identical wiring does not excuse skipping the test for its sibling.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `presentation/screens` · harmful: 0
+- features: song-detail-screen
+- evidence: DETAIL-12/DETAIL-13 (presentation/screens)
+- last seen: 2026-11-20T17:40:42Z
+
+### L-014 - When a spec requires N identically-shaped rows/actions (e.g. a 4-row 'Preparar' section), test navigation for every row individually, not just one representative row — rendering/presence checks do not substitute for a per-row tap-and-navigate assertion.
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `presentation/screens` · harmful: 0
+- features: song-detail-screen
+- evidence: DETAIL-08/DETAIL-09 (presentation/screens)
+- last seen: 2026-11-20T17:40:53Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
