@@ -342,12 +342,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] All 4 variants render with the letter/name required by `VoicePartColors` (color is never the only signal — letter always present)
-- [ ] Widget test: each variant renders its letter, `missing` shows dashed outline, both themes
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] All 4 variants render with the letter/name required by `VoicePartColors` (color is never the only signal — letter always present)
+- [x] Widget test: each variant renders its letter, `missing` shows dashed outline, both themes
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 30/30 widget tests pass (whole suite). `filled`/`missing` take an explicit `part` to pick the right letter (S/C/T/B); `missing` always resolves color via `VoicePartColors.of(VoicePart.semFaixa, ...)` and renders a small `CustomPainter`-drawn dashed rounded outline instead of a solid fill, matching DESIGN_SYSTEM §2.3.
 
 ---
 
