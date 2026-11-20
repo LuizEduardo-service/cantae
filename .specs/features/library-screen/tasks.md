@@ -279,12 +279,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] All 4 variants render with correct label/semantics (button role)
-- [ ] Widget test: each variant, both themes, tap callback fires
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] All 4 variants render with correct label/semantics (button role)
+- [x] Widget test: each variant, both themes, tap callback fires
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 13/13 widget tests pass. `back` prefixes the label with "‹ "; the other 3 variants render the caller-supplied label as-is, matching `COMPONENTS.md`'s per-variant copy examples.
 
 ---
 
