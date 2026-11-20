@@ -1,0 +1,4 @@
+enum SongOrigin {
+  created,
+  received,
+}

@@ -13,4 +13,6 @@ abstract class SongRepository {
   Future<Result<Unit, Failure>> delete(String id);
 
   Future<Result<Unit, StorageFailure>> deleteAll();
+
+  Future<Result<Unit, Failure>> markRehearsed(String id, DateTime at);
 }

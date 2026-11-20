@@ -12,6 +12,8 @@ class SongsTable extends Table {
   IntColumn get metronomeBeatsPerMeasure => integer().nullable()();
   BoolColumn get metronomeDownbeatAccent => boolean().nullable()();
   BoolColumn get metronomeEnabledByDefault => boolean().nullable()();
+  TextColumn get origin => text().withDefault(const Constant('created'))();
+  DateTimeColumn get lastRehearsedAt => dateTime().nullable()();
 
   @override
   Set<Column> get primaryKey => {id};

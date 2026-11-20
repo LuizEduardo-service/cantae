@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 
 SongTrack _track(Naipe naipe, {bool isPlayback = false}) => SongTrack(
@@ -125,6 +126,29 @@ void main() {
         ],
       );
       expect(song.isComplete, isTrue);
+    });
+  });
+
+  group('Song.origin / Song.lastRehearsedAt (LIB-12)', () {
+    test('default to SongOrigin.created and null when not passed', () {
+      const song = Song(id: 's1', name: 'Defaults', author: 'A');
+
+      expect(song.origin, equals(SongOrigin.created));
+      expect(song.lastRehearsedAt, isNull);
+    });
+
+    test('round-trip an explicit origin and lastRehearsedAt through the constructor', () {
+      final rehearsedAt = DateTime.utc(2026, 11, 1, 10, 30);
+      final song = Song(
+        id: 's1',
+        name: 'Explicit',
+        author: 'A',
+        origin: SongOrigin.received,
+        lastRehearsedAt: rehearsedAt,
+      );
+
+      expect(song.origin, equals(SongOrigin.received));
+      expect(song.lastRehearsedAt, equals(rehearsedAt));
     });
   });
 }

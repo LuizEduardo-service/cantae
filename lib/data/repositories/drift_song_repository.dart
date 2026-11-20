@@ -168,4 +168,21 @@ class DriftSongRepository implements SongRepository {
     await _db.delete(_db.songsTable).go();
     return const Result.success(Unit());
   }
+
+  @override
+  Future<Result<Unit, Failure>> markRehearsed(String id, DateTime at) async {
+    final existing = await (_db.select(_db.songsTable)
+          ..where((s) => s.id.equals(id)))
+        .getSingleOrNull();
+
+    if (existing == null) {
+      return Result.failure(NotFoundFailure(code: 'song_not_found'));
+    }
+
+    await (_db.update(_db.songsTable)..where((s) => s.id.equals(id))).write(
+      SongsTableCompanion(lastRehearsedAt: Value(at)),
+    );
+
+    return const Result.success(Unit());
+  }
 }

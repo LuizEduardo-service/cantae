@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 import 'package:cantae/domain/entities/lyric_line.dart';
 import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/infrastructure/database/app_database.dart';
 
@@ -19,6 +20,8 @@ class SongMapper {
       metronomeBeatsPerMeasure: Value(config?.beatsPerMeasure),
       metronomeDownbeatAccent: Value(config?.downbeatAccent),
       metronomeEnabledByDefault: Value(config?.enabledByDefault),
+      origin: Value(song.origin.name),
+      lastRehearsedAt: Value(song.lastRehearsedAt),
     );
   }
 
@@ -43,6 +46,8 @@ class SongMapper {
       tracks: tracks,
       lyrics: lyrics,
       playbackTrack: playbackTrack,
+      origin: SongOrigin.values.byName(row.origin),
+      lastRehearsedAt: row.lastRehearsedAt,
       metronomeConfig: hasConfig
           ? MetronomeConfig(
               bpm: row.metronomeBpm!,
