@@ -258,12 +258,13 @@ T20 -> T21
 **Tools**: MCP: NONE · Skill: `flutter-clean-architecture` (confirm `presentation/widgets/` placement — first widget file in this directory)
 
 **Done when**:
-- [ ] Renders top/body/footer slots per `COMPONENTS.md`
-- [ ] Widget test: renders with/without footer, both themes, safe-area respected
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Renders top/body/footer slots per `COMPONENTS.md`
+- [x] Widget test: renders with/without footer, both themes, safe-area respected
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 5/5 widget tests pass (`flutter test test/presentation/widgets/`). `topLeft`/`topRight` wrapped in `Flexible` to keep the top row from overflowing — needed because `flutter_test`'s fallback font metrics render plain text far wider than the real Geist font, a test-harness artifact (not a real-device issue) that applies to every Row-of-text widget in this batch.
 
 ---
 
