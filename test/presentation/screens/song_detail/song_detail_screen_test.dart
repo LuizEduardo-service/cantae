@@ -211,6 +211,22 @@ void main() {
       },
     );
 
+    testWidgets(
+      'nenhum naipe cadastrado (tracks vazio): todos os 4 aparecem como faltantes, sem erro',
+      (tester) async {
+        const song = Song(id: 's1', name: 'Ave Maria', author: 'Schubert');
+        final repo = _FakeSongRepository(
+          getById: (_) async => const Result.success(song),
+        );
+        await tester.pumpWidget(_wrap(repo));
+        await tester.pumpAndSettle();
+
+        expect(tester.takeException(), isNull);
+        expect(find.textContaining('Incompleta'), findsOneWidget);
+        expect(find.text('Enviar faixa'), findsNWidgets(4));
+      },
+    );
+
     testWidgets('"Enviar faixa" navigates to the track-upload route', (
       tester,
     ) async {
@@ -240,6 +256,65 @@ void main() {
       expect(find.text('route:studio'), findsOneWidget);
     });
 
+    testWidgets('"Alinhar entradas" navigates to the track-align route', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_completeSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Alinhar entradas'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.textContaining('Alinhar entradas'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:track-align'), findsOneWidget);
+    });
+
+    testWidgets('"Sincronizar letra" navigates to the lyrics-editor route', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_completeSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Sincronizar letra'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.ensureVisible(find.textContaining('Sincronizar letra'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.textContaining('Sincronizar letra'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:lyrics-editor'), findsOneWidget);
+    });
+
+    testWidgets('"Ensaios anteriores" navigates to the song-history route', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_completeSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.textContaining('Ensaios anteriores'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.textContaining('Ensaios anteriores'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:song-history'), findsOneWidget);
+    });
+
     testWidgets('"Exportar" navigates to the package-import route', (
       tester,
     ) async {
@@ -254,7 +329,7 @@ void main() {
       expect(find.text('route:package-import'), findsOneWidget);
     });
 
-    testWidgets('rodapé: "Ensaiar só" e "Ensaiar em grupo" navigate correctly', (
+    testWidgets('rodapé: "Ensaiar só" navigates to the solo-player route', (
       tester,
     ) async {
       final repo = _FakeSongRepository(
@@ -266,6 +341,20 @@ void main() {
       await tester.tap(find.text('Ensaiar só'));
       await tester.pumpAndSettle();
       expect(find.text('route:solo-player'), findsOneWidget);
+    });
+
+    testWidgets('rodapé: "Ensaiar em grupo" navigates to the room-create route', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_completeSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Ensaiar em grupo'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:room-create'), findsOneWidget);
     });
 
     testWidgets(
