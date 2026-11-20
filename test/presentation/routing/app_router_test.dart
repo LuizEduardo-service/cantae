@@ -7,6 +7,7 @@ import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
+import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,8 +24,8 @@ class _EmptySongRepository implements SongRepository {
       throw UnimplementedError();
 
   @override
-  Future<Result<Song, Failure>> getById(String id) =>
-      throw UnimplementedError();
+  Future<Result<Song, Failure>> getById(String id) async =>
+      Result.failure(NotFoundFailure(code: 'song_not_found'));
 
   @override
   Future<Result<Unit, Failure>> delete(String id) =>
@@ -67,14 +68,19 @@ void main() {
       expect(find.byType(ComingSoonScreen), findsNothing);
     });
 
-    testWidgets('song-detail renders ComingSoonScreen', (tester) async {
+    testWidgets('song-detail renders SongDetailScreen with the route id', (
+      tester,
+    ) async {
       final router = await _pumpRouter(tester);
 
       router.goNamed('song-detail', pathParameters: {'id': 'abc'});
       await tester.pumpAndSettle();
 
-      expect(find.byType(ComingSoonScreen), findsOneWidget);
-      expect(find.text('Detalhe da música'), findsOneWidget);
+      expect(find.byType(SongDetailScreen), findsOneWidget);
+      expect(
+        tester.widget<SongDetailScreen>(find.byType(SongDetailScreen)).songId,
+        equals('abc'),
+      );
     });
 
     testWidgets('room-create renders ComingSoonScreen', (tester) async {
@@ -116,5 +122,24 @@ void main() {
       expect(find.byType(ComingSoonScreen), findsOneWidget);
       expect(find.text('Importar pacote'), findsOneWidget);
     });
+
+    for (final entry in {
+      'solo-player': 'Modo solo',
+      'studio': 'Studio — corte de áudio',
+      'track-align': 'Alinhar entradas',
+      'lyrics-editor': 'Sincronizar letra',
+      'song-history': 'Ensaios anteriores',
+      'track-upload': 'Enviar faixa',
+    }.entries) {
+      testWidgets('${entry.key} renders ComingSoonScreen', (tester) async {
+        final router = await _pumpRouter(tester);
+
+        router.goNamed(entry.key);
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ComingSoonScreen), findsOneWidget);
+        expect(find.text(entry.value), findsOneWidget);
+      });
+    }
   });
 }

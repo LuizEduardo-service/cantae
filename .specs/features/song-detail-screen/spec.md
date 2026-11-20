@@ -144,7 +144,7 @@ Documentado para evitar scope creep.
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| DETAIL-01 | P1: Ver o hub da música | Design | Pending |
+| DETAIL-01 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-02 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-03 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-04 | P1: Ver o hub da música | Design | Implementing |
@@ -168,7 +168,7 @@ Documentado para evitar scope creep.
 | DETAIL-22 | P2: Exportar | Design | Implementing |
 | DETAIL-23 | P2: Exportar | Design | Implementing |
 
-**Coverage:** 23 total, 0 mapped to tasks, 23 unmapped ⚠️ (esperado antes da fase Tasks)
+**Coverage:** 23 total, 23 mapped, 0 unmapped.
 
 ---
 

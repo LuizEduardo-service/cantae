@@ -181,14 +181,15 @@ T4 --> T5
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `song-detail` resolve para `SongDetailScreen` com o `id` da rota
-- [ ] Os 6 novos nomes de rota resolvem para `ComingSoonScreen` com um título apropriado cada
-- [ ] Widget test: pumping a `MaterialApp.router` com este router — `goNamed('song-detail', pathParameters: {'id': ...})` mostra `SongDetailScreen`; `goNamed` em cada uma das 6 novas mostra `ComingSoonScreen`
-- [ ] Gate check passes (último task da feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
-- [ ] Test count: 7+ new tests; suíte total ≥ 377 (contagem no início desta feature) + todos os testes novos de T1-T5
+- [x] `song-detail` resolve para `SongDetailScreen` com o `id` da rota
+- [x] Os 6 novos nomes de rota resolvem para `ComingSoonScreen` com um título apropriado cada
+- [x] Widget test: pumping a `MaterialApp.router` com este router — `goNamed('song-detail', pathParameters: {'id': ...})` mostra `SongDetailScreen`; `goNamed` em cada uma das 6 novas mostra `ComingSoonScreen`
+- [x] Gate check passes (último task da feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
+- [x] Test count: 7+ new tests; suíte total ≥ 377 (contagem no início desta feature) + todos os testes novos de T1-T5
 
 **Tests**: widget
 **Gate**: build
+**Status**: ✅ Complete. 12/12 new/changed tests pass in `test/presentation/routing/`. Full BUILD gate green: `flutter analyze` 0 issues, `flutter test` 410/410 clean on a fresh run (two timing-sensitive tests in `room_session_controller_test.dart`/`song_sync_coordinator_test.dart` flaked once mid-feature — confirmed untouched by this branch via `git diff --stat develop...HEAD`, confirmed passing in isolation, and the full suite reran green), `check_layers.py` + `dart analyze lib/domain/` clean.
 
 ---
 
