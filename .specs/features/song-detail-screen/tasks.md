@@ -128,15 +128,16 @@ T4 --> T5
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Resolves `AsyncData(Result.success(song))` when the repository finds the song
-- [ ] Resolves `AsyncData(Result.failure(NotFoundFailure))` when the repository returns `NotFoundFailure` (never surfaces as `AsyncError`)
-- [ ] Resolves `AsyncData(Result.failure(other))` for any other `Failure` (same: stays `AsyncData`, not `AsyncError` — only a thrown exception from the repository call itself would produce `AsyncError`, which doesn't happen in the real `DriftSongRepository`)
-- [ ] Unit tests (`ProviderContainer`, fake `SongRepository`): one per branch above
-- [ ] Gate check passes: `flutter test test/presentation/providers/`
-- [ ] Test count: 3+ new tests
+- [x] Resolves `AsyncData(Result.success(song))` when the repository finds the song
+- [x] Resolves `AsyncData(Result.failure(NotFoundFailure))` when the repository returns `NotFoundFailure` (never surfaces as `AsyncError`)
+- [x] Resolves `AsyncData(Result.failure(other))` for any other `Failure` (same: stays `AsyncData`, not `AsyncError` — only a thrown exception from the repository call itself would produce `AsyncError`, which doesn't happen in the real `DriftSongRepository`)
+- [x] Unit tests (`ProviderContainer`, fake `SongRepository`): one per branch above
+- [x] Gate check passes: `flutter test test/presentation/providers/`
+- [x] Test count: 3+ new tests
 
 **Tests**: unit
 **Gate**: quick
+**Status**: ✅ Complete. 3/3 new tests pass (13/13 `test/presentation/providers/`).
 
 ---
 

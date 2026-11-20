@@ -145,10 +145,10 @@ Documentado para evitar scope creep.
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
 | DETAIL-01 | P1: Ver o hub da música | Design | Pending |
-| DETAIL-02 | P1: Ver o hub da música | Design | Pending |
+| DETAIL-02 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-03 | P1: Ver o hub da música | Design | Pending |
-| DETAIL-04 | P1: Ver o hub da música | Design | Pending |
-| DETAIL-05 | P1: Ver o hub da música | Design | Pending |
+| DETAIL-04 | P1: Ver o hub da música | Design | Implementing |
+| DETAIL-05 | P1: Ver o hub da música | Design | Implementing |
 | DETAIL-06 | P1: Ver o hub da música | Design | Pending |
 | DETAIL-07 | P1: Ver o hub da música | Design | Pending |
 | DETAIL-08 | P1: Preparar e ensaiar | Design | Pending |
