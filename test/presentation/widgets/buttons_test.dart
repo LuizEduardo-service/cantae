@@ -2,6 +2,7 @@ import 'dart:ui' show Tristate;
 
 import 'package:cantae/presentation/widgets/buttons.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
+import 'package:cantae/presentation/theme/cantae_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -127,6 +128,94 @@ void main() {
       );
 
       expect(find.text('Entrar em sala'), findsOneWidget);
+    });
+  });
+
+  group('DestructiveButton', () {
+    testWidgets('tonal variant renders dangerBg background and onDanger text', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          DestructiveButton(
+            label: 'Apagar desta música',
+            onPressed: () {},
+          ),
+          theme: AppTheme.light,
+        ),
+      );
+
+      expect(find.text('Apagar desta música'), findsOneWidget);
+      final material = tester.widget<Material>(
+        find
+            .ancestor(of: find.byType(InkWell), matching: find.byType(Material))
+            .first,
+      );
+      expect(material.color, AppTheme.light.extension<CantaeColors>()!.dangerBg);
+      final text = tester.widget<Text>(find.text('Apagar desta música'));
+      expect(
+        text.style?.color,
+        AppTheme.light.extension<CantaeColors>()!.onDanger,
+      );
+    });
+
+    testWidgets('solid variant renders dangerSolid background and white text', (
+      tester,
+    ) async {
+      var tapped = false;
+      await tester.pumpWidget(
+        _wrap(
+          DestructiveButton(
+            label: 'Apagar definitivamente',
+            variant: DestructiveButtonVariant.solid,
+            onPressed: () => tapped = true,
+          ),
+          theme: AppTheme.light,
+        ),
+      );
+
+      final material = tester.widget<Material>(
+        find
+            .ancestor(of: find.byType(InkWell), matching: find.byType(Material))
+            .first,
+      );
+      expect(
+        material.color,
+        AppTheme.light.extension<CantaeColors>()!.dangerSolid,
+      );
+      final text = tester.widget<Text>(find.text('Apagar definitivamente'));
+      expect(text.style?.color, Colors.white);
+
+      await tester.tap(find.text('Apagar definitivamente'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('disabled state (no onPressed) blocks taps', (tester) async {
+      await tester.pumpWidget(
+        _wrap(
+          const DestructiveButton(label: 'Indisponível'),
+          theme: AppTheme.light,
+        ),
+      );
+
+      final semantics = tester.getSemantics(find.byType(DestructiveButton));
+      expect(semantics.flagsCollection.isEnabled, Tristate.isFalse);
+    });
+
+    testWidgets('renders under the dark theme without throwing', (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          DestructiveButton(
+            label: 'Apagar desta música',
+            onPressed: () {},
+          ),
+          theme: AppTheme.dark,
+        ),
+      );
+
+      expect(find.text('Apagar desta música'), findsOneWidget);
     });
   });
 }

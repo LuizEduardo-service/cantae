@@ -160,7 +160,7 @@ Documentado para evitar scope creep.
 | DETAIL-14 | P1: Modo somente leitura | Design | Pending |
 | DETAIL-15 | P1: Modo somente leitura | Design | Pending |
 | DETAIL-16 | P1: Modo somente leitura | Design | Pending |
-| DETAIL-17 | P1: Excluir música | Design | Pending |
+| DETAIL-17 | P1: Excluir música | Design | Implementing |
 | DETAIL-18 | P1: Excluir música | Design | Pending |
 | DETAIL-19 | P1: Excluir música | Design | Pending |
 | DETAIL-20 | P1: Excluir música | Design | Pending |
