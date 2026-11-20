@@ -105,14 +105,15 @@ T4 --> T5
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `steps: 1` (this feature's only consumer): shows `title`, `message`, a safe action (`safeLabel`) and a destructive action (`destructiveLabel`); tapping destructive resolves `show()` to `true`, tapping safe/dismissing resolves to `false`
-- [ ] `steps: 2` + `typedConfirmation`: second step's final button stays disabled until the typed text matches (case-insensitive), per `UI_GUIDELINES.md` §11 — exercised even though this feature's own consumer (T4) only uses `steps: 1`, since the component itself must match the full `COMPONENTS.md` shape (see design.md's Tech Decisions)
-- [ ] Widget tests: 1-step confirm, 1-step cancel, 2-step typed-confirmation gating (disabled until match, case-insensitive), one dark-theme spot-check
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
-- [ ] Test count: 4+ new tests
+- [x] `steps: 1` (this feature's only consumer): shows `title`, `message`, a safe action (`safeLabel`) and a destructive action (`destructiveLabel`); tapping destructive resolves `show()` to `true`, tapping safe/dismissing resolves to `false`
+- [x] `steps: 2` + `typedConfirmation`: second step's final button stays disabled until the typed text matches (case-insensitive), per `UI_GUIDELINES.md` §11 — exercised even though this feature's own consumer (T4) only uses `steps: 1`, since the component itself must match the full `COMPONENTS.md` shape (see design.md's Tech Decisions)
+- [x] Widget tests: 1-step confirm, 1-step cancel, 2-step typed-confirmation gating (disabled until match, case-insensitive), one dark-theme spot-check
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Test count: 4+ new tests
 
 **Tests**: widget
 **Gate**: full
+**Status**: ✅ Complete. 4/4 new tests pass (63/63 `test/presentation/widgets/`).
 
 ---
 
