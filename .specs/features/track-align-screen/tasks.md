@@ -242,17 +242,19 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Carregando: esqueleto, sem `TrackAlignRow` nem rodapé (ALIGN-02)
-- [ ] Sem faixas: `EmptyState` com ações para `studio`/`track-upload` (ALIGN-03)
-- [ ] Erro ao carregar o motor: `InlineBanner` erro + "Tentar de novo" (ALIGN-06)
-- [ ] Carregado: um `TrackAlignRow` por naipe com faixa, campos de início/fim do trecho, rodapé "Ouvir em loop"/"Salvar atrasos" (ALIGN-04, 05)
-- [ ] Editar atraso, mudo, solo e trecho de loop refletem no `trackAlignProvider` e na UI (ALIGN-07 a 16)
-- [ ] "Ouvir em loop" vira "Parar" enquanto testando (ALIGN-14, 15, 16)
-- [ ] "Salvar atrasos" bem-sucedido mostra `Toast` "Atrasos salvos"; falha mostra erro inline (ALIGN-17, 18)
-- [ ] Voltar com alterações não salvas abre `ConfirmSheet`; confirmando, navega para `song-detail`; sem alterações, navega direto (ALIGN-19, 20, 21)
-- [ ] Widget tests: uma por estado/comportamento acima, usando um `GoRouter` de teste com builders stub (mesmo padrão das features anteriores)
-- [ ] Gate check passes: `flutter test test/presentation/screens/`
-- [ ] Test count: 12+ new tests
+- [x] Carregando: esqueleto, sem `TrackAlignRow` nem rodapé (ALIGN-02)
+- [x] Sem faixas: `EmptyState` com ações para `studio`/`track-upload` (ALIGN-03)
+- [x] Erro ao carregar o motor: `InlineBanner` erro + "Tentar de novo" (ALIGN-06)
+- [x] Carregado: um `TrackAlignRow` por naipe com faixa, campos de início/fim do trecho, rodapé "Ouvir em loop"/"Salvar atrasos" (ALIGN-04, 05)
+- [x] Editar atraso, mudo, solo e trecho de loop refletem no `trackAlignProvider` e na UI (ALIGN-07 a 16)
+- [x] "Ouvir em loop" vira "Parar" enquanto testando (ALIGN-14, 15, 16)
+- [x] "Salvar atrasos" bem-sucedido mostra `Toast` "Atrasos salvos"; falha mostra erro inline (ALIGN-17, 18)
+- [x] Voltar com alterações não salvas abre `ConfirmSheet`; confirmando, navega para `song-detail`; sem alterações, navega direto (ALIGN-19, 20, 21)
+- [x] Widget tests: uma por estado/comportamento acima, usando um `GoRouter` de teste com builders stub (mesmo padrão das features anteriores)
+- [x] Gate check passes: `flutter test test/presentation/screens/`
+- [x] Test count: 12+ new tests (12)
+
+**Status: Done.** Bug found and fixed while writing T7's tests: `TrackAlignNotifier._stopTest` awaited `_positionSubscription?.cancel()`, whose Future never resolved for a never-emitted broadcast-stream subscription under `flutter test`'s FakeAsync zone — removed the await (nothing depended on it completing). Also fixed `FakeAudioPlaybackEngine` in `test/data/playback/playback_command_handler_test.dart` to implement T2's 5 new interface members (full-suite `flutter analyze` caught this).
 
 **Tests**: widget
 **Gate**: full

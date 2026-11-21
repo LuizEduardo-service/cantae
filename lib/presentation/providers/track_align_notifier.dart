@@ -236,7 +236,11 @@ class TrackAlignNotifier extends StateNotifier<TrackAlignState> {
   }
 
   Future<void> _stopTest() async {
-    await _positionSubscription?.cancel();
+    // Deliberately not awaited: cancelling a subscription with no events
+    // pending has nothing for the caller to wait on, and awaiting it here
+    // has been observed to never resolve for some broadcast-stream
+    // implementations under test (FakeAsync).
+    _positionSubscription?.cancel();
     _positionSubscription = null;
     await _engine.stop();
     state = state.copyWith(testing: false);
