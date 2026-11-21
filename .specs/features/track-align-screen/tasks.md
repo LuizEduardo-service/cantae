@@ -141,10 +141,12 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `ProviderContainer().read(audioPlaybackEngineProvider)` returns a `MultiTrackAudioEngine` instance
-- [ ] Disposing the container calls the engine's `dispose()` without throwing
-- [ ] Gate check passes: `flutter test test/presentation/providers/`
-- [ ] Test count: 2+ new tests
+- [x] `ProviderContainer().read(audioPlaybackEngineProvider)` returns a `MultiTrackAudioEngine` instance
+- [x] Disposing the container calls the engine's `dispose()` without throwing
+- [x] Gate check passes: `flutter test test/presentation/providers/`
+- [x] Test count: 2+ new tests (2)
+
+**Status: Done.**
 
 **Tests**: unit
 **Gate**: quick
