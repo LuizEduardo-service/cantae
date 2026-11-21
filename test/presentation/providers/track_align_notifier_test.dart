@@ -152,12 +152,16 @@ Song _songWith({int sopranoDelayMs = 0}) => Song(
   return (container: container, engine: engine, repo: repo);
 }
 
-/// Constructs `trackAlignProvider(id)`'s notifier (if not already read),
-/// waits for `songByIdProvider` to resolve, then flushes the microtask
-/// queue a few more times so `TrackAlignNotifier._onSongLoaded`'s own
-/// `await engine.loadSong(...)` tail has a chance to complete too.
+/// `trackAlignProvider` is `autoDispose` (so a loop test stops when the
+/// real screen unmounts) — a bare `container.read` would tear it right back
+/// down with no listener attached. `container.listen` pins it alive for the
+/// container's lifetime, same as the real screen's `ref.watch` would.
+/// Constructs the notifier, waits for `songByIdProvider` to resolve, then
+/// flushes the microtask queue a few more times so
+/// `TrackAlignNotifier._onSongLoaded`'s own `await engine.loadSong(...)`
+/// tail has a chance to complete too.
 Future<void> _settle(ProviderContainer container, String id) async {
-  container.read(trackAlignProvider(id));
+  container.listen(trackAlignProvider(id), (_, __) {});
   await container.read(songByIdProvider(id).future);
   for (var i = 0; i < 5; i++) {
     await Future<void>.delayed(Duration.zero);
@@ -387,6 +391,30 @@ void main() {
         setup.container.read(trackAlignProvider('song-1')).hasUnsavedChanges,
         isFalse,
       );
+    });
+  });
+
+  group('autoDispose', () {
+    test('stops playback once nothing is watching the provider anymore', () async {
+      final setup = _setUp();
+      setup.engine.durationMsValue = 10000;
+      addTearDown(setup.container.dispose);
+      final subscription =
+          setup.container.listen(trackAlignProvider('song-1'), (_, __) {});
+      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      await setup.container.read(songByIdProvider('song-1').future);
+      for (var i = 0; i < 5; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+      notifier.setLoopStart(0);
+      notifier.setLoopEnd(2000);
+      await notifier.toggleTest();
+      expect(setup.container.read(trackAlignProvider('song-1')).testing, isTrue);
+
+      subscription.close();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(setup.engine.stopped, isTrue);
     });
   });
 }

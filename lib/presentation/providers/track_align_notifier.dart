@@ -84,8 +84,12 @@ class TrackAlignState {
   }
 }
 
-final trackAlignProvider =
-    StateNotifierProvider.family<TrackAlignNotifier, TrackAlignState, String>(
+/// `autoDispose`: the notifier (and the `engine.stop()` its `dispose()`
+/// triggers) must tear down when the screen unmounts — otherwise a loop
+/// test left running would keep audio playing in the background
+/// indefinitely (spec.md's Edge Cases).
+final trackAlignProvider = StateNotifierProvider.autoDispose
+    .family<TrackAlignNotifier, TrackAlignState, String>(
   (ref, songId) => TrackAlignNotifier(ref, songId),
 );
 
