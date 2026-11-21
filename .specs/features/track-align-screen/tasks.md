@@ -113,15 +113,17 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `setTrackMuted(trackId, true)` sets that track's volume to 0 (via `setVolume`), leaves other tracks' volume unchanged; `setTrackMuted(trackId, false)` restores its base gain
-- [ ] `setTrackSolo(trackId, true)` sets every *other* loaded track's volume to 0 and restores the soloed track's base gain, regardless of its own mute state; activating solo on a second track clears the first track's solo and restores its volume per its own mute state
-- [ ] `setTrackStartDelayMs(trackId, newDelay)` changes only the internal map — a subsequent `seekAllTo(timelineMs)` computes that track's local seek target using the new delay, without calling `load`/`setFilePath` again
-- [ ] `durationMs` is `null` before `loadSong` resolves; after, equals the maximum of `startDelayMs + file duration` across all loaded tracks (timeline-space, not file-space)
-- [ ] `positionMs` emits the first-loaded track's reported position, converted from track-local to timeline time via `TimelineConverter.toTimeline`
-- [ ] No existing member's signature changed; `PlaybackCommandHandler`/`BackgroundAudioHandler` compile unchanged
-- [ ] Unit tests for every bullet above, using `FakeJustAudioPlatform` (T1)
-- [ ] Gate check passes: `flutter test test/infrastructure/audio/`
-- [ ] Test count: 8+ new tests
+- [x] `setTrackMuted(trackId, true)` sets that track's volume to 0 (via `setVolume`), leaves other tracks' volume unchanged; `setTrackMuted(trackId, false)` restores its base gain
+- [x] `setTrackSolo(trackId, true)` sets every *other* loaded track's volume to 0 and restores the soloed track's base gain, regardless of its own mute state; activating solo on a second track clears the first track's solo and restores its volume per its own mute state
+- [x] `setTrackStartDelayMs(trackId, newDelay)` changes only the internal map — a subsequent `seekAllTo(timelineMs)` computes that track's local seek target using the new delay, without calling `load`/`setFilePath` again
+- [x] `durationMs` is `null` before `loadSong` resolves; after, equals the maximum of `startDelayMs + file duration` across all loaded tracks (timeline-space, not file-space)
+- [x] `positionMs` emits the first-loaded track's reported position, converted from track-local to timeline time via `TimelineConverter.toTimeline`
+- [x] No existing member's signature changed; `PlaybackCommandHandler`/`BackgroundAudioHandler` compile unchanged
+- [x] Unit tests for every bullet above, using `FakeJustAudioPlatform` (T1)
+- [x] Gate check passes: `flutter test test/infrastructure/audio/`
+- [x] Test count: 8+ new tests (11)
+
+**Status: Done.** `positionMs` is driven by `AudioPlayer.playbackEventStream` (fed directly by platform events), not `positionStream` — the latter is a timer-polled animation stream unsuitable for deterministic tests and not needed for this engine's purpose.
 
 **Tests**: unit
 **Gate**: quick

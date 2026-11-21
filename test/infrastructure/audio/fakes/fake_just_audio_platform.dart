@@ -19,9 +19,16 @@ import 'package:just_audio_platform_interface/just_audio_platform_interface.dart
 class FakeJustAudioPlatform extends JustAudioPlatform {
   final List<FakeAudioPlayerPlatform> created = [];
 
+  /// Applied to every [FakeAudioPlayerPlatform] as it's created, so a test
+  /// can configure the duration `load()` reports before calling code (like
+  /// `MultiTrackAudioEngine.loadSong`) creates players it doesn't hold a
+  /// direct reference to yet.
+  Duration? defaultLoadDuration;
+
   @override
   Future<AudioPlayerPlatform> init(InitRequest request) async {
-    final player = FakeAudioPlayerPlatform(request.id);
+    final player = FakeAudioPlayerPlatform(request.id)
+      ..loadDuration = defaultLoadDuration;
     created.add(player);
     return player;
   }
