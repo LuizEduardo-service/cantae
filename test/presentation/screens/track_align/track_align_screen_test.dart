@@ -191,6 +191,23 @@ void main() {
       expect(find.text('route:studio'), findsOneWidget);
     });
 
+    testWidgets(
+      'não encontrada: EmptyState "não encontrada" + voltar à Biblioteca',
+      (tester) async {
+        final engine = _FakeAudioPlaybackEngine();
+        final repo = _FakeSongRepository();
+        await tester.pumpWidget(_wrap(engine: engine, repo: repo));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Música não encontrada'), findsOneWidget);
+
+        await tester.tap(find.text('Voltar à Biblioteca'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('route:library'), findsOneWidget);
+      },
+    );
+
     testWidgets('erro ao carregar o motor: InlineBanner erro + Tentar de novo', (
       tester,
     ) async {
@@ -326,6 +343,31 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('route:song-detail:song-1'), findsOneWidget);
+      },
+    );
+
+    testWidgets(
+      'voltar com alterações não salvas; cancelar no ConfirmSheet mantém a tela',
+      (tester) async {
+        final engine = _FakeAudioPlaybackEngine();
+        final repo = _FakeSongRepository(initialSong: _songWith());
+        await tester.pumpWidget(_wrap(engine: engine, repo: repo));
+        await tester.pumpAndSettle();
+
+        await tester.enterText(find.byType(TextField).first, '0:01.5');
+        await tester.pump();
+
+        await tester.tap(find.text('‹ Ave Maria'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Descartar alterações?'), findsOneWidget);
+
+        await tester.tap(find.text('Continuar editando'));
+        await tester.pumpAndSettle();
+
+        expect(find.text('Descartar alterações?'), findsNothing);
+        expect(find.text('route:song-detail:song-1'), findsNothing);
+        expect(find.text('0:01.5'), findsOneWidget);
       },
     );
 

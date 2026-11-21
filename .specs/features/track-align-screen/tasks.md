@@ -256,6 +256,8 @@ T7 --> T8
 
 **Status: Done.** Bug found and fixed while writing T7's tests: `TrackAlignNotifier._stopTest` awaited `_positionSubscription?.cancel()`, whose Future never resolved for a never-emitted broadcast-stream subscription under `flutter test`'s FakeAsync zone — removed the await (nothing depended on it completing). Also fixed `FakeAudioPlaybackEngine` in `test/data/playback/playback_command_handler_test.dart` to implement T2's 5 new interface members (full-suite `flutter analyze` caught this).
 
+**Verifier iteration 1 (FAIL → fixed):** flagged 2 test-coverage gaps, no production bugs — ALIGN-19's cancel branch ("Continuar editando") and the "não encontrada" screen state were both implemented but never exercised by a test. Added both (`track_align_screen_test.dart`): cancel-path test and not-found-state test. 474 tests total now. Re-verification pending.
+
 **Tests**: widget
 **Gate**: full
 
