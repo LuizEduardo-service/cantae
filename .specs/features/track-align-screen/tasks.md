@@ -164,15 +164,17 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] Carregando / não encontrada / sem faixas / erro ao carregar o motor / carregado — all 5 states represented in `TrackAlignState` (ALIGN-01 to 06)
-- [ ] Editar um atraso válido atualiza o draft e marca "não salvo"; um valor inválido (negativo ou fora do formato) é rejeitado, mantendo o último valor válido (ALIGN-07, 08, 09)
-- [ ] Mudo/solo chamam `engine.setTrackMuted`/`setTrackSolo` e atualizam o estado visual; solo é exclusivo na própria store, não só no motor (ALIGN-10, 11, 12)
-- [ ] Definir início/fim do trecho valida fim > início e fim ≤ `engine.durationMs` (quando conhecida); "Ouvir em loop" chama `seekAllTo(início)` + `playAt(agora)` e assina `positionMs` para reposicionar ao alcançar o fim; "Parar" chama `stop()` e cancela a assinatura (ALIGN-13, 14, 15, 16)
-- [ ] Salvar chama `SongRepository.save` com a música reconstruída (tracks com os novos `startDelayMs`); sucesso invalida `songsProvider` e limpa "não salvo"; falha mantém o estado e expõe um erro (ALIGN-17, 18)
-- [ ] Expõe o suficiente para a tela decidir a confirmação de saída (uma flag de "não salvo") sem a tela precisar duplicar essa lógica (ALIGN-19, 20, 21)
-- [ ] Unit tests (`ProviderContainer`, fake `AudioPlaybackEngine` — a plain Dart double of the domain interface, not `MultiTrackAudioEngine`): um por critério acima
-- [ ] Gate check passes: `flutter test test/presentation/providers/`
-- [ ] Test count: 14+ new tests
+- [x] Carregando / não encontrada / sem faixas / erro ao carregar o motor / carregado — all 5 states represented in `TrackAlignState` (ALIGN-01 to 06)
+- [x] Editar um atraso válido atualiza o draft e marca "não salvo"; um valor inválido (negativo ou fora do formato) é rejeitado, mantendo o último valor válido (ALIGN-07, 08, 09)
+- [x] Mudo/solo chamam `engine.setTrackMuted`/`setTrackSolo` e atualizam o estado visual; solo é exclusivo na própria store, não só no motor (ALIGN-10, 11, 12)
+- [x] Definir início/fim do trecho valida fim > início e fim ≤ `engine.durationMs` (quando conhecida); "Ouvir em loop" chama `seekAllTo(início)` + `playAt(agora)` e assina `positionMs` para reposicionar ao alcançar o fim; "Parar" chama `stop()` e cancela a assinatura (ALIGN-13, 14, 15, 16)
+- [x] Salvar chama `SongRepository.save` com a música reconstruída (tracks com os novos `startDelayMs`); sucesso invalida `songsProvider` e limpa "não salvo"; falha mantém o estado e expõe um erro (ALIGN-17, 18)
+- [x] Expõe o suficiente para a tela decidir a confirmação de saída (uma flag de "não salvo") sem a tela precisar duplicar essa lógica (ALIGN-19, 20, 21)
+- [x] Unit tests (`ProviderContainer`, fake `AudioPlaybackEngine` — a plain Dart double of the domain interface, not `MultiTrackAudioEngine`): um por critério acima
+- [x] Gate check passes: `flutter test test/presentation/providers/`
+- [x] Test count: 14+ new tests (15)
+
+**Status: Done.** `discard()` from design.md's method list wasn't implemented — nothing to discard beyond navigating away (the family provider is disposed on unmount), and the screen can call `context.goNamed('song-detail', ...)` directly; adding a no-op method would be dead code. `TrackAlignStatus.error` is one bucket covering both a repository-fetch error and an engine-load error (spec.md names only the latter); `retry()` picks the right one to redo based on whether `state.song` is already set.
 
 **Tests**: unit
 **Gate**: quick

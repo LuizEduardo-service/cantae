@@ -131,29 +131,29 @@ Uma música com faixas cadastradas não pode ser ensaiada em grupo com sincronis
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| ALIGN-01 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-02 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-03 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-04 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-05 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-06 | P1: Ver o alinhamento carregado | Design | Pending |
-| ALIGN-07 | P1: Editar o atraso por campo | Design | Pending |
-| ALIGN-08 | P1: Editar o atraso por campo | Design | Pending |
-| ALIGN-09 | P1: Editar o atraso por campo | Design | Pending |
-| ALIGN-10 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-11 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-12 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-13 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-14 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-15 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-16 | P1: Testar com mudo, solo e loop | Design | Pending |
-| ALIGN-17 | P1: Salvar ou descartar | Design | Pending |
-| ALIGN-18 | P1: Salvar ou descartar | Design | Pending |
-| ALIGN-19 | P1: Salvar ou descartar | Design | Pending |
-| ALIGN-20 | P1: Salvar ou descartar | Design | Pending |
-| ALIGN-21 | P1: Salvar ou descartar | Design | Pending |
+| ALIGN-01 | P1: Ver o alinhamento carregado | T8 | Pending |
+| ALIGN-02 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
+| ALIGN-03 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
+| ALIGN-04 | P1: Ver o alinhamento carregado | T4, T5, T7 | Implementing |
+| ALIGN-05 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
+| ALIGN-06 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
+| ALIGN-07 | P1: Editar o atraso por campo | T2, T4, T5 | Implementing |
+| ALIGN-08 | P1: Editar o atraso por campo | T4, T5 | Implementing |
+| ALIGN-09 | P1: Editar o atraso por campo | T4 | Implementing |
+| ALIGN-10 | P1: Testar com mudo, solo e loop | T2, T4, T5 | Implementing |
+| ALIGN-11 | P1: Testar com mudo, solo e loop | T2, T4, T5 | Implementing |
+| ALIGN-12 | P1: Testar com mudo, solo e loop | T2, T4 | Implementing |
+| ALIGN-13 | P1: Testar com mudo, solo e loop | T4, T7 | Implementing |
+| ALIGN-14 | P1: Testar com mudo, solo e loop | T4, T7 | Implementing |
+| ALIGN-15 | P1: Testar com mudo, solo e loop | T4, T7 | Implementing |
+| ALIGN-16 | P1: Testar com mudo, solo e loop | T4, T7 | Implementing |
+| ALIGN-17 | P1: Salvar ou descartar | T4, T6, T7 | Implementing |
+| ALIGN-18 | P1: Salvar ou descartar | T4, T7 | Implementing |
+| ALIGN-19 | P1: Salvar ou descartar | T4, T7 | Implementing |
+| ALIGN-20 | P1: Salvar ou descartar | T4, T7 | Implementing |
+| ALIGN-21 | P1: Salvar ou descartar | T4, T7 | Implementing |
 
-**Coverage:** 21 total, 0 mapped to tasks, 21 unmapped ⚠️ (esperado antes da fase Tasks)
+**Coverage:** 21 total, 21 mapped to tasks, 0 unmapped. 20/21 reach `TrackAlignNotifier` (Implementing); ALIGN-01 (navigation into the route) still Pending until T8.
 
 ---
 
