@@ -8,6 +8,7 @@ import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
+import 'package:cantae/presentation/screens/track_align/track_align_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -123,10 +124,24 @@ void main() {
       expect(find.text('Importar pacote'), findsOneWidget);
     });
 
+    testWidgets('track-align renders TrackAlignScreen with the route id', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed('track-align', pathParameters: {'id': 'abc'});
+      await tester.pumpAndSettle();
+
+      expect(find.byType(TrackAlignScreen), findsOneWidget);
+      expect(
+        tester.widget<TrackAlignScreen>(find.byType(TrackAlignScreen)).songId,
+        equals('abc'),
+      );
+    });
+
     for (final entry in {
       'solo-player': 'Modo solo',
       'studio': 'Studio — corte de áudio',
-      'track-align': 'Alinhar entradas',
       'lyrics-editor': 'Sincronizar letra',
       'song-history': 'Ensaios anteriores',
       'track-upload': 'Enviar faixa',

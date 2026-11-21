@@ -131,7 +131,7 @@ Uma música com faixas cadastradas não pode ser ensaiada em grupo com sincronis
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| ALIGN-01 | P1: Ver o alinhamento carregado | T8 | Pending |
+| ALIGN-01 | P1: Ver o alinhamento carregado | T8 | Implementing |
 | ALIGN-02 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
 | ALIGN-03 | P1: Ver o alinhamento carregado | T4, T7 | Implementing |
 | ALIGN-04 | P1: Ver o alinhamento carregado | T4, T5, T7 | Implementing |
@@ -153,7 +153,7 @@ Uma música com faixas cadastradas não pode ser ensaiada em grupo com sincronis
 | ALIGN-20 | P1: Salvar ou descartar | T4, T7 | Implementing |
 | ALIGN-21 | P1: Salvar ou descartar | T4, T7 | Implementing |
 
-**Coverage:** 21 total, 21 mapped to tasks, 0 unmapped. 20/21 reach `TrackAlignNotifier` (Implementing); ALIGN-01 (navigation into the route) still Pending until T8.
+**Coverage:** 21 total, 21 mapped to tasks, 0 unmapped. All 21 reach the real screen end-to-end (Implementing) as of T8; awaiting the independent Verifier to promote to Verified.
 
 ---
 

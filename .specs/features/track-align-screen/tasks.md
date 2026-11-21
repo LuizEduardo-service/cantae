@@ -272,12 +272,18 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `track-align` resolve para `TrackAlignScreen` com o `id` da rota
-- [ ] `SongDetailScreen`'s "Alinhar entradas" chama `goNamed('track-align', pathParameters: {'id': song.id})`
-- [ ] O teste existente de `song_detail_screen_test.dart` para essa linha é atualizado para afirmar o `id` enviado (hoje só afirma que a rota `track-align` foi alcançada, sem checar o parâmetro)
-- [ ] Widget test novo em `app_router_test.dart`: `goNamed('track-align', pathParameters: {'id': 'abc'})` mostra `TrackAlignScreen` com esse id
-- [ ] Gate check passes (último task da feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
-- [ ] Test count: 1+ new test (routing) + 1 updated test (song-detail); suíte total ≥ 414 (contagem no início desta feature) + todos os testes novos de T1-T8
+- [x] `track-align` resolve para `TrackAlignScreen` com o `id` da rota
+- [x] `SongDetailScreen`'s "Alinhar entradas" chama `goNamed('track-align', pathParameters: {'id': song.id})`
+- [x] O teste existente de `song_detail_screen_test.dart` para essa linha é atualizado para afirmar o `id` enviado (hoje só afirma que a rota `track-align` foi alcançada, sem checar o parâmetro)
+- [x] Widget test novo em `app_router_test.dart`: `goNamed('track-align', pathParameters: {'id': 'abc'})` mostra `TrackAlignScreen` com esse id
+- [x] Gate check passes (último task da feature): `flutter analyze && flutter test && python scripts/check_layers.py --root . && dart analyze lib/domain/`
+- [x] Test count: 1+ new test (routing) + 1 updated test (song-detail); suíte total ≥ 414 (contagem no início desta feature) + todos os testes novos de T1-T8 (472 total)
+
+**Status: Done.** All gates clean (0 errors/warnings). One pre-existing flaky test (`song_sync_coordinator_test.dart`, unrelated to this feature) failed once under full-suite load but passed in isolation — not a regression from this feature.
+
+---
+
+## Feature Status: Done, awaiting Verifier.
 
 **Tests**: widget
 **Gate**: build
