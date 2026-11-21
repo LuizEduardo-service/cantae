@@ -192,13 +192,15 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Renderiza selo, nome, atraso formatado `mm:ss.s`, botões M/S
-- [ ] Editar o campo de atraso com um valor válido chama `onOffsetChanged` com o novo valor em ms; um valor inválido não chama o callback
-- [ ] Tocar M/S chama `onMuteChanged`/`onSoloChanged` com o novo booleano
-- [ ] Quando `muted: true`, a forma de onda renderiza com opacidade reduzida (25%); quando `solo: true`, o card tem borda `accent`
-- [ ] Widget tests: estados (normal/mudo/solo), edição válida/invalida, tap M/S, um spot-check em tema escuro
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
-- [ ] Test count: 6+ new tests
+- [x] Renderiza selo, nome, atraso formatado `mm:ss.s`, botões M/S
+- [x] Editar o campo de atraso com um valor válido chama `onOffsetChanged` com o novo valor em ms; um valor inválido não chama o callback
+- [x] Tocar M/S chama `onMuteChanged`/`onSoloChanged` com o novo booleano
+- [x] Quando `muted: true`, a forma de onda renderiza com opacidade reduzida (25%); quando `solo: true`, o card tem borda `accent`
+- [x] Widget tests: estados (normal/mudo/solo), edição válida/invalida, tap M/S, um spot-check em tema escuro
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Test count: 6+ new tests (10)
+
+**Status: Done.** Waveform seed uses `naipe` (design.md's actual constructor has no track id — see SPEC_DEVIATION comment in the widget file).
 
 **Tests**: widget
 **Gate**: full
