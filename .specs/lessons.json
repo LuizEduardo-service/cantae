@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 15,
+  "next_id": 16,
   "lessons": [
     {
       "id": "L-001",
@@ -256,6 +256,24 @@
       ],
       "created": "2026-11-20T17:40:53Z",
       "last_seen": "2026-11-20T17:40:53Z"
+    },
+    {
+      "id": "L-015",
+      "key": "ac_gap::when a notifier exposes n status branch values e g an error state enum a confirm cancel pair write a screen level test for every one of them individually implementing a branch and testing only its sibling or the underlying state transition is not evidence the branch itself renders or navigates correctly",
+      "text": "When a notifier exposes N status/branch values (e.g. an error-state enum, a confirm/cancel pair), write a screen-level test for every one of them individually — implementing a branch and testing only its sibling or the underlying state transition is not evidence the branch itself renders or navigates correctly.",
+      "signal": "ac_gap",
+      "scope": "presentation/screens",
+      "status": "candidate",
+      "features": [
+        "track-align-screen"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ALIGN-19 ConfirmSheet cancel branch; não encontrada screen state (presentation/screens)"
+      ],
+      "created": "2026-11-21T15:56:52Z",
+      "last_seen": "2026-11-21T15:56:52Z"
     }
   ]
 }

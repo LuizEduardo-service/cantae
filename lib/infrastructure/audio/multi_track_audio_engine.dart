@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:just_audio/just_audio.dart';
 
 import 'package:cantae/domain/audio/audio_mix_calculator.dart';
@@ -33,6 +35,13 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final AudioPlayer Function() _playerFactory;
   final Map<String, AudioPlayer> _playersByTrackId = {};
   final Map<String, int> _startDelayMsByTrackId = {};
+  final Map<String, double> _baseGainByTrackId = {};
+  final Map<String, bool> _mutedByTrackId = {};
+  final Map<String, int?> _fileDurationMsByTrackId = {};
+  final StreamController<int> _positionMsController =
+      StreamController<int>.broadcast();
+  String? _soloTrackId;
+  StreamSubscription<PlaybackEvent>? _referencePlaybackEventSubscription;
 
   MultiTrackAudioEngine({AudioPlayer Function()? playerFactory})
       : _playerFactory = playerFactory ?? AudioPlayer.new;
@@ -48,13 +57,84 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
 
     for (final track in tracks) {
       final player = _playerFactory();
-      await player.setFilePath(track.filePath);
-      await player.setVolume(
-        track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0),
-      );
+      final baseGain =
+          track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0);
+      final fileDuration = await player.setFilePath(track.filePath);
+      await player.setVolume(baseGain);
       _playersByTrackId[track.id] = player;
       _startDelayMsByTrackId[track.id] = track.startDelayMs;
+      _baseGainByTrackId[track.id] = baseGain;
+      _mutedByTrackId[track.id] = false;
+      _fileDurationMsByTrackId[track.id] = fileDuration?.inMilliseconds;
     }
+
+    if (tracks.isNotEmpty) {
+      final referenceTrack = tracks.first;
+      final referencePlayer = _playersByTrackId[referenceTrack.id]!;
+      final referenceStartDelayMs = referenceTrack.startDelayMs;
+      _referencePlaybackEventSubscription =
+          referencePlayer.playbackEventStream.listen((event) {
+        _positionMsController.add(TimelineConverter.toTimeline(
+          trackLocalMs: event.updatePosition.inMilliseconds,
+          startDelayMs: referenceStartDelayMs,
+        ));
+      });
+    }
+  }
+
+  @override
+  Future<void> setTrackMuted(String trackId, bool muted) async {
+    _mutedByTrackId[trackId] = muted;
+    await _applyVolume(trackId);
+  }
+
+  @override
+  Future<void> setTrackSolo(String trackId, bool solo) async {
+    if (solo) {
+      _soloTrackId = trackId;
+    } else if (_soloTrackId == trackId) {
+      _soloTrackId = null;
+    }
+    for (final id in _playersByTrackId.keys) {
+      await _applyVolume(id);
+    }
+  }
+
+  @override
+  Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {
+    _startDelayMsByTrackId[trackId] = startDelayMs;
+  }
+
+  @override
+  int? get durationMs {
+    int? maxMs;
+    for (final entry in _startDelayMsByTrackId.entries) {
+      final fileDurationMs = _fileDurationMsByTrackId[entry.key];
+      if (fileDurationMs == null) continue;
+      final totalMs = entry.value + fileDurationMs;
+      if (maxMs == null || totalMs > maxMs) {
+        maxMs = totalMs;
+      }
+    }
+    return maxMs;
+  }
+
+  @override
+  Stream<int> get positionMs => _positionMsController.stream;
+
+  Future<void> _applyVolume(String trackId) async {
+    final player = _playersByTrackId[trackId];
+    if (player == null) return;
+    await player.setVolume(_effectiveVolume(trackId));
+  }
+
+  double _effectiveVolume(String trackId) {
+    final baseGain = _baseGainByTrackId[trackId] ?? 1.0;
+    if (_soloTrackId != null) {
+      return trackId == _soloTrackId ? baseGain : 0.0;
+    }
+    final muted = _mutedByTrackId[trackId] ?? false;
+    return muted ? 0.0 : baseGain;
   }
 
   @override
@@ -95,15 +175,24 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   Future<void> _disposeAllPlayers() async {
+    await _referencePlaybackEventSubscription?.cancel();
+    _referencePlaybackEventSubscription = null;
     for (final player in _playersByTrackId.values) {
       await player.dispose();
     }
     _playersByTrackId.clear();
     _startDelayMsByTrackId.clear();
+    _baseGainByTrackId.clear();
+    _mutedByTrackId.clear();
+    _fileDurationMsByTrackId.clear();
+    _soloTrackId = null;
   }
 
   /// Releases every track's `AudioPlayer`. Not part of [AudioPlaybackEngine]
   /// — called by infrastructure owners (e.g. [BackgroundAudioHandler]) when
   /// the engine itself is being torn down, not on every song change.
-  Future<void> dispose() => _disposeAllPlayers();
+  Future<void> dispose() async {
+    await _disposeAllPlayers();
+    await _positionMsController.close();
+  }
 }

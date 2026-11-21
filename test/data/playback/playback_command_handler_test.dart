@@ -49,6 +49,21 @@ class FakeAudioPlaybackEngine implements AudioPlaybackEngine {
   Future<void> seekAllTo(int timelineMs) async {
     seekAllToCalls.add(timelineMs);
   }
+
+  @override
+  Future<void> setTrackMuted(String trackId, bool muted) async {}
+
+  @override
+  Future<void> setTrackSolo(String trackId, bool solo) async {}
+
+  @override
+  Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {}
+
+  @override
+  int? get durationMs => null;
+
+  @override
+  Stream<int> get positionMs => const Stream.empty();
 }
 
 class _FakeRoomDiscovery implements RoomDiscovery {

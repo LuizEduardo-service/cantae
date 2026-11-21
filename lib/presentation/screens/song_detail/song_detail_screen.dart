@@ -261,7 +261,10 @@ class _HubScaffold extends StatelessWidget {
             ),
             _PreparaRow(
               label: 'Alinhar entradas',
-              onTap: () => context.goNamed('track-align'),
+              onTap: () => context.goNamed(
+                'track-align',
+                pathParameters: {'id': song.id},
+              ),
             ),
             _PreparaRow(
               label: song.lyrics.isEmpty

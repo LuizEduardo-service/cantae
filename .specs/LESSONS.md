@@ -98,6 +98,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: DETAIL-08/DETAIL-09 (presentation/screens)
 - last seen: 2026-11-20T17:40:53Z
 
+### L-015 - When a notifier exposes N status/branch values (e.g. an error-state enum, a confirm/cancel pair), write a screen-level test for every one of them individually — implementing a branch and testing only its sibling or the underlying state transition is not evidence the branch itself renders or navigates correctly.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `presentation/screens` · harmful: 0
+- features: track-align-screen
+- evidence: ALIGN-19 ConfirmSheet cancel branch; não encontrada screen state (presentation/screens)
+- last seen: 2026-11-21T15:56:52Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

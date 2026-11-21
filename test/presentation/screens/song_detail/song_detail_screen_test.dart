@@ -65,9 +65,14 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             SongDetailScreen(songId: state.pathParameters['id']!),
       ),
+      GoRoute(
+        path: '/track-align/:id',
+        name: 'track-align',
+        builder: (context, state) =>
+            Text('route:track-align:${state.pathParameters['id']}'),
+      ),
       for (final name in [
         'studio',
-        'track-align',
         'lyrics-editor',
         'song-history',
         'solo-player',
@@ -272,7 +277,7 @@ void main() {
       );
       await tester.tap(find.textContaining('Alinhar entradas'));
       await tester.pumpAndSettle();
-      expect(find.text('route:track-align'), findsOneWidget);
+      expect(find.text('route:track-align:s1'), findsOneWidget);
     });
 
     testWidgets('"Sincronizar letra" navigates to the lyrics-editor route', (
