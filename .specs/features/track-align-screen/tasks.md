@@ -218,11 +218,13 @@ T7 --> T8
 **Tools**: MCP: NONE · Skill: NONE
 
 **Done when**:
-- [ ] `Toast.show(context, 'Atrasos salvos')` insere a mensagem na árvore (verificável via `find.text`)
-- [ ] Desaparece sozinho após ~2,5 s (verificado com `tester.pump(Duration(...))`, sem precisar de interação do usuário)
-- [ ] Widget tests: aparece, desaparece sozinho, um spot-check em tema escuro
-- [ ] Gate check passes: `flutter test test/presentation/widgets/`
-- [ ] Test count: 3+ new tests
+- [x] `Toast.show(context, 'Atrasos salvos')` insere a mensagem na árvore (verificável via `find.text`)
+- [x] Desaparece sozinho após ~2,5 s (verificado com `tester.pump(Duration(...))`, sem precisar de interação do usuário)
+- [x] Widget tests: aparece, desaparece sozinho, um spot-check em tema escuro
+- [x] Gate check passes: `flutter test test/presentation/widgets/`
+- [x] Test count: 3+ new tests (3)
+
+**Status: Done.**
 
 **Tests**: widget
 **Gate**: full
