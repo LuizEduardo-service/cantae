@@ -87,10 +87,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: `flutter-clean-architecture` (confirm the entity stays Flutter/plugin-free)
 
 **Done when**:
-- [ ] `onsetMs` is `int?`; assert is `onsetMs == null || onsetMs >= 0`
-- [ ] `test/domain/entities/lyric_line_test.dart` created covering: `onsetMs: null` constructs; `onsetMs: 0` constructs; negative `onsetMs` throws the assert; empty `text` still throws its existing assert
-- [ ] Gate check passes: `flutter test test/domain/entities/lyric_line_test.dart`
-- [ ] Test count: 4 tests pass (no silent deletions)
+- [x] `onsetMs` is `int?`; assert is `onsetMs == null || onsetMs >= 0`
+- [x] `test/domain/entities/lyric_line_test.dart` created covering: `onsetMs: null` constructs; `onsetMs: 0` constructs; negative `onsetMs` throws the assert; empty `text` still throws its existing assert
+- [x] Gate check passes: `flutter test test/domain/entities/lyric_line_test.dart`
+- [x] Test count: 4 tests pass (no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
