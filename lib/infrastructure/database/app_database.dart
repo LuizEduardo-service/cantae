@@ -10,7 +10,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   // SPEC_DEVIATION: AD-009/design.md's original sketch named drift's
   // `stepByStep(from1To2: ...)` helper. That helper now only exists as
@@ -27,6 +27,12 @@ class AppDatabase extends _$AppDatabase {
           if (from < 2) {
             await m.addColumn(songsTable, songsTable.origin);
             await m.addColumn(songsTable, songsTable.lastRehearsedAt);
+          }
+          if (from < 3) {
+            // SQLite has no ALTER COLUMN, and addColumn cannot drop NOT NULL
+            // from onset_ms. alterTable rebuilds lyric_lines from the current
+            // (nullable) schema and copies every existing row unchanged.
+            await m.alterTable(TableMigration(lyricLinesTable));
           }
         },
         beforeOpen: (details) async {

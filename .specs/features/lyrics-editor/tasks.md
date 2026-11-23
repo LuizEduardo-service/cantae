@@ -111,12 +111,12 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `LyricLinesTable.onsetMs` is `integer().nullable()()`
-- [ ] `schemaVersion` is `3`; `onUpgrade` adds `if (from < 3) { await m.alterTable(TableMigration(lyricLinesTable)); }`
-- [ ] New test in `app_database_migration_test.dart`: seed a raw v2 DB with a `lyric_lines` row where `onset_ms` is a non-null int, open it with `AppDatabase`, assert the row (`text`, `onset_ms`, `naipe`, `dynamics`) is unchanged after the v2→v3 upgrade
-- [ ] New test: a fresh install (`NativeDatabase.memory()`) allows inserting a `lyric_lines` row with `onsetMs: null` without a constraint error
-- [ ] Gate check passes: `flutter test test/infrastructure/database/app_database_migration_test.dart`
-- [ ] Test count: 4 tests pass (2 pre-existing LIB-12 tests + 2 new)
+- [x] `LyricLinesTable.onsetMs` is `integer().nullable()()`
+- [x] `schemaVersion` is `3`; `onUpgrade` adds `if (from < 3) { await m.alterTable(TableMigration(lyricLinesTable)); }`
+- [x] New test in `app_database_migration_test.dart`: seed a raw v2 DB with a `lyric_lines` row where `onset_ms` is a non-null int, open it with `AppDatabase`, assert the row (`text`, `onset_ms`, `naipe`, `dynamics`) is unchanged after the v2→v3 upgrade
+- [x] New test: a fresh install (`NativeDatabase.memory()`) allows inserting a `lyric_lines` row with `onsetMs: null` without a constraint error
+- [x] Gate check passes: `flutter test test/infrastructure/database/app_database_migration_test.dart`
+- [x] Test count: 4 tests pass (2 pre-existing LIB-12 tests + 2 new)
 
 **Tests**: unit (in-memory/file-backed DB)
 **Gate**: quick
