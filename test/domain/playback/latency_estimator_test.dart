@@ -12,7 +12,8 @@ void main() {
       expect(delay, equals(0));
     });
 
-    test('a typical LAN round trip of a few ms halves to the one-way delay', () {
+    test('a typical LAN round trip of a few ms halves to the one-way delay',
+        () {
       final delay = LatencyEstimator.estimateOneWayDelayMs(
         sentAtEpochMs: 1000,
         echoedAtEpochMs: 1003,

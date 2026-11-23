@@ -31,11 +31,11 @@ class VoicePartBadge extends StatelessWidget {
     this.part,
     this.size = 22,
   }) : assert(
-         variant != VoicePartBadgeVariant.filled &&
-                 variant != VoicePartBadgeVariant.missing ||
-             part != null,
-         'filled/missing badges need a part to pick the right letter',
-       );
+          variant != VoicePartBadgeVariant.filled &&
+                  variant != VoicePartBadgeVariant.missing ||
+              part != null,
+          'filled/missing badges need a part to pick the right letter',
+        );
 
   final VoicePartBadgeVariant variant;
 
@@ -128,7 +128,8 @@ class VoicePartBadge extends StatelessWidget {
 /// Paints a dashed rounded-rect outline, matching DESIGN_SYSTEM §2.3's
 /// "naipe sem faixa" / "visitante" treatment (1,5 px dashed outline).
 class _DashedRoundedBorderPainter extends CustomPainter {
-  const _DashedRoundedBorderPainter({required this.color, required this.radius});
+  const _DashedRoundedBorderPainter(
+      {required this.color, required this.radius});
 
   final Color color;
   final double radius;

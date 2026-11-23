@@ -20,8 +20,8 @@ bool _anyRichTextContains(WidgetTester tester, String substring) {
   );
 }
 
-SongTrack _track(Naipe naipe) =>
-    SongTrack(id: 't-${naipe.name}', filePath: '/tmp/${naipe.name}.wav', naipe: naipe);
+SongTrack _track(Naipe naipe) => SongTrack(
+    id: 't-${naipe.name}', filePath: '/tmp/${naipe.name}.wav', naipe: naipe);
 
 final _completeSong = Song(
   id: 's1',
@@ -101,7 +101,8 @@ void main() {
 
       final container = tester.widget<Container>(
         find
-            .ancestor(of: find.text('Ave Maria'), matching: find.byType(Container))
+            .ancestor(
+                of: find.text('Ave Maria'), matching: find.byType(Container))
             .first,
       );
       expect(container.color, const Color(0xFFFFFFFF));
@@ -117,7 +118,8 @@ void main() {
 
       final container = tester.widget<Container>(
         find
-            .ancestor(of: find.text('Ave Maria'), matching: find.byType(Container))
+            .ancestor(
+                of: find.text('Ave Maria'), matching: find.byType(Container))
             .first,
       );
       expect(container.color, isNull);

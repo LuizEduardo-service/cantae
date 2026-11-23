@@ -23,7 +23,8 @@ void main() {
         ),
       );
 
-      final accent = Theme.of(capturedContext).extension<CantaeColors>()!.accent;
+      final accent =
+          Theme.of(capturedContext).extension<CantaeColors>()!.accent;
       expect(accent, const Color(0xFF0E5E4B));
     },
   );
@@ -47,7 +48,8 @@ void main() {
         ),
       );
 
-      final accent = Theme.of(capturedContext).extension<CantaeColors>()!.accent;
+      final accent =
+          Theme.of(capturedContext).extension<CantaeColors>()!.accent;
       expect(accent, const Color(0xFF5FC4A3));
     },
   );
@@ -66,7 +68,8 @@ void main() {
 
       final textWidget = tester.widget<Text>(find.byKey(const Key('probe')));
       final context = tester.element(find.byKey(const Key('probe')));
-      final effectiveStyle = DefaultTextStyle.of(context).style.merge(textWidget.style);
+      final effectiveStyle =
+          DefaultTextStyle.of(context).style.merge(textWidget.style);
 
       expect(effectiveStyle.fontFamily, 'Geist');
     },

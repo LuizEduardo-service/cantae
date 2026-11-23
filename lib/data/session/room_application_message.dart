@@ -59,8 +59,7 @@ Uint8List _withU16LenString(int tag, String value, [Uint8List? tail]) {
 }
 
 (String, int) _readU16LenString(Uint8List body, int offset) {
-  final len =
-      body.buffer.asByteData(body.offsetInBytes + offset).getUint16(0);
+  final len = body.buffer.asByteData(body.offsetInBytes + offset).getUint16(0);
   final value = utf8.decode(
     Uint8List.sublistView(body, offset + 2, offset + 2 + len),
   );
@@ -83,8 +82,7 @@ Uint8List _u32LenBytesBytes(Uint8List value) {
 }
 
 (Uint8List, int) _readU32LenBytes(Uint8List body, int offset) {
-  final len =
-      body.buffer.asByteData(body.offsetInBytes + offset).getUint32(0);
+  final len = body.buffer.asByteData(body.offsetInBytes + offset).getUint32(0);
   final value = Uint8List.sublistView(body, offset + 4, offset + 4 + len);
   return (value, offset + 4 + len);
 }
@@ -213,9 +211,8 @@ class ChunkAckMessage extends RoomApplicationMessage {
 
   static ChunkAckMessage _decodeBody(Uint8List body) {
     final (trackId, afterTrack) = _readU16LenString(body, 0);
-    final chunkIndex = body.buffer
-        .asByteData(body.offsetInBytes + afterTrack)
-        .getUint32(0);
+    final chunkIndex =
+        body.buffer.asByteData(body.offsetInBytes + afterTrack).getUint32(0);
     return ChunkAckMessage(trackId: trackId, chunkIndex: chunkIndex);
   }
 }
@@ -270,16 +267,14 @@ class PlayCommandMessage extends RoomApplicationMessage {
     final out = BytesBuilder();
     out.addByte(0x05);
     out.add(_u16LenStringBytes(songId));
-    out.add(
-        (ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
+    out.add((ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
     return out.toBytes();
   }
 
   static PlayCommandMessage _decodeBody(Uint8List body) {
     final (songId, afterSong) = _readU16LenString(body, 0);
-    final masterSendEpochMs = body.buffer
-        .asByteData(body.offsetInBytes + afterSong)
-        .getInt64(0);
+    final masterSendEpochMs =
+        body.buffer.asByteData(body.offsetInBytes + afterSong).getInt64(0);
     return PlayCommandMessage(
         songId: songId, masterSendEpochMs: masterSendEpochMs);
   }
@@ -294,8 +289,7 @@ class PauseCommandMessage extends RoomApplicationMessage {
   Uint8List encode() {
     final out = BytesBuilder();
     out.addByte(0x06);
-    out.add(
-        (ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
+    out.add((ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
     return out.toBytes();
   }
 
@@ -315,8 +309,7 @@ class StopCommandMessage extends RoomApplicationMessage {
   Uint8List encode() {
     final out = BytesBuilder();
     out.addByte(0x07);
-    out.add(
-        (ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
+    out.add((ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
     return out.toBytes();
   }
 
@@ -336,8 +329,7 @@ class LoopRepositionMessage extends RoomApplicationMessage {
   Uint8List encode() {
     final out = BytesBuilder();
     out.addByte(0x08);
-    out.add(
-        (ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
+    out.add((ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
     return out.toBytes();
   }
 
@@ -362,16 +354,14 @@ class LatencyProbeMessage extends RoomApplicationMessage {
     final out = BytesBuilder();
     out.addByte(0x09);
     out.add(_u16LenStringBytes(probeId));
-    out.add(
-        (ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
+    out.add((ByteData(8)..setInt64(0, masterSendEpochMs)).buffer.asUint8List());
     return out.toBytes();
   }
 
   static LatencyProbeMessage _decodeBody(Uint8List body) {
     final (probeId, afterProbe) = _readU16LenString(body, 0);
-    final masterSendEpochMs = body.buffer
-        .asByteData(body.offsetInBytes + afterProbe)
-        .getInt64(0);
+    final masterSendEpochMs =
+        body.buffer.asByteData(body.offsetInBytes + afterProbe).getInt64(0);
     return LatencyProbeMessage(
         probeId: probeId, masterSendEpochMs: masterSendEpochMs);
   }

@@ -25,8 +25,7 @@ class _FakeSongRepository implements SongRepository {
       throw UnimplementedError();
 
   @override
-  Future<Result<Unit, Failure>> delete(String id) =>
-      throw UnimplementedError();
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
 
   @override
   Future<Result<Unit, StorageFailure>> deleteAll() =>
@@ -49,7 +48,8 @@ ProviderContainer _containerFor(
 
 void main() {
   group('songByIdProvider', () {
-    test('resolves AsyncData(Result.success(song)) when the song exists', () async {
+    test('resolves AsyncData(Result.success(song)) when the song exists',
+        () async {
       const song = Song(id: 's1', name: 'Song', author: 'Author');
       final container = _containerFor(
         (id) async => const Result.success(song),

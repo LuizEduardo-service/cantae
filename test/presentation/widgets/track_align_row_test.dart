@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 Widget _wrap(Widget child, {ThemeData? theme}) {
-  return MaterialApp(theme: theme ?? AppTheme.light, home: Scaffold(body: child));
+  return MaterialApp(
+      theme: theme ?? AppTheme.light, home: Scaffold(body: child));
 }
 
 void main() {

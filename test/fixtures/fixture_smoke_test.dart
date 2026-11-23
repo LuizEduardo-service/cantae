@@ -8,7 +8,10 @@ void main() {
       final song = FixtureSongs.completeSong();
       expect(song.tracks.length, equals(4));
       final naipes = song.tracks.map((t) => t.naipe).toSet();
-      expect(naipes, containsAll([Naipe.soprano, Naipe.contralto, Naipe.tenor, Naipe.bass]));
+      expect(
+          naipes,
+          containsAll(
+              [Naipe.soprano, Naipe.contralto, Naipe.tenor, Naipe.bass]));
     });
   });
 
@@ -45,7 +48,8 @@ void main() {
       final song = FixtureSongs.invalidTrackSong();
       // filePath must be non-empty (domain invariant); 'invalid' means the file
       // won't load at the infrastructure layer (path to a nonexistent file).
-      final hasNonexistent = song.tracks.any((t) => t.filePath.contains('nonexistent'));
+      final hasNonexistent =
+          song.tracks.any((t) => t.filePath.contains('nonexistent'));
       expect(hasNonexistent, isTrue);
     });
   });

@@ -36,13 +36,17 @@ void main() {
       expect(color.textColor, const Color(0xFFFFFFFF));
     });
 
-    test('semFaixa is outlined with no fill and text2 as the outline/text color', () {
+    test(
+        'semFaixa is outlined with no fill and text2 as the outline/text color',
+        () {
       final color = VoicePartColors.of(VoicePart.semFaixa, Brightness.light);
       expect(color.outlined, isTrue);
       expect(color.textColor, CantaeColors.light.text2);
     });
 
-    test('visitante is outlined with no fill and text2 as the outline/text color', () {
+    test(
+        'visitante is outlined with no fill and text2 as the outline/text color',
+        () {
       final color = VoicePartColors.of(VoicePart.visitante, Brightness.light);
       expect(color.outlined, isTrue);
       expect(color.textColor, CantaeColors.light.text2);

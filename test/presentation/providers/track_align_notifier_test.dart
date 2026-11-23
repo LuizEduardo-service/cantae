@@ -132,8 +132,11 @@ Song _songWith({int sopranoDelayMs = 0}) => Song(
       ],
     );
 
-({ProviderContainer container, _FakeAudioPlaybackEngine engine, _FakeSongRepository repo})
-    _setUp({
+({
+  ProviderContainer container,
+  _FakeAudioPlaybackEngine engine,
+  _FakeSongRepository repo
+}) _setUp({
   Song? initialSong,
   bool songNotFound = false,
   Result<Unit, StorageFailure>? saveResult,
@@ -219,7 +222,8 @@ void main() {
     test('a valid edit updates the draft and marks unsaved', () async {
       final setup = _setUp();
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       await notifier.setOffset('soprano', 1500);
@@ -230,10 +234,12 @@ void main() {
       expect(setup.engine.startDelayCalls['soprano'], 1500);
     });
 
-    test('a negative value is rejected, keeping the last valid value', () async {
+    test('a negative value is rejected, keeping the last valid value',
+        () async {
       final setup = _setUp();
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       await notifier.setOffset('soprano', -10);
@@ -245,25 +251,31 @@ void main() {
   });
 
   group('mute/solo', () {
-    test('setMuted calls engine.setTrackMuted and updates visual state', () async {
+    test('setMuted calls engine.setTrackMuted and updates visual state',
+        () async {
       final setup = _setUp();
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       await notifier.setMuted('soprano', true);
 
       expect(setup.engine.mutedCalls['soprano'], isTrue);
       expect(
-        setup.container.read(trackAlignProvider('song-1')).mutedByTrackId['soprano'],
+        setup.container
+            .read(trackAlignProvider('song-1'))
+            .mutedByTrackId['soprano'],
         isTrue,
       );
     });
 
-    test('setSolo calls engine.setTrackSolo and is exclusive in the store', () async {
+    test('setSolo calls engine.setTrackSolo and is exclusive in the store',
+        () async {
       final setup = _setUp();
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       await notifier.setSolo('soprano', true);
@@ -280,31 +292,38 @@ void main() {
       final setup = _setUp();
       setup.engine.durationMsValue = 10000;
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       notifier.setLoopEnd(0);
 
-      expect(setup.container.read(trackAlignProvider('song-1')).loopEndMs, 2000);
+      expect(
+          setup.container.read(trackAlignProvider('song-1')).loopEndMs, 2000);
     });
 
     test('rejects end > known duration', () async {
       final setup = _setUp();
       setup.engine.durationMsValue = 5000;
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       notifier.setLoopEnd(6000);
 
-      expect(setup.container.read(trackAlignProvider('song-1')).loopEndMs, 2000);
+      expect(
+          setup.container.read(trackAlignProvider('song-1')).loopEndMs, 2000);
     });
 
-    test('toggleTest seeks to start and plays, then stop cancels the subscription', () async {
+    test(
+        'toggleTest seeks to start and plays, then stop cancels the subscription',
+        () async {
       final setup = _setUp();
       setup.engine.durationMsValue = 10000;
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
       notifier.setLoopStart(0);
       notifier.setLoopEnd(2000);
@@ -313,19 +332,22 @@ void main() {
 
       expect(setup.engine.seekAllToCalls, contains(0));
       expect(setup.engine.playAtCalls, isNotEmpty);
-      expect(setup.container.read(trackAlignProvider('song-1')).testing, isTrue);
+      expect(
+          setup.container.read(trackAlignProvider('song-1')).testing, isTrue);
 
       await notifier.toggleTest();
 
       expect(setup.engine.stopped, isTrue);
-      expect(setup.container.read(trackAlignProvider('song-1')).testing, isFalse);
+      expect(
+          setup.container.read(trackAlignProvider('song-1')).testing, isFalse);
     });
 
     test('reaching the loop end repositions to the loop start', () async {
       final setup = _setUp();
       setup.engine.durationMsValue = 10000;
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
       notifier.setLoopStart(500);
       notifier.setLoopEnd(2000);
@@ -339,11 +361,13 @@ void main() {
   });
 
   group('save', () {
-    test('calls SongRepository.save with the rebuilt song; success invalidates '
+    test(
+        'calls SongRepository.save with the rebuilt song; success invalidates '
         'songsProvider and clears unsaved', () async {
       final setup = _setUp();
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
       await notifier.setOffset('soprano', 1500);
 
@@ -362,7 +386,8 @@ void main() {
         saveResult: Result.failure(StorageFailure(code: 'save_failed')),
       );
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
       await notifier.setOffset('soprano', 1500);
 
@@ -379,7 +404,8 @@ void main() {
       final setup = _setUp();
       setup.engine.durationMsValue = 10000;
       addTearDown(setup.container.dispose);
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await _settle(setup.container, 'song-1');
 
       await notifier.setMuted('soprano', true);
@@ -395,13 +421,15 @@ void main() {
   });
 
   group('autoDispose', () {
-    test('stops playback once nothing is watching the provider anymore', () async {
+    test('stops playback once nothing is watching the provider anymore',
+        () async {
       final setup = _setUp();
       setup.engine.durationMsValue = 10000;
       addTearDown(setup.container.dispose);
       final subscription =
           setup.container.listen(trackAlignProvider('song-1'), (_, __) {});
-      final notifier = setup.container.read(trackAlignProvider('song-1').notifier);
+      final notifier =
+          setup.container.read(trackAlignProvider('song-1').notifier);
       await setup.container.read(songByIdProvider('song-1').future);
       for (var i = 0; i < 5; i++) {
         await Future<void>.delayed(Duration.zero);
@@ -409,7 +437,8 @@ void main() {
       notifier.setLoopStart(0);
       notifier.setLoopEnd(2000);
       await notifier.toggleTest();
-      expect(setup.container.read(trackAlignProvider('song-1')).testing, isTrue);
+      expect(
+          setup.container.read(trackAlignProvider('song-1')).testing, isTrue);
 
       subscription.close();
       await Future<void>.delayed(const Duration(milliseconds: 50));

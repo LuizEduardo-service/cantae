@@ -11,8 +11,10 @@ class FixtureSongs {
         name: 'Complete Song',
         author: 'Fixture Author',
         tracks: [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
-          SongTrack(id: 'track-c', filePath: 'contralto.mp3', naipe: Naipe.contralto),
+          SongTrack(
+              id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-c', filePath: 'contralto.mp3', naipe: Naipe.contralto),
           SongTrack(id: 'track-t', filePath: 'tenor.mp3', naipe: Naipe.tenor),
           SongTrack(id: 'track-b', filePath: 'bass.mp3', naipe: Naipe.bass),
         ],
@@ -23,8 +25,10 @@ class FixtureSongs {
         name: 'Incomplete Song',
         author: 'Fixture Author',
         tracks: [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
-          SongTrack(id: 'track-c', filePath: 'contralto.mp3', naipe: Naipe.contralto),
+          SongTrack(
+              id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-c', filePath: 'contralto.mp3', naipe: Naipe.contralto),
           SongTrack(id: 'track-b', filePath: 'bass.mp3', naipe: Naipe.bass),
         ],
       );
@@ -34,7 +38,8 @@ class FixtureSongs {
         name: 'Offset Song',
         author: 'Fixture Author',
         tracks: [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
           SongTrack(
             id: 'track-c',
             filePath: 'contralto.mp3',
@@ -56,12 +61,20 @@ class FixtureSongs {
         name: 'Song With Lyrics',
         author: 'Fixture Author',
         tracks: [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
         ],
         lyrics: [
-          LyricLine(text: 'First line of the song', onsetMs: 1000, naipe: Naipe.soprano),
-          LyricLine(text: 'Second line continues', onsetMs: 3500, naipe: Naipe.soprano),
-          LyricLine(text: 'Third line resolves', onsetMs: 6200, naipe: Naipe.soprano),
+          LyricLine(
+              text: 'First line of the song',
+              onsetMs: 1000,
+              naipe: Naipe.soprano),
+          LyricLine(
+              text: 'Second line continues',
+              onsetMs: 3500,
+              naipe: Naipe.soprano),
+          LyricLine(
+              text: 'Third line resolves', onsetMs: 6200, naipe: Naipe.soprano),
         ],
       );
 
@@ -70,7 +83,8 @@ class FixtureSongs {
         name: 'Invalid Track Song',
         author: 'Fixture Author',
         tracks: [
-          SongTrack(id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-s', filePath: 'soprano.mp3', naipe: Naipe.soprano),
           // 'invalid' means the path points to a nonexistent file — the domain
           // invariant only guards against empty paths; file existence is
           // checked at the infrastructure layer.

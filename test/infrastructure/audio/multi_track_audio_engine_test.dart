@@ -76,8 +76,7 @@ void main() {
   });
 
   group('setTrackSolo', () {
-    test('solos the given track, silencing every other loaded track',
-        () async {
+    test('solos the given track, silencing every other loaded track', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
       final sopranoPlatform = fakePlatform.created[0];
       final contraltoPlatform = fakePlatform.created[1];
@@ -117,8 +116,7 @@ void main() {
   });
 
   group('setTrackStartDelayMs', () {
-    test('changes only the internal map, without reloading the file',
-        () async {
+    test('changes only the internal map, without reloading the file', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
       final sopranoPlatform = fakePlatform.created[0];
       final loadCallsBefore = sopranoPlatform.loadCalls.length;
@@ -193,9 +191,10 @@ void main() {
     });
   });
 
-  group('loadSong / seekAllTo (pre-existing behavior, now exercised by the fake)', () {
-    test('loadSong sets up one player per track plus playback track',
-        () async {
+  group(
+      'loadSong / seekAllTo (pre-existing behavior, now exercised by the fake)',
+      () {
+    test('loadSong sets up one player per track plus playback track', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
 
       expect(fakePlatform.created, hasLength(2));

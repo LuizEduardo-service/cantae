@@ -71,8 +71,8 @@ void main() {
     test('PlayCommandMessage', () {
       const message =
           PlayCommandMessage(songId: 'song-1', masterSendEpochMs: 1700000000);
-      final decoded = RoomApplicationMessage.decode(message.encode())
-          as PlayCommandMessage;
+      final decoded =
+          RoomApplicationMessage.decode(message.encode()) as PlayCommandMessage;
       expect(decoded.songId, equals('song-1'));
       expect(decoded.masterSendEpochMs, equals(1700000000));
     });
@@ -86,8 +86,8 @@ void main() {
 
     test('StopCommandMessage', () {
       const message = StopCommandMessage(masterSendEpochMs: 99);
-      final decoded = RoomApplicationMessage.decode(message.encode())
-          as StopCommandMessage;
+      final decoded =
+          RoomApplicationMessage.decode(message.encode()) as StopCommandMessage;
       expect(decoded.masterSendEpochMs, equals(99));
     });
 
@@ -141,7 +141,9 @@ void main() {
       );
     });
 
-    test('a truncated body (declared length exceeds available bytes) is rejected', () {
+    test(
+        'a truncated body (declared length exceeds available bytes) is rejected',
+        () {
       // ChunkAckMessage tag (0x03) + trackId length-prefix claiming 50 bytes
       // but the body only actually contains 2 bytes after the length prefix.
       final bytes = Uint8List.fromList([0x03, 0, 50, 1, 2]);

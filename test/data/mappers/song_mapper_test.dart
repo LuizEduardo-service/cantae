@@ -10,7 +10,8 @@ SongsTableData _row(SongsTableCompanion companion) => SongsTableData(
       name: companion.name.value,
       author: companion.author.value,
       version: companion.version.value,
-      metronomeBpm: companion.metronomeBpm.present ? companion.metronomeBpm.value : null,
+      metronomeBpm:
+          companion.metronomeBpm.present ? companion.metronomeBpm.value : null,
       metronomeBeatsPerMeasure: companion.metronomeBeatsPerMeasure.present
           ? companion.metronomeBeatsPerMeasure.value
           : null,
@@ -21,18 +22,23 @@ SongsTableData _row(SongsTableCompanion companion) => SongsTableData(
           ? companion.metronomeEnabledByDefault.value
           : null,
       origin: companion.origin.present ? companion.origin.value : 'created',
-      lastRehearsedAt:
-          companion.lastRehearsedAt.present ? companion.lastRehearsedAt.value : null,
+      lastRehearsedAt: companion.lastRehearsedAt.present
+          ? companion.lastRehearsedAt.value
+          : null,
     );
 
 void main() {
   group('SongMapper', () {
-    test('round trips id/name/author/version with metronomeConfig null (LIB-10)', () {
-      const song = Song(id: 's1', name: 'Song', author: 'Author', version: '1.0');
+    test(
+        'round trips id/name/author/version with metronomeConfig null (LIB-10)',
+        () {
+      const song =
+          Song(id: 's1', name: 'Song', author: 'Author', version: '1.0');
 
       final companion = SongMapper.toCompanion(song);
       final row = _row(companion);
-      final roundTripped = SongMapper.fromRow(row, tracks: const [], lyrics: const [], playbackTrack: null);
+      final roundTripped = SongMapper.fromRow(row,
+          tracks: const [], lyrics: const [], playbackTrack: null);
 
       expect(roundTripped.id, equals(song.id));
       expect(roundTripped.name, equals(song.name));
@@ -60,7 +66,8 @@ void main() {
 
       final companion = SongMapper.toCompanion(song);
       final row = _row(companion);
-      final roundTripped = SongMapper.fromRow(row, tracks: const [], lyrics: const [], playbackTrack: null);
+      final roundTripped = SongMapper.fromRow(row,
+          tracks: const [], lyrics: const [], playbackTrack: null);
 
       expect(roundTripped.metronomeConfig, isNotNull);
       expect(roundTripped.metronomeConfig!.bpm, equals(90));
@@ -69,7 +76,9 @@ void main() {
       expect(roundTripped.metronomeConfig!.enabledByDefault, isTrue);
     });
 
-    test('round trips a received origin and a non-null lastRehearsedAt (LIB-12)', () {
+    test(
+        'round trips a received origin and a non-null lastRehearsedAt (LIB-12)',
+        () {
       final rehearsedAt = DateTime.utc(2026, 11, 1, 10, 30);
       final song = Song(
         id: 's3',
@@ -81,8 +90,8 @@ void main() {
 
       final companion = SongMapper.toCompanion(song);
       final row = _row(companion);
-      final roundTripped =
-          SongMapper.fromRow(row, tracks: const [], lyrics: const [], playbackTrack: null);
+      final roundTripped = SongMapper.fromRow(row,
+          tracks: const [], lyrics: const [], playbackTrack: null);
 
       expect(row.origin, equals('received'));
       expect(roundTripped.origin, equals(SongOrigin.received));
@@ -94,8 +103,8 @@ void main() {
 
       final companion = SongMapper.toCompanion(song);
       final row = _row(companion);
-      final roundTripped =
-          SongMapper.fromRow(row, tracks: const [], lyrics: const [], playbackTrack: null);
+      final roundTripped = SongMapper.fromRow(row,
+          tracks: const [], lyrics: const [], playbackTrack: null);
 
       expect(roundTripped.origin, equals(SongOrigin.created));
       expect(roundTripped.lastRehearsedAt, isNull);

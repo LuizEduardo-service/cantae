@@ -59,7 +59,9 @@ class SegmentedControl<T> extends StatelessWidget {
                   duration: const Duration(milliseconds: 150),
                   curve: Curves.easeOut,
                   decoration: BoxDecoration(
-                    color: isSelected ? colors.segmentSelected : Colors.transparent,
+                    color: isSelected
+                        ? colors.segmentSelected
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(
                       CantaeRadii.radiusSegment,
                     ),

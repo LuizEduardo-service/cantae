@@ -168,7 +168,8 @@ class _NotFoundBody extends StatelessWidget {
     return EmptyState(
       icon: Icons.search_off,
       title: 'Música não encontrada',
-      message: 'Essa música não existe mais ou nunca existiu na sua biblioteca.',
+      message:
+          'Essa música não existe mais ou nunca existiu na sua biblioteca.',
       primaryLabel: 'Voltar à Biblioteca',
       onPrimary: () => context.goNamed('library'),
     );

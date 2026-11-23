@@ -51,8 +51,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/solo-player',
         name: 'solo-player',
-        builder: (context, state) =>
-            const ComingSoonScreen(title: 'Modo solo'),
+        builder: (context, state) => const ComingSoonScreen(title: 'Modo solo'),
       ),
       GoRoute(
         path: '/studio',

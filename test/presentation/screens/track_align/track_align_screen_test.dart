@@ -180,7 +180,8 @@ void main() {
       tester,
     ) async {
       final engine = _FakeAudioPlaybackEngine();
-      final repo = _FakeSongRepository(initialSong: _songWith(tracks: const []));
+      final repo =
+          _FakeSongRepository(initialSong: _songWith(tracks: const []));
       await tester.pumpWidget(_wrap(engine: engine, repo: repo));
       await tester.pumpAndSettle();
 
@@ -208,7 +209,8 @@ void main() {
       },
     );
 
-    testWidgets('erro ao carregar o motor: InlineBanner erro + Tentar de novo', (
+    testWidgets('erro ao carregar o motor: InlineBanner erro + Tentar de novo',
+        (
       tester,
     ) async {
       final engine = _FakeAudioPlaybackEngine()..throwOnLoad = true;

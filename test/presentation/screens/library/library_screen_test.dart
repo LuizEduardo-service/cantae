@@ -15,8 +15,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 
 class _FakeSongRepository implements SongRepository {
-  _FakeSongRepository(List<Song> songs)
-      : _results = [Result.success(songs)];
+  _FakeSongRepository(List<Song> songs) : _results = [Result.success(songs)];
 
   _FakeSongRepository.sequence(this._results);
 
@@ -39,8 +38,7 @@ class _FakeSongRepository implements SongRepository {
       throw UnimplementedError();
 
   @override
-  Future<Result<Unit, Failure>> delete(String id) =>
-      throw UnimplementedError();
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
 
   @override
   Future<Result<Unit, StorageFailure>> deleteAll() =>
@@ -52,8 +50,7 @@ class _FakeSongRepository implements SongRepository {
 }
 
 class _PendingSongRepository implements SongRepository {
-  final Completer<Result<List<Song>, StorageFailure>> completer =
-      Completer();
+  final Completer<Result<List<Song>, StorageFailure>> completer = Completer();
 
   @override
   Future<Result<List<Song>, StorageFailure>> getAll() => completer.future;
@@ -67,8 +64,7 @@ class _PendingSongRepository implements SongRepository {
       throw UnimplementedError();
 
   @override
-  Future<Result<Unit, Failure>> delete(String id) =>
-      throw UnimplementedError();
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
 
   @override
   Future<Result<Unit, StorageFailure>> deleteAll() =>
@@ -217,7 +213,8 @@ void main() {
         await tester.enterText(find.byType(TextField), 'zzzznotfound');
         await tester.pumpAndSettle();
 
-        expect(find.text('Nada encontrado para "zzzznotfound"'), findsOneWidget);
+        expect(
+            find.text('Nada encontrado para "zzzznotfound"'), findsOneWidget);
         expect(find.text('Limpar busca'), findsOneWidget);
 
         await tester.tap(find.text('Limpar busca'));
@@ -267,7 +264,8 @@ void main() {
       },
     );
 
-    testWidgets('renders the populated state under the dark theme without throwing', (
+    testWidgets(
+        'renders the populated state under the dark theme without throwing', (
       tester,
     ) async {
       final repo = _FakeSongRepository([
@@ -320,7 +318,8 @@ void main() {
       expect(find.text('route:profile'), findsOneWidget);
     });
 
-    testWidgets('tapping the footer Entrar em sala/Criar sala navigate accordingly', (
+    testWidgets(
+        'tapping the footer Entrar em sala/Criar sala navigate accordingly', (
       tester,
     ) async {
       final repo = _FakeSongRepository([

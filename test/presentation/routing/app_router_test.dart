@@ -29,8 +29,7 @@ class _EmptySongRepository implements SongRepository {
       Result.failure(NotFoundFailure(code: 'song_not_found'));
 
   @override
-  Future<Result<Unit, Failure>> delete(String id) =>
-      throw UnimplementedError();
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
 
   @override
   Future<Result<Unit, StorageFailure>> deleteAll() =>

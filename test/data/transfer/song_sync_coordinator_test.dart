@@ -53,7 +53,8 @@ void _attachStubReceiver(
         await Future<void>.delayed(ackDelay);
       }
       await visitor.sendEnvelope(
-        ChunkAckMessage(trackId: message.trackId, chunkIndex: message.chunkIndex)
+        ChunkAckMessage(
+                trackId: message.trackId, chunkIndex: message.chunkIndex)
             .encode(),
       );
     }
@@ -189,7 +190,10 @@ void main() {
         name: 'Fanout Song',
         author: 'test',
         tracks: [
-          SongTrack(id: 'track-naipe', filePath: trackFile.path, naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-naipe',
+              filePath: trackFile.path,
+              naipe: Naipe.soprano),
         ],
         playbackTrack: SongTrack(
           id: 'track-playback',
@@ -260,14 +264,18 @@ void main() {
 
       final sourceDir = Directory.systemTemp.createTempSync('sync_oversize');
       addTearDown(() => sourceDir.deleteSync(recursive: true));
-      final oversizeFile = await _createSparseOversizeFile(sourceDir, 'huge.bin');
+      final oversizeFile =
+          await _createSparseOversizeFile(sourceDir, 'huge.bin');
 
       final song = Song(
         id: 'song-oversize',
         name: 'Oversize Song',
         author: 'test',
         tracks: [
-          SongTrack(id: 'track-huge', filePath: oversizeFile.path, naipe: Naipe.soprano),
+          SongTrack(
+              id: 'track-huge',
+              filePath: oversizeFile.path,
+              naipe: Naipe.soprano),
         ],
       );
 
@@ -348,13 +356,17 @@ void main() {
         id: 'song-a',
         name: 'Song A',
         author: 'test',
-        tracks: [SongTrack(id: 'track-a', filePath: fileA.path, naipe: Naipe.soprano)],
+        tracks: [
+          SongTrack(id: 'track-a', filePath: fileA.path, naipe: Naipe.soprano)
+        ],
       );
       final songB = Song(
         id: 'song-b',
         name: 'Song B',
         author: 'test',
-        tracks: [SongTrack(id: 'track-b', filePath: fileB.path, naipe: Naipe.soprano)],
+        tracks: [
+          SongTrack(id: 'track-b', filePath: fileB.path, naipe: Naipe.soprano)
+        ],
       );
 
       final resultAFuture = coordinator.syncSongToRoom(songA);
@@ -455,7 +467,8 @@ void main() {
         (event) => masterReceived.add(RoomApplicationMessage.decode(event.$2)),
       );
 
-      final sourceDir = Directory.systemTemp.createTempSync('sync_visitor_connected');
+      final sourceDir =
+          Directory.systemTemp.createTempSync('sync_visitor_connected');
       addTearDown(() => sourceDir.deleteSync(recursive: true));
       final file = _writeSmallFile(sourceDir, 'track.bin', 10);
       final track = SongTrack(

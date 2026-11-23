@@ -125,8 +125,9 @@ class PlaybackCommandHandler {
     DateTime? scheduledStartAt,
   }) {
     _current = RoomPlaybackSnapshot(
-      activeSongId:
-          activeSongId == _unset ? _current.activeSongId : activeSongId as String?,
+      activeSongId: activeSongId == _unset
+          ? _current.activeSongId
+          : activeSongId as String?,
       phase: phase,
       scheduledStartAt: scheduledStartAt,
     );

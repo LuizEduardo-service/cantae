@@ -40,7 +40,8 @@ void main() {
       expect(find.text('T'), findsOneWidget);
     });
 
-    testWidgets('missing variant renders with a dashed outline, not a solid fill', (
+    testWidgets(
+        'missing variant renders with a dashed outline, not a solid fill', (
       tester,
     ) async {
       await tester.pumpWidget(
@@ -83,7 +84,9 @@ void main() {
       expect(find.text('Todos'), findsOneWidget);
     });
 
-    testWidgets('filled variant uses the naipe color, never color alone (letter present)', (
+    testWidgets(
+        'filled variant uses the naipe color, never color alone (letter present)',
+        (
       tester,
     ) async {
       await tester.pumpWidget(

@@ -2,6 +2,7 @@ import 'package:cantae/domain/entities/naipe.dart';
 
 class LyricLine {
   final String text;
+
   /// Instant the line starts, in ms. `null` means "not yet marked".
   final int? onsetMs;
   final Naipe? naipe;

@@ -184,7 +184,8 @@ void main() {
       });
 
       final participant = await _connectAndApprove(master, visitor, bus);
-      final storageRoot = Directory.systemTemp.createTempSync('receiver_mismatch');
+      final storageRoot =
+          Directory.systemTemp.createTempSync('receiver_mismatch');
       addTearDown(() => storageRoot.deleteSync(recursive: true));
 
       const trackId = 'track-mismatch';
@@ -402,7 +403,8 @@ void main() {
                 .isNotEmpty;
       }
 
-      final storageRootA = Directory.systemTemp.createTempSync('receiver_fail_a');
+      final storageRootA =
+          Directory.systemTemp.createTempSync('receiver_fail_a');
       final storageRootB = Directory.systemTemp.createTempSync('receiver_ok_b');
       addTearDown(() {
         storageRootA.deleteSync(recursive: true);
@@ -428,18 +430,20 @@ void main() {
         storageRoot: storageRootB,
       );
 
-      final progressAFuture =
-          receiverA.receiveTrack(
+      final progressAFuture = receiverA
+          .receiveTrack(
             trackId: 'track-fail',
             expectedSha256: 'does-not-matter',
             totalSizeBytes: chunkBytes.length,
-          ).toList();
-      final progressBFuture =
-          receiverB.receiveTrack(
+          )
+          .toList();
+      final progressBFuture = receiverB
+          .receiveTrack(
             trackId: 'track-ok',
             expectedSha256: sha256ForB,
             totalSizeBytes: chunkBytes.length,
-          ).toList();
+          )
+          .toList();
 
       await master.sendEnvelopeTo(
         pendingA.id,
@@ -453,7 +457,8 @@ void main() {
       );
       await master.sendEnvelopeTo(
         pendingA.id,
-        ChunkDataMessage(trackId: 'track-fail', chunkIndex: 0, bytes: chunkBytes)
+        ChunkDataMessage(
+                trackId: 'track-fail', chunkIndex: 0, bytes: chunkBytes)
             .encode(),
       );
 

@@ -183,7 +183,8 @@ void main() {
       );
     });
 
-    test('pause(), stop(), and repositionToLoopStart() each send their own command type with a probe-adjusted epoch',
+    test(
+        'pause(), stop(), and repositionToLoopStart() each send their own command type with a probe-adjusted epoch',
         () async {
       final bus = StreamController<DiscoveredRoom>.broadcast();
       final master = RoomSessionController(
@@ -292,7 +293,8 @@ void main() {
         requiresMasterRole: true,
       );
       expect(sendResult.isSuccess, isTrue,
-          reason: 'the wire send itself succeeds; rejection happens at the role gate on receipt');
+          reason:
+              'the wire send itself succeeds; rejection happens at the role gate on receipt');
 
       await Future<void>.delayed(const Duration(milliseconds: 500));
       expect(received, isEmpty);

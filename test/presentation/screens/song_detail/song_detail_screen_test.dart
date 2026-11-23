@@ -21,8 +21,8 @@ class _FakeSongRepository implements SongRepository {
   _FakeSongRepository({
     required Future<Result<Song, Failure>> Function(String id) getById,
     Future<Result<Unit, Failure>> Function(String id)? delete,
-  }) : _getById = getById,
-       _delete = delete ?? ((_) async => const Result.success(Unit()));
+  })  : _getById = getById,
+        _delete = delete ?? ((_) async => const Result.success(Unit()));
 
   final Future<Result<Song, Failure>> Function(String id) _getById;
   final Future<Result<Unit, Failure>> Function(String id) _delete;
@@ -348,7 +348,8 @@ void main() {
       expect(find.text('route:solo-player'), findsOneWidget);
     });
 
-    testWidgets('rodapé: "Ensaiar em grupo" navigates to the room-create route', (
+    testWidgets('rodapé: "Ensaiar em grupo" navigates to the room-create route',
+        (
       tester,
     ) async {
       final repo = _FakeSongRepository(
