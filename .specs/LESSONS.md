@@ -14,18 +14,6 @@ _none_
 
 Seen once or not yet corroborated. Tracked, not trusted.
 
-### L-001 - When an acceptance criterion says every or all, assert the collection with more than one element instead of a single fake instance
-- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
-- features: session-networking
-- evidence: NET-02 - test/infrastructure/network/nsd_room_discovery_test.dart:124 (tests)
-- last seen: 2026-10-06T20:55:15Z
-
-### L-002 - When asserting an event-triggered side effect that a periodic sweep also performs, bound the wait window well below the sweep interval so the sweep cannot satisfy the assertion
-- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `tests` · harmful: 0
-- features: session-networking
-- evidence: iteration-2 sensor mutation 3 - lib/data/session/room_session_controller.dart:185 (NET-06) (tests)
-- last seen: 2026-10-06T20:55:30Z
-
 ### L-003 - When a design doc specifies that one component sends a message another component reacts to, verify both the sender and the receiver exist in production code, not just a unit test that hand-constructs the message for the receiver.
 - signal: `ac_gap` · recurrence: 1 feature(s) · scope: `data/playback` · harmful: 0
 - features: file-transfer-and-sync-playback
