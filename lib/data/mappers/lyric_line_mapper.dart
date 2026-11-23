@@ -13,7 +13,7 @@ class LyricLineMapper {
     return LyricLinesTableCompanion.insert(
       songId: songId,
       lyricText: line.text,
-      onsetMs: line.onsetMs,
+      onsetMs: Value(line.onsetMs),
       naipe: Value(line.naipe?.name),
       dynamics: Value(line.dynamics),
     );

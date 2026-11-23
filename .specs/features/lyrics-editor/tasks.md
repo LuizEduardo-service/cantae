@@ -137,11 +137,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] `toCompanion` passes `onsetMs: Value(line.onsetMs)`
-- [ ] `fromRow` passes `onsetMs: row.onsetMs` directly, no cast
-- [ ] New test: round-trips a line with `onsetMs: null` (text + naipe + dynamics all present) and asserts `roundTripped.onsetMs` is `null`
-- [ ] Gate check passes: `flutter test test/data/mappers/lyric_line_mapper_test.dart`
-- [ ] Test count: 4 tests pass (3 pre-existing + 1 new)
+- [x] `toCompanion` passes `onsetMs: Value(line.onsetMs)`
+- [x] `fromRow` passes `onsetMs: row.onsetMs` directly, no cast
+- [x] New test: round-trips a line with `onsetMs: null` (text + naipe + dynamics all present) and asserts `roundTripped.onsetMs` is `null`
+- [x] Gate check passes: `flutter test test/data/mappers/lyric_line_mapper_test.dart`
+- [x] Test count: 4 tests pass (3 pre-existing + 1 new)
 
 **Tests**: unit
 **Gate**: quick
