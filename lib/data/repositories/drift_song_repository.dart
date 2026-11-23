@@ -77,10 +77,9 @@ class DriftSongRepository implements SongRepository {
         .get();
     final lyricRows = await (_db.select(_db.lyricLinesTable)
           ..where((l) => l.songId.equals(id))
-          ..orderBy([
-            (l) => OrderingTerm.asc(l.onsetMs),
-            (l) => OrderingTerm.asc(l.rowId),
-          ]))
+          // Saved (manual) order: save() reinserts lyrics in list order, so
+          // rowId mirrors it. onsetMs may be null for unmarked lines.
+          ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
     final tracks = trackRows
@@ -112,10 +111,9 @@ class DriftSongRepository implements SongRepository {
         .get();
     final lyricRows = await (_db.select(_db.lyricLinesTable)
           ..where((l) => l.songId.isIn(songIds))
-          ..orderBy([
-            (l) => OrderingTerm.asc(l.onsetMs),
-            (l) => OrderingTerm.asc(l.rowId),
-          ]))
+          // Saved (manual) order: save() reinserts lyrics in list order, so
+          // rowId mirrors it. onsetMs may be null for unmarked lines.
+          ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
     final tracksBySong = <String, List<SongTracksTableData>>{};

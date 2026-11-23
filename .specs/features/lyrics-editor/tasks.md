@@ -162,10 +162,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Both `orderBy` calls are `[(l) => OrderingTerm.asc(l.rowId)]` only
-- [ ] New test: save a song whose `lyrics` list has an unmarked line (`onsetMs: null`) inserted between two marked lines, fetch via `getById`, assert the returned list preserves the original list order (not sorted by `onsetMs`)
-- [ ] Gate check passes: `flutter test` (full - cross-layer change, touches the same DB the migration test and mapper test exercise)
-- [ ] Test count: all existing + 1 new repository test pass
+- [x] Both `orderBy` calls are `[(l) => OrderingTerm.asc(l.rowId)]` only
+- [x] New test: save a song whose `lyrics` list has an unmarked line (`onsetMs: null`) inserted between two marked lines, fetch via `getById`, assert the returned list preserves the original list order (not sorted by `onsetMs`)
+- [x] Gate check passes: `flutter test` (full - cross-layer change, touches the same DB the migration test and mapper test exercise)
+- [x] Test count: all existing + 1 new repository test pass
 
 **Tests**: unit (in-memory DB)
 **Gate**: full

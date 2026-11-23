@@ -190,6 +190,34 @@ void main() {
       );
     });
 
+    test('keeps an unmarked line (onsetMs null) in its saved place between marked lines (LYR-01)', () async {
+      const song = Song(
+        id: 'ave-verum',
+        name: 'Ave Verum Corpus',
+        author: 'Mozart',
+        lyrics: [
+          LyricLine(text: 'Ave verum corpus', onsetMs: 1000),
+          LyricLine(text: 'natum de Maria Virgine', onsetMs: null),
+          LyricLine(text: 'vere passum immolatum', onsetMs: 4000),
+        ],
+      );
+      await repo.save(song);
+
+      final result = await repo.getById('ave-verum');
+
+      result.when(
+        success: (loaded) {
+          expect(loaded.lyrics.map((l) => l.text).toList(), [
+            'Ave verum corpus',
+            'natum de Maria Virgine',
+            'vere passum immolatum',
+          ]);
+          expect(loaded.lyrics.map((l) => l.onsetMs).toList(), [1000, null, 4000]);
+        },
+        failure: (_) => fail('expected success'),
+      );
+    });
+
     test('returns NotFoundFailure for an unknown id (LIB-12)', () async {
       final result = await repo.getById('does-not-exist');
 
@@ -229,7 +257,10 @@ void main() {
       );
     });
 
-    test('orders each song\'s lyrics by ascending onsetMs, stable on ties (LIB-15)', () async {
+    // LIB-15 originally required ascending-onsetMs order. Superseded by
+    // lyrics-editor's "ordem manual" decision: lyrics come back in the order
+    // they were saved, regardless of onsetMs.
+    test('returns each song\'s lyrics in saved (manual) order, not sorted by onsetMs (LIB-15, superseded by lyrics-editor)', () async {
       const song = Song(
         id: 'song-ties',
         name: 'Tied Lyrics',
@@ -250,10 +281,10 @@ void main() {
             failure: (_) => throw StateError('expected success'),
           );
 
-      final expectedOrder = ['first', 'third (tie)', 'second (tie)'];
+      final expectedOrder = ['third (tie)', 'first', 'second (tie)'];
       expect(textsOf(firstRead), equals(expectedOrder));
       expect(textsOf(secondRead), equals(expectedOrder),
-          reason: 'tie-break order must be stable across repeated calls');
+          reason: 'saved order must be stable across repeated calls');
     });
 
     test('issues a bounded number of queries independent of song count (no N+1)', () async {
