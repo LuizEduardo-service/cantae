@@ -280,6 +280,38 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 
 ---
 
+## Fix Tasks (from validation.md, iteration 1)
+
+### F1: Prove the v2→v3 migration allows NULL `onset_ms` on an upgraded DB
+
+**What**: Regression test for sensor mutant M14: after upgrading a seeded v2 file DB, insert a `lyric_lines` row with `onsetMs: null` and read it back.
+**Where**: `test/infrastructure/database/app_database_migration_test.dart`
+**Requirement**: LYR-01
+
+**Done when**:
+- [x] New test fails with the `alterTable` step removed (M14: `NOT NULL constraint failed: lyric_lines.onset_ms`) and passes without it
+- [x] Gate check passes: `flutter test test/infrastructure/database/app_database_migration_test.dart` (5 tests)
+
+**Tests**: unit (file-backed DB)
+**Gate**: quick
+**Commit**: `test(lyrics-editor): prove upgraded databases accept unmarked lines`
+
+### F2: Pin the equal-instant boundary of the out-of-order mark rule
+
+**What**: Regression test for sensor mutant M2: marking at exactly the previous marked line's onset is accepted (AC7 rejects only an earlier instant).
+**Where**: `test/presentation/providers/lyrics_editor_notifier_test.dart`
+**Requirement**: LYR-06
+
+**Done when**:
+- [ ] New test fails with `now < previousOnset` mutated to `<=` (M2) and passes without it
+- [ ] Gate check passes: `flutter test test/presentation/providers/lyrics_editor_notifier_test.dart`
+
+**Tests**: unit
+**Gate**: quick
+**Commit**: `test(lyrics-editor): accept a mark at the previous line's instant`
+
+---
+
 ## Phase Execution Map
 
 ```
