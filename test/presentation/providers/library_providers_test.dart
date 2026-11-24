@@ -27,8 +27,7 @@ class _FakeSongRepository implements SongRepository {
       throw UnimplementedError();
 
   @override
-  Future<Result<Unit, Failure>> delete(String id) =>
-      throw UnimplementedError();
+  Future<Result<Unit, Failure>> delete(String id) => throw UnimplementedError();
 
   @override
   Future<Result<Unit, StorageFailure>> deleteAll() =>
@@ -66,7 +65,8 @@ ProviderContainer _containerFor(List<Song> songs) {
 
 void main() {
   group('visibleSongsProvider', () {
-    test('LibrarySortOrder.name sorts alphabetically, case-insensitive', () async {
+    test('LibrarySortOrder.name sorts alphabetically, case-insensitive',
+        () async {
       final songs = [
         _song(id: '1', name: 'zebra', author: 'A'),
         _song(id: '2', name: 'Ave Maria', author: 'B'),
@@ -116,14 +116,15 @@ void main() {
       addTearDown(container.dispose);
 
       await container.read(songsProvider.future);
-      container.read(originFilterProvider.notifier).state =
-          SongOrigin.received;
+      container.read(originFilterProvider.notifier).state = SongOrigin.received;
       final visible = container.read(visibleSongsProvider).value!;
 
       expect(visible.map((s) => s.id), ['2']);
     });
 
-    test('searchQueryProvider alone matches case-insensitive name or author substring', () async {
+    test(
+        'searchQueryProvider alone matches case-insensitive name or author substring',
+        () async {
       final songs = [
         _song(id: '1', name: 'Ave Maria', author: 'Marina Silva'),
         _song(id: '2', name: 'Panis Angelicus', author: 'José Pereira'),
@@ -153,8 +154,7 @@ void main() {
 
       await container.read(songsProvider.future);
       container.read(searchQueryProvider.notifier).state = 'ave maria';
-      container.read(originFilterProvider.notifier).state =
-          SongOrigin.received;
+      container.read(originFilterProvider.notifier).state = SongOrigin.received;
       final visible = container.read(visibleSongsProvider).value!;
 
       expect(visible.map((s) => s.id), ['2']);

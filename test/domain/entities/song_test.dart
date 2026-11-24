@@ -33,7 +33,11 @@ void main() {
         id: 's1',
         name: 'No S',
         author: 'A',
-        tracks: [_track(Naipe.contralto), _track(Naipe.tenor), _track(Naipe.bass)],
+        tracks: [
+          _track(Naipe.contralto),
+          _track(Naipe.tenor),
+          _track(Naipe.bass)
+        ],
       );
       expect(song.isComplete, isFalse);
     });
@@ -43,7 +47,11 @@ void main() {
         id: 's1',
         name: 'No C',
         author: 'A',
-        tracks: [_track(Naipe.soprano), _track(Naipe.tenor), _track(Naipe.bass)],
+        tracks: [
+          _track(Naipe.soprano),
+          _track(Naipe.tenor),
+          _track(Naipe.bass)
+        ],
       );
       expect(song.isComplete, isFalse);
     });
@@ -53,7 +61,11 @@ void main() {
         id: 's1',
         name: 'No T',
         author: 'A',
-        tracks: [_track(Naipe.soprano), _track(Naipe.contralto), _track(Naipe.bass)],
+        tracks: [
+          _track(Naipe.soprano),
+          _track(Naipe.contralto),
+          _track(Naipe.bass)
+        ],
       );
       expect(song.isComplete, isFalse);
     });
@@ -63,7 +75,11 @@ void main() {
         id: 's1',
         name: 'No B',
         author: 'A',
-        tracks: [_track(Naipe.soprano), _track(Naipe.contralto), _track(Naipe.tenor)],
+        tracks: [
+          _track(Naipe.soprano),
+          _track(Naipe.contralto),
+          _track(Naipe.tenor)
+        ],
       );
       expect(song.isComplete, isFalse);
     });
@@ -100,7 +116,8 @@ void main() {
         author: 'A',
         tracks: [
           _track(Naipe.soprano),
-          const SongTrack(id: 'track-s2', filePath: 's2.mp3', naipe: Naipe.soprano),
+          const SongTrack(
+              id: 'track-s2', filePath: 's2.mp3', naipe: Naipe.soprano),
           _track(Naipe.contralto),
           _track(Naipe.bass),
         ],
@@ -109,7 +126,8 @@ void main() {
     });
 
     test('empty track list returns false', () {
-      expect(const Song(id: 's1', name: 'Empty', author: 'A').isComplete, isFalse);
+      expect(
+          const Song(id: 's1', name: 'Empty', author: 'A').isComplete, isFalse);
     });
 
     test('duplicates of a naipe still satisfy that naipe requirement', () {
@@ -137,7 +155,9 @@ void main() {
       expect(song.lastRehearsedAt, isNull);
     });
 
-    test('round-trip an explicit origin and lastRehearsedAt through the constructor', () {
+    test(
+        'round-trip an explicit origin and lastRehearsedAt through the constructor',
+        () {
       final rehearsedAt = DateTime.utc(2026, 11, 1, 10, 30);
       final song = Song(
         id: 's1',

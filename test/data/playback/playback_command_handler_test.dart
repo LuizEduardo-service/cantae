@@ -136,8 +136,9 @@ void main() {
       final phases = <PlaybackPhase>[];
       handler.snapshots.listen((s) => phases.add(s.phase));
 
-      final targetEpoch =
-          DateTime.now().add(const Duration(milliseconds: 50)).millisecondsSinceEpoch;
+      final targetEpoch = DateTime.now()
+          .add(const Duration(milliseconds: 50))
+          .millisecondsSinceEpoch;
       handler.handleApplicationMessage(
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
@@ -156,7 +157,8 @@ void main() {
         equals(targetEpoch),
       );
       expect(handler.current.phase, equals(PlaybackPhase.playing));
-      expect(phases, containsAllInOrder([PlaybackPhase.scheduled, PlaybackPhase.playing]));
+      expect(phases,
+          containsAllInOrder([PlaybackPhase.scheduled, PlaybackPhase.playing]));
     });
 
     test(

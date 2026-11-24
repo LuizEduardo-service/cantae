@@ -95,7 +95,7 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 12. IF `SongRepository.getById(id)` is called with an `id` that does not exist THEN the system SHALL return `Result.failure(NotFoundFailure)` with a non-empty `code`. <!-- LIB-12 -->
 13. WHEN `SongRepository.getAll()` is called on a library with N saved songs THEN the system SHALL return `Result.success(songs)` where `songs.length == N`. <!-- LIB-13 -->
 14. WHEN `SongRepository.getAll()` is called on an empty library THEN the system SHALL return `Result.success(<Song>[])` (empty list, not a failure). <!-- LIB-14 -->
-15. WHEN a song's `lyrics` are loaded THEN the system SHALL return them ordered by ascending `onsetMs`. <!-- LIB-15 -->
+15. ~~WHEN a song's `lyrics` are loaded THEN the system SHALL return them ordered by ascending `onsetMs`.~~ **Superseded by `lyrics-editor` (2026-11-23):** lyrics are returned in saved (manual) order, independent of `onsetMs`, which may now be null for unmarked lines. <!-- LIB-15 -->
 
 **Independent Test**: Save a known `Song` fixture; `getById` and assert deep equality against the fixture; `getById` on a random unknown id and assert `NotFoundFailure`.
 
@@ -160,7 +160,7 @@ Phase 1 produced pure domain entities (`Song`, `SongTrack`, `LyricLine`, `Metron
 | LIB-12 | P1: Repository Read | T11 | Done |
 | LIB-13 | P1: Repository Read | T12 | Done |
 | LIB-14 | P1: Repository Read | T12 | Done |
-| LIB-15 | P1: Repository Read | T8, T12 | Done |
+| LIB-15 | P1: Repository Read | T8, T12 | Superseded by lyrics-editor T4 |
 | LIB-16 | P1: Repository Delete | T13 | Done |
 | LIB-17 | P1: Repository Delete | T13 | Done |
 | LIB-18 | P1: Repository Delete | T13 | Done |

@@ -92,6 +92,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: ALIGN-19 ConfirmSheet cancel branch; não encontrada screen state (presentation/screens)
 - last seen: 2026-11-21T15:56:52Z
 
+### L-016 - A schema migration test must exercise the new constraint on the upgraded database, not only that existing rows survive
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `database` · harmful: 0
+- features: lyrics-editor
+- evidence: validation.md M14 (lib/infrastructure/database/app_database.dart:35) (database)
+- last seen: 2026-11-24T22:58:04Z
+
+### L-017 - Pin every comparison boundary from an acceptance criterion with a test at the exact equal value
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `presentation` · harmful: 0
+- features: lyrics-editor
+- evidence: validation.md M2 (lib/presentation/providers/lyrics_editor_notifier.dart:336) (presentation)
+- last seen: 2026-11-24T22:58:06Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -23,7 +23,8 @@ void main() {
           .get();
       final tableNames = rows.map((r) => r.data['name'] as String).toSet();
 
-      expect(tableNames, containsAll(<String>['songs', 'song_tracks', 'lyric_lines']));
+      expect(tableNames,
+          containsAll(<String>['songs', 'song_tracks', 'lyric_lines']));
     });
 
     test('rejects a duplicate songs.id (TEXT PRIMARY KEY enforced)', () async {
@@ -39,7 +40,8 @@ void main() {
       );
     });
 
-    test('rejects a duplicate song_tracks.id (TEXT PRIMARY KEY enforced)', () async {
+    test('rejects a duplicate song_tracks.id (TEXT PRIMARY KEY enforced)',
+        () async {
       await db.customStatement(
         "INSERT INTO songs (id, name, author, version) VALUES ('s1', 'A', 'Author', '')",
       );
@@ -73,16 +75,16 @@ void main() {
         "VALUES ('t1', 's1', 'a.mp3', 'soprano', 0, 0, 0)",
       );
 
-      final before = await db.customSelect('SELECT * FROM song_tracks WHERE song_id = ?',
-              variables: [Variable.withString('s1')])
-          .get();
+      final before = await db.customSelect(
+          'SELECT * FROM song_tracks WHERE song_id = ?',
+          variables: [Variable.withString('s1')]).get();
       expect(before, hasLength(1));
 
       await db.customStatement("DELETE FROM songs WHERE id = 's1'");
 
-      final after = await db.customSelect('SELECT * FROM song_tracks WHERE song_id = ?',
-              variables: [Variable.withString('s1')])
-          .get();
+      final after = await db.customSelect(
+          'SELECT * FROM song_tracks WHERE song_id = ?',
+          variables: [Variable.withString('s1')]).get();
       expect(after, isEmpty);
     });
   });

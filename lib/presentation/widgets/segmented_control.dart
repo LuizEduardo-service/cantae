@@ -5,13 +5,19 @@ import '../theme/cantae_spacing.dart';
 import '../theme/cantae_typography.dart';
 
 /// One option of a [SegmentedControl]: a visible [label] and the [value] it
-/// selects.
+/// selects. [semanticLabel], when set, is what screen readers announce
+/// instead of [label] — for short visible labels like a naipe letter ("S").
 @immutable
 class SegmentedOption<T> {
-  const SegmentedOption({required this.label, required this.value});
+  const SegmentedOption({
+    required this.label,
+    required this.value,
+    this.semanticLabel,
+  });
 
   final String label;
   final T value;
+  final String? semanticLabel;
 }
 
 /// Generic 2+ option segmented control. Track `fillField`, active segment
@@ -52,14 +58,16 @@ class SegmentedControl<T> extends StatelessWidget {
               button: true,
               selected: isSelected,
               inMutuallyExclusiveGroup: true,
-              label: option.label,
+              label: option.semanticLabel ?? option.label,
               child: GestureDetector(
                 onTap: () => onChanged(option.value),
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 150),
                   curve: Curves.easeOut,
                   decoration: BoxDecoration(
-                    color: isSelected ? colors.segmentSelected : Colors.transparent,
+                    color: isSelected
+                        ? colors.segmentSelected
+                        : Colors.transparent,
                     borderRadius: BorderRadius.circular(
                       CantaeRadii.radiusSegment,
                     ),
@@ -74,10 +82,13 @@ class SegmentedControl<T> extends StatelessWidget {
                         : null,
                   ),
                   alignment: Alignment.center,
-                  child: Text(
-                    option.label,
-                    style: CantaeTypography.label.copyWith(
-                      color: isSelected ? colors.text : colors.text2,
+                  child: ExcludeSemantics(
+                    excluding: option.semanticLabel != null,
+                    child: Text(
+                      option.label,
+                      style: CantaeTypography.label.copyWith(
+                        color: isSelected ? colors.text : colors.text2,
+                      ),
                     ),
                   ),
                 ),

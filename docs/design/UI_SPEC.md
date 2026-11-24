@@ -66,11 +66,12 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
   - *Alterações não salvas*: sair pede confirmação.
 
 ## 6.6 Editor de letra
-- **Pré‑condição:** alinhamento salvo; caso contrário, banner orientando.
-- **Topo:** Voltar · "Ouvir com a letra". Título "Letra" + "3 de 5 marcadas".
-- **Conteúdo:** grupo de linhas: tempo (mono, "—" se não marcado), texto, ponto do naipe + "Naipe · dinâmica", "Editar". A linha atual aparece destacada. "+ Acrescentar linha".
-- **Rodapé:** card "Próxima: … 0:21.8" · [S] Pausar · [P] Marcar agora.
-- **Estados:** vazio (sem linhas), editando, pré‑visualizando.
+- **Pré‑condição:** ao menos uma faixa cadastrada; caso contrário, banner warning "Sem faixas para ouvir" com ação "Alinhar faixas" e "Ouvir com a letra" desabilitado. Digitar, editar e salvar a letra continuam liberados.
+- **Topo:** Voltar · "Ouvir com a letra" (vira "Parar de ouvir" no modo de marcação). Título "Letra" + "3 de 5 marcadas" (números em mono, região viva).
+- **Conteúdo:** grupo de `LyricLineRow`: tempo (mono, "—" se não marcado), texto, selo do naipe + "Naipe · dinâmica", "Editar" (expande na própria linha). A linha atual aparece destacada. "+ Acrescentar linha".
+- **Rodapé (editando):** [P] Salvar letra.
+- **Rodapé (marcando):** card "Próxima: … 0:21.8" (ou "Todas as linhas marcadas") · [P] Marcar agora · [S] Pausar/Continuar · [S] Salvar letra. Marcação fora de ordem mostra banner "Marcação recusada".
+- **Estados:** carregando, não encontrada, erro ao abrir (banner + "Tentar de novo"), vazio (sem linhas, sem rodapé; ação "Acrescentar linha"), editando, marcando (tocando), marcando (pausado: "Continuar" retoma de onde parou, "Marcar agora" desabilitado), erro ao tocar as faixas (banner, edição continua), erro ao salvar (banner, alterações mantidas). Sair com alterações não salvas abre `ConfirmSheet`; sair para o áudio.
 
 ## 6.7 Criar sala
 - **Topo:** Cancelar · StatusPill "Visível no Coral‑WiFi".

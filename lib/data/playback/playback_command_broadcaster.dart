@@ -184,7 +184,8 @@ class PlaybackCommandBroadcaster {
   /// "no measurement" — the caller still proceeds (spec Edge Case: no
   /// fallback mode exists, the 100 ms target is a measured bar, not a
   /// guaranteed clamp).
-  Future<void> _awaitProbeReply(ParticipantId participant, String probeId) async {
+  Future<void> _awaitProbeReply(
+      ParticipantId participant, String probeId) async {
     try {
       await _controller.applicationMessages
           .where((event) => event.$1 == participant)

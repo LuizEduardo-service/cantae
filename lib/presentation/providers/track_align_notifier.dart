@@ -70,7 +70,8 @@ class TrackAlignState {
     return TrackAlignState(
       status: status ?? this.status,
       song: song ?? this.song,
-      startDelayMsByTrackId: startDelayMsByTrackId ?? this.startDelayMsByTrackId,
+      startDelayMsByTrackId:
+          startDelayMsByTrackId ?? this.startDelayMsByTrackId,
       mutedByTrackId: mutedByTrackId ?? this.mutedByTrackId,
       soloTrackId: clearSolo ? null : (soloTrackId ?? this.soloTrackId),
       loopStartMs: loopStartMs ?? this.loopStartMs,
@@ -257,7 +258,8 @@ class TrackAlignNotifier extends StateNotifier<TrackAlignState> {
               id: track.id,
               filePath: track.filePath,
               naipe: track.naipe,
-              startDelayMs: state.startDelayMsByTrackId[track.id] ?? track.startDelayMs,
+              startDelayMs:
+                  state.startDelayMsByTrackId[track.id] ?? track.startDelayMs,
               isPlayback: track.isPlayback,
             ))
         .toList();

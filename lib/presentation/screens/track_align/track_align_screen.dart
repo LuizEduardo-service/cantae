@@ -152,7 +152,8 @@ class _NotFoundBody extends StatelessWidget {
     return EmptyState(
       icon: Icons.search_off,
       title: 'Música não encontrada',
-      message: 'Essa música não existe mais ou nunca existiu na sua biblioteca.',
+      message:
+          'Essa música não existe mais ou nunca existiu na sua biblioteca.',
       primaryLabel: 'Voltar à Biblioteca',
       onPrimary: () => context.goNamed('library'),
     );
@@ -239,8 +240,9 @@ class _LoadedScaffold extends StatelessWidget {
             if (tracksByNaipe[naipe] != null) ...[
               TrackAlignRow(
                 naipe: naipe,
-                startDelayMs: state.startDelayMsByTrackId[tracksByNaipe[naipe]!.id] ??
-                    tracksByNaipe[naipe]!.startDelayMs,
+                startDelayMs:
+                    state.startDelayMsByTrackId[tracksByNaipe[naipe]!.id] ??
+                        tracksByNaipe[naipe]!.startDelayMs,
                 muted: state.mutedByTrackId[tracksByNaipe[naipe]!.id] ?? false,
                 solo: state.soloTrackId == tracksByNaipe[naipe]!.id,
                 onOffsetChanged: (ms) =>

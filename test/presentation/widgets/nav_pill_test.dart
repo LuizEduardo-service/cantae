@@ -1,4 +1,5 @@
 import 'package:cantae/presentation/theme/app_theme.dart';
+import 'package:cantae/presentation/theme/cantae_colors.dart';
 import 'package:cantae/presentation/widgets/nav_pill.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -112,6 +113,28 @@ void main() {
 
         expect(tapped, isTrue, reason: 'variant $variant should fire onTap');
       }
+    });
+
+    testWidgets('null onTap renders a disabled pill: muted text, not enabled',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _wrap(
+          const NavPill(
+            variant: NavPillVariant.action,
+            label: 'Ouvir com a letra',
+            onTap: null,
+          ),
+          theme: AppTheme.light,
+        ),
+      );
+      final colors = AppTheme.light.extension<CantaeColors>()!;
+
+      final text = tester.widget<Text>(find.text('Ouvir com a letra'));
+      expect(text.style!.color, colors.textDisabled);
+      final semantics = tester.getSemantics(find.text('Ouvir com a letra'));
+      expect(semantics.flagsCollection.isEnabled.toBoolOrNull(), isFalse);
+      handle.dispose();
     });
 
     testWidgets('renders under the dark theme without throwing', (

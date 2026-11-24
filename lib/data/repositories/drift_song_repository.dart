@@ -77,23 +77,24 @@ class DriftSongRepository implements SongRepository {
         .get();
     final lyricRows = await (_db.select(_db.lyricLinesTable)
           ..where((l) => l.songId.equals(id))
-          ..orderBy([
-            (l) => OrderingTerm.asc(l.onsetMs),
-            (l) => OrderingTerm.asc(l.rowId),
-          ]))
+          // Saved (manual) order: save() reinserts lyrics in list order, so
+          // rowId mirrors it. onsetMs may be null for unmarked lines.
+          ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
     final tracks = trackRows
         .where((row) => !row.isPlaybackSlot)
         .map(SongTrackMapper.fromRow)
         .toList();
-    final playbackRow = trackRows.where((row) => row.isPlaybackSlot).firstOrNull;
+    final playbackRow =
+        trackRows.where((row) => row.isPlaybackSlot).firstOrNull;
 
     final song = SongMapper.fromRow(
       songRow,
       tracks: tracks,
       lyrics: lyricRows.map(LyricLineMapper.fromRow).toList(),
-      playbackTrack: playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+      playbackTrack:
+          playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
     );
 
     return Result.success(song);
@@ -112,10 +113,9 @@ class DriftSongRepository implements SongRepository {
         .get();
     final lyricRows = await (_db.select(_db.lyricLinesTable)
           ..where((l) => l.songId.isIn(songIds))
-          ..orderBy([
-            (l) => OrderingTerm.asc(l.onsetMs),
-            (l) => OrderingTerm.asc(l.rowId),
-          ]))
+          // Saved (manual) order: save() reinserts lyrics in list order, so
+          // rowId mirrors it. onsetMs may be null for unmarked lines.
+          ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
     final tracksBySong = <String, List<SongTracksTableData>>{};
@@ -133,7 +133,8 @@ class DriftSongRepository implements SongRepository {
           .where((row) => !row.isPlaybackSlot)
           .map(SongTrackMapper.fromRow)
           .toList();
-      final playbackRow = allTracks.where((row) => row.isPlaybackSlot).firstOrNull;
+      final playbackRow =
+          allTracks.where((row) => row.isPlaybackSlot).firstOrNull;
 
       return SongMapper.fromRow(
         songRow,
@@ -141,7 +142,8 @@ class DriftSongRepository implements SongRepository {
         lyrics: (lyricsBySong[songRow.id] ?? const [])
             .map(LyricLineMapper.fromRow)
             .toList(),
-        playbackTrack: playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+        playbackTrack:
+            playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
       );
     }).toList();
 

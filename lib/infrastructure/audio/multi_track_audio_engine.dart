@@ -57,8 +57,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
 
     for (final track in tracks) {
       final player = _playerFactory();
-      final baseGain =
-          track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0);
+      final baseGain = track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0);
       final fileDuration = await player.setFilePath(track.filePath);
       await player.setVolume(baseGain);
       _playersByTrackId[track.id] = player;

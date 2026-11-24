@@ -52,7 +52,8 @@ void main() {
 
     testWidgets('disabled state (no onPressed) blocks taps', (tester) async {
       await tester.pumpWidget(
-        _wrap(const PrimaryButton(label: 'Indisponível'), theme: AppTheme.light),
+        _wrap(const PrimaryButton(label: 'Indisponível'),
+            theme: AppTheme.light),
       );
 
       final semantics = tester.getSemantics(find.byType(PrimaryButton));
@@ -151,7 +152,8 @@ void main() {
             .ancestor(of: find.byType(InkWell), matching: find.byType(Material))
             .first,
       );
-      expect(material.color, AppTheme.light.extension<CantaeColors>()!.dangerBg);
+      expect(
+          material.color, AppTheme.light.extension<CantaeColors>()!.dangerBg);
       final text = tester.widget<Text>(find.text('Apagar desta música'));
       expect(
         text.style?.color,

@@ -215,9 +215,8 @@ class ChunkedFileReceiver {
         }
 
         final partialFile = File(partialPath);
-        final bytes = totalChunks == 0
-            ? Uint8List(0)
-            : await partialFile.readAsBytes();
+        final bytes =
+            totalChunks == 0 ? Uint8List(0) : await partialFile.readAsBytes();
         final actualSha256 = sha256.convert(bytes).toString();
 
         if (actualSha256 == expectedSha256) {

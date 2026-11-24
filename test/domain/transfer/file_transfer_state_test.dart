@@ -15,17 +15,18 @@ void main() {
       final result = initial().advance(const TransferStarted());
       expect(result.isSuccess, isTrue);
       result.when(
-        success: (state) => expect(state.phase, equals(TransferPhase.inProgress)),
+        success: (state) =>
+            expect(state.phase, equals(TransferPhase.inProgress)),
         failure: (_) => fail('expected success'),
       );
     });
 
-    test('inProgress -> inProgress on ChunkAcked, updates lastAckedChunkIndex', () {
-      final inProgress =
-          initial().advance(const TransferStarted()).when(
-                success: (s) => s,
-                failure: (_) => throw StateError('setup failed'),
-              );
+    test('inProgress -> inProgress on ChunkAcked, updates lastAckedChunkIndex',
+        () {
+      final inProgress = initial().advance(const TransferStarted()).when(
+            success: (s) => s,
+            failure: (_) => throw StateError('setup failed'),
+          );
       final result = inProgress.advance(const ChunkAcked(1));
       expect(result.isSuccess, isTrue);
       result.when(
@@ -45,7 +46,8 @@ void main() {
       final result = inProgress.advance(const AllChunksReceived());
       expect(result.isSuccess, isTrue);
       result.when(
-        success: (state) => expect(state.phase, equals(TransferPhase.validating)),
+        success: (state) =>
+            expect(state.phase, equals(TransferPhase.validating)),
         failure: (_) => fail('expected success'),
       );
     });
@@ -95,7 +97,8 @@ void main() {
       final result = validating.advance(const HashValidated());
       expect(result.isSuccess, isTrue);
       result.when(
-        success: (state) => expect(state.phase, equals(TransferPhase.available)),
+        success: (state) =>
+            expect(state.phase, equals(TransferPhase.available)),
         failure: (_) => fail('expected success'),
       );
     });
@@ -139,7 +142,8 @@ void main() {
     });
   });
 
-  group('FileTransferState.advance — invalid transitions rejected per state', () {
+  group('FileTransferState.advance — invalid transitions rejected per state',
+      () {
     test('pending rejects HashValidated (out-of-order event)', () {
       final result = initial().advance(const HashValidated());
       expect(result.isFailure, isTrue);
@@ -165,7 +169,8 @@ void main() {
       );
     });
 
-    test('validating rejects ChunkAcked (chunks are already fully received)', () {
+    test('validating rejects ChunkAcked (chunks are already fully received)',
+        () {
       final validating = initial()
           .advance(const TransferStarted())
           .when(success: (s) => s, failure: (_) => throw StateError('setup'))
@@ -196,10 +201,14 @@ void main() {
     });
 
     test('failed (terminal) rejects any further event', () {
-      final failed = initial().advance(const TransferStarted()).when(
+      final failed = initial()
+          .advance(const TransferStarted())
+          .when(
             success: (s) => s,
             failure: (_) => throw StateError('setup failed'),
-          ).advance(const ChunkDeliveryFailed()).when(
+          )
+          .advance(const ChunkDeliveryFailed())
+          .when(
             success: (s) => s,
             failure: (_) => throw StateError('setup failed'),
           );

@@ -45,7 +45,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(const CantaeScaffold(body: Text('conteudo')), theme: AppTheme.light),
+        _wrap(const CantaeScaffold(body: Text('conteudo')),
+            theme: AppTheme.light),
       );
 
       expect(find.text('rodape'), findsNothing);
@@ -55,7 +56,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        _wrap(const CantaeScaffold(body: Text('conteudo')), theme: AppTheme.light),
+        _wrap(const CantaeScaffold(body: Text('conteudo')),
+            theme: AppTheme.light),
       );
 
       final safeAreaFinder = find.ancestor(

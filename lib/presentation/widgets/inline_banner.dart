@@ -46,9 +46,11 @@ class InlineBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(title, style: CantaeTypography.listTitle.copyWith(color: onColor)),
+          Text(title,
+              style: CantaeTypography.listTitle.copyWith(color: onColor)),
           const SizedBox(height: CantaeSpacing.space1),
-          Text(message, style: CantaeTypography.bodySmall.copyWith(color: onColor)),
+          Text(message,
+              style: CantaeTypography.bodySmall.copyWith(color: onColor)),
           if (actionLabel != null && onAction != null) ...[
             const SizedBox(height: CantaeSpacing.space3),
             Semantics(

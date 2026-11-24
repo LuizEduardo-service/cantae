@@ -168,7 +168,8 @@ class _NotFoundBody extends StatelessWidget {
     return EmptyState(
       icon: Icons.search_off,
       title: 'Música não encontrada',
-      message: 'Essa música não existe mais ou nunca existiu na sua biblioteca.',
+      message:
+          'Essa música não existe mais ou nunca existiu na sua biblioteca.',
       primaryLabel: 'Voltar à Biblioteca',
       onPrimary: () => context.goNamed('library'),
     );
@@ -270,7 +271,10 @@ class _HubScaffold extends StatelessWidget {
               label: song.lyrics.isEmpty
                   ? 'Sincronizar letra · Letra não sincronizada'
                   : 'Sincronizar letra · ${song.lyrics.length} linhas',
-              onTap: () => context.goNamed('lyrics-editor'),
+              onTap: () => context.goNamed(
+                'lyrics-editor',
+                pathParameters: {'id': song.id},
+              ),
             ),
             _PreparaRow(
               label: 'Ensaios anteriores',

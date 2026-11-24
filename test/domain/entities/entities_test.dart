@@ -16,19 +16,22 @@ void main() {
 
     test('empty id throws AssertionError', () {
       // ignore: prefer_const_constructors
-      expect(() => Song(id: '', name: 'Test', author: 'A'), throwsA(isA<AssertionError>()));
+      expect(() => Song(id: '', name: 'Test', author: 'A'),
+          throwsA(isA<AssertionError>()));
     });
 
     test('empty name throws AssertionError', () {
       // ignore: prefer_const_constructors
-      expect(() => Song(id: 's1', name: '', author: 'A'), throwsA(isA<AssertionError>()));
+      expect(() => Song(id: 's1', name: '', author: 'A'),
+          throwsA(isA<AssertionError>()));
     });
   });
 
   group('SongTrack invariants', () {
     test('valid SongTrack constructs without error', () {
       expect(
-        () => const SongTrack(id: 't1', filePath: 'soprano.mp3', naipe: Naipe.soprano),
+        () => const SongTrack(
+            id: 't1', filePath: 'soprano.mp3', naipe: Naipe.soprano),
         returnsNormally,
       );
     });
@@ -52,14 +55,19 @@ void main() {
     test('negative startDelayMs throws AssertionError', () {
       expect(
         // ignore: prefer_const_constructors
-        () => SongTrack(id: 't1', filePath: 'f.mp3', naipe: Naipe.soprano, startDelayMs: -1),
+        () => SongTrack(
+            id: 't1',
+            filePath: 'f.mp3',
+            naipe: Naipe.soprano,
+            startDelayMs: -1),
         throwsA(isA<AssertionError>()),
       );
     });
 
     test('zero startDelayMs is valid', () {
       expect(
-        () => const SongTrack(id: 't1', filePath: 'f.mp3', naipe: Naipe.soprano),
+        () =>
+            const SongTrack(id: 't1', filePath: 'f.mp3', naipe: Naipe.soprano),
         returnsNormally,
       );
     });
@@ -75,12 +83,14 @@ void main() {
 
     test('empty text throws AssertionError', () {
       // ignore: prefer_const_constructors
-      expect(() => LyricLine(text: '', onsetMs: 1000), throwsA(isA<AssertionError>()));
+      expect(() => LyricLine(text: '', onsetMs: 1000),
+          throwsA(isA<AssertionError>()));
     });
 
     test('negative onsetMs throws AssertionError', () {
       // ignore: prefer_const_constructors
-      expect(() => LyricLine(text: 'Line', onsetMs: -1), throwsA(isA<AssertionError>()));
+      expect(() => LyricLine(text: 'Line', onsetMs: -1),
+          throwsA(isA<AssertionError>()));
     });
 
     test('zero onsetMs is valid', () {
@@ -113,11 +123,13 @@ void main() {
     });
 
     test('bpm boundary 30 is valid', () {
-      expect(() => const MetronomeConfig(bpm: 30, beatsPerMeasure: 4), returnsNormally);
+      expect(() => const MetronomeConfig(bpm: 30, beatsPerMeasure: 4),
+          returnsNormally);
     });
 
     test('bpm boundary 300 is valid', () {
-      expect(() => const MetronomeConfig(bpm: 300, beatsPerMeasure: 4), returnsNormally);
+      expect(() => const MetronomeConfig(bpm: 300, beatsPerMeasure: 4),
+          returnsNormally);
     });
 
     test('beatsPerMeasure below 2 throws AssertionError', () {
@@ -137,11 +149,13 @@ void main() {
     });
 
     test('beatsPerMeasure boundary 2 is valid', () {
-      expect(() => const MetronomeConfig(bpm: 120, beatsPerMeasure: 2), returnsNormally);
+      expect(() => const MetronomeConfig(bpm: 120, beatsPerMeasure: 2),
+          returnsNormally);
     });
 
     test('beatsPerMeasure boundary 16 is valid', () {
-      expect(() => const MetronomeConfig(bpm: 120, beatsPerMeasure: 16), returnsNormally);
+      expect(() => const MetronomeConfig(bpm: 120, beatsPerMeasure: 16),
+          returnsNormally);
     });
   });
 }

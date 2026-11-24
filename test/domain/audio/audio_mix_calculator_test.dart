@@ -41,7 +41,8 @@ void main() {
   group('AudioMixCalculator sum invariant', () {
     test('ownGain + choirGain == 1.0 for values in [0.0, 1.0]', () {
       for (final m in [0.0, 0.1, 0.25, 0.5, 0.75, 0.9, 1.0]) {
-        final sum = AudioMixCalculator.ownGain(m) + AudioMixCalculator.choirGain(m);
+        final sum =
+            AudioMixCalculator.ownGain(m) + AudioMixCalculator.choirGain(m);
         expect(sum, closeTo(1.0, 1e-10), reason: 'sum != 1.0 for mix=$m');
       }
     });

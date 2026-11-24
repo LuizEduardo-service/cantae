@@ -9,7 +9,7 @@ class LyricLinesTable extends Table {
   TextColumn get songId =>
       text().references(SongsTable, #id, onDelete: KeyAction.cascade)();
   TextColumn get lyricText => text().named('text')();
-  IntColumn get onsetMs => integer()();
+  IntColumn get onsetMs => integer().nullable()();
   TextColumn get naipe => text().nullable()();
   TextColumn get dynamics => text().nullable()();
 }

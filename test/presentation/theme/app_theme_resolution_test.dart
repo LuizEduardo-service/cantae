@@ -22,14 +22,17 @@ void main() {
       expect(colors!.accent, CantaeColors.dark.accent);
     });
 
-    test('light theme textTheme.bodyLarge resolves the body typography token', () {
+    test('light theme textTheme.bodyLarge resolves the body typography token',
+        () {
       final bodyLarge = AppTheme.light.textTheme.bodyLarge!;
       expect(bodyLarge.fontFamily, CantaeTypography.body.fontFamily);
       expect(bodyLarge.fontSize, CantaeTypography.body.fontSize);
       expect(bodyLarge.fontWeight, CantaeTypography.body.fontWeight);
     });
 
-    test('light theme textTheme.headlineLarge resolves the titleHub typography token', () {
+    test(
+        'light theme textTheme.headlineLarge resolves the titleHub typography token',
+        () {
       final headlineLarge = AppTheme.light.textTheme.headlineLarge!;
       expect(headlineLarge.fontFamily, CantaeTypography.titleHub.fontFamily);
       expect(headlineLarge.fontSize, CantaeTypography.titleHub.fontSize);

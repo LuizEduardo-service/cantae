@@ -30,7 +30,8 @@ void main() {
       expect(pulses[3].isDownbeat, isFalse);
     });
 
-    test('first pulse aligns to next beat boundary when startMs is mid-beat', () {
+    test('first pulse aligns to next beat boundary when startMs is mid-beat',
+        () {
       const config = MetronomeConfig(bpm: 60, beatsPerMeasure: 4);
       final pulses = MetronomePulseGenerator.generate(
         startMs: 500,

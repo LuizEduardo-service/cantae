@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 16,
+  "next_id": 18,
   "lessons": [
     {
       "id": "L-003",
@@ -238,6 +238,42 @@
       ],
       "created": "2026-11-21T15:56:52Z",
       "last_seen": "2026-11-21T15:56:52Z"
+    },
+    {
+      "id": "L-016",
+      "key": "surviving_mutant::a schema migration test must exercise the new constraint on the upgraded database not only that existing rows survive",
+      "text": "A schema migration test must exercise the new constraint on the upgraded database, not only that existing rows survive",
+      "signal": "surviving_mutant",
+      "scope": "database",
+      "status": "candidate",
+      "features": [
+        "lyrics-editor"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M14 (lib/infrastructure/database/app_database.dart:35) (database)"
+      ],
+      "created": "2026-11-24T22:58:04Z",
+      "last_seen": "2026-11-24T22:58:04Z"
+    },
+    {
+      "id": "L-017",
+      "key": "surviving_mutant::pin every comparison boundary from an acceptance criterion with a test at the exact equal value",
+      "text": "Pin every comparison boundary from an acceptance criterion with a test at the exact equal value",
+      "signal": "surviving_mutant",
+      "scope": "presentation",
+      "status": "candidate",
+      "features": [
+        "lyrics-editor"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md M2 (lib/presentation/providers/lyrics_editor_notifier.dart:336) (presentation)"
+      ],
+      "created": "2026-11-24T22:58:06Z",
+      "last_seen": "2026-11-24T22:58:06Z"
     }
   ]
 }

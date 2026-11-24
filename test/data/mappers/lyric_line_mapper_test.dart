@@ -4,7 +4,8 @@ import 'package:cantae/domain/entities/lyric_line.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/infrastructure/database/app_database.dart';
 
-LyricLinesTableData _row(LyricLinesTableCompanion companion) => LyricLinesTableData(
+LyricLinesTableData _row(LyricLinesTableCompanion companion) =>
+    LyricLinesTableData(
       rowId: 1,
       songId: companion.songId.value,
       lyricText: companion.lyricText.value,
@@ -45,13 +46,34 @@ void main() {
     });
 
     test('round trips naipe null with dynamics present', () {
-      const line = LyricLine(text: 'Only dynamics', onsetMs: 200, dynamics: 'piano');
+      const line =
+          LyricLine(text: 'Only dynamics', onsetMs: 200, dynamics: 'piano');
 
       final companion = LyricLineMapper.toCompanion(line, songId: 'song-1');
       final roundTripped = LyricLineMapper.fromRow(_row(companion));
 
       expect(roundTripped.naipe, isNull);
       expect(roundTripped.dynamics, equals('piano'));
+    });
+
+    test(
+        'round trips a not-yet-marked line (onsetMs null) keeping its other fields',
+        () {
+      const line = LyricLine(
+        text: 'Ave verum corpus',
+        onsetMs: null,
+        naipe: Naipe.tenor,
+        dynamics: 'mezzo-piano',
+      );
+
+      final companion = LyricLineMapper.toCompanion(line, songId: 'song-1');
+      expect(companion.onsetMs.present, isTrue);
+      final roundTripped = LyricLineMapper.fromRow(_row(companion));
+
+      expect(roundTripped.onsetMs, isNull);
+      expect(roundTripped.text, equals('Ave verum corpus'));
+      expect(roundTripped.naipe, equals(Naipe.tenor));
+      expect(roundTripped.dynamics, equals('mezzo-piano'));
     });
   });
 }

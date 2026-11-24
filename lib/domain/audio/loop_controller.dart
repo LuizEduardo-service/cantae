@@ -9,8 +9,7 @@ final class LoopController {
     required this.maxMs,
   });
 
-  bool get isValid =>
-      startMs >= 0 && endMs > startMs && endMs <= maxMs;
+  bool get isValid => startMs >= 0 && endMs > startMs && endMs <= maxMs;
 
   bool shouldReposition(int currentMs) => isValid && currentMs >= endMs;
 

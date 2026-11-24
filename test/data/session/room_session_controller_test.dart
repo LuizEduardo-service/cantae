@@ -469,7 +469,8 @@ void main() {
     final visitorPayload = Uint8List.fromList([9, 8, 7]);
     final visitorApplicationMessage =
         visitor.applicationMessages.first.timeout(const Duration(seconds: 5));
-    final sendFromMaster = await master.sendEnvelopeTo(pending.id, visitorPayload);
+    final sendFromMaster =
+        await master.sendEnvelopeTo(pending.id, visitorPayload);
     expect(sendFromMaster.isSuccess, isTrue);
     final (masterSender, receivedByVisitor) = await visitorApplicationMessage;
     expect(masterSender, equals(const ParticipantId('master-device')));
@@ -507,7 +508,9 @@ void main() {
       Uint8List.fromList([4, 5, 6]),
       requiresMasterRole: true,
     );
-    expect(sendResult.isSuccess, isTrue, reason: 'the wire send itself succeeds; rejection happens at the role gate on receipt');
+    expect(sendResult.isSuccess, isTrue,
+        reason:
+            'the wire send itself succeeds; rejection happens at the role gate on receipt');
 
     // Give the loopback TCP round trip time to complete, well under the
     // test's own timeout, then assert nothing was ever published.
@@ -579,7 +582,8 @@ void main() {
       await masterSnapshotQueue.moveNext();
       pendingB = masterSnapshotQueue.current.participants
           .where((p) =>
-              p.state == ParticipantState.pendingApproval && p.id != pendingA!.id)
+              p.state == ParticipantState.pendingApproval &&
+              p.id != pendingA!.id)
           .firstOrNull;
     }
     await master.approve(pendingB.id);
@@ -614,7 +618,8 @@ void main() {
     // sendEnvelopeTo(A only) must not also reach B.
     final targetedPayload = Uint8List.fromList([1, 1, 1]);
     final bReceivedTargeted = <Uint8List>[];
-    visitorB.applicationMessages.listen((event) => bReceivedTargeted.add(event.$2));
+    visitorB.applicationMessages
+        .listen((event) => bReceivedTargeted.add(event.$2));
     final targetedMessage =
         visitorA.applicationMessages.first.timeout(const Duration(seconds: 5));
     await master.sendEnvelopeTo(pendingA.id, targetedPayload);

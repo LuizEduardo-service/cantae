@@ -165,9 +165,8 @@ void main() {
         3) {
       await Future<void>.delayed(const Duration(milliseconds: 15));
     }
-    final chunksAckedBeforeDrop = progressEvents
-        .where((p) => p.phase == TransferPhase.inProgress)
-        .length;
+    final chunksAckedBeforeDrop =
+        progressEvents.where((p) => p.phase == TransferPhase.inProgress).length;
     expect(chunksAckedBeforeDrop, greaterThan(0));
     expect(chunksAckedBeforeDrop, lessThan(totalChunks));
 
@@ -223,8 +222,7 @@ void main() {
     expect(
       chunksSentInSecondAttempt,
       lessThan(totalChunks),
-      reason:
-          'resume must not resend every chunk from zero after a reconnect',
+      reason: 'resume must not resend every chunk from zero after a reconnect',
     );
 
     final finalPath = LibraryStoragePaths.trackFilePath(
@@ -233,8 +231,8 @@ void main() {
       extension: 'bin',
     );
     final deadline = DateTime.now().add(const Duration(seconds: 3));
-    while (!await File(finalPath).exists() &&
-        DateTime.now().isBefore(deadline)) {
+    while (
+        !await File(finalPath).exists() && DateTime.now().isBefore(deadline)) {
       await Future<void>.delayed(const Duration(milliseconds: 20));
     }
     expect(await File(finalPath).exists(), isTrue);

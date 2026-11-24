@@ -18,6 +18,7 @@ Pílula de navegação no topo.
 - Variantes: `back` ("‹ Biblioteca", "‹ Voltar"), `exit` ("Sair"), `cancel` ("Cancelar"), `action` ("Exportar", "Importar").
 - Altura 44, fundo `fillMuted`, texto `label` 15/500.
 - `exit` em sala abre `ConfirmSheet` antes de sair.
+- Sem `onTap`, fica desabilitada: texto `textDisabled` e semântica "não habilitado". Usar junto de uma frase que explique o motivo (ex.: banner "Sem faixas para ouvir" no Editor de letra).
 
 ### `StatusPill`
 Status à direita do topo.
@@ -53,6 +54,7 @@ Dentro de cards. Fundo `fillOnSurface` (neutro) ou `accentSoft` (positivo). Altu
 - Trilho `fillField`, raio 12, padding 3. Segmento ativo `segmentSelected` + sombra leve; inativo transparente `text2`.
 - Altura do segmento 38–42. Expõe semântica de tab ou radio.
 - Usos: filtros da Biblioteca, tema, naipe do Cantor (com ponto de cor + nome).
+- Opção com rótulo curto visível (ex.: letra do naipe "S") pode ter um `semanticLabel` com o nome completo ("Soprano"): o leitor de tela anuncia o nome completo, não a letra.
 
 ### `SearchField`
 Fundo `fillField`, raio 12, altura 44, ícone de lupa `text2`, placeholder "Buscar música ou autor".
@@ -115,6 +117,13 @@ Componente compartilhado por Cantor, Mestre, Visitante e Modo solo.
 - `LyricLine.active` — card `surface` com selo do naipe + "Naipe · dinâmica" e texto `lyricActive`.
 - `LyricLine.next` — rótulo "Próxima" ou "Próxima é sua" (cor do naipe do usuário) + texto `lyricNext`.
 - Props: `lines`, `activeIndex`, `userVoicePart`.
+
+### `LyricLineRow`
+Editor de letra: uma linha da letra, com edição inline.
+- **Recolhida:** tempo em mono (`0:05.3`, ou "—" se não marcada), texto (`text3` "Linha sem texto" quando vazio), selo do naipe + "Naipe · dinâmica" (só o selo, sem dinâmica; só a dinâmica, sem naipe), botão "Editar" (≥ 44 dp).
+- **Expandida:** campo "Texto da linha" (1–200 caracteres), `SegmentedControl` de naipe S · C · T · B · — (leitor de tela: Soprano, Contralto, Tenor, Baixo, Nenhum), campo "Dinâmica (opcional)" (até 40; vazio = sem dinâmica). Botão vira "Concluir". Valor inválido volta ao último válido ao sair do campo, sem erro modal.
+- **Linha atual:** borda 2 px `accent`, texto em `listTitle` (mais forte) e rótulo semântico "Linha atual" — nunca só cor.
+- Props: `line` (`LyricDraftLine`), `isCurrent`, `expanded`, `onToggleExpanded`, `onTextChanged`, `onNaipeChanged`, `onDynamicsChanged`.
 
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".

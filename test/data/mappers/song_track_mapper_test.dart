@@ -38,7 +38,8 @@ void main() {
       expect(row.isPlaybackSlot, isFalse);
     });
 
-    test('round trips the designated playback-slot row (isPlaybackSlot: true)', () {
+    test('round trips the designated playback-slot row (isPlaybackSlot: true)',
+        () {
       const track = SongTrack(
         id: 'track-pb',
         filePath: 'playback.mp3',
@@ -56,7 +57,9 @@ void main() {
       expect(companion.isPlayback.value, isTrue);
     });
 
-    test('isPlaybackSlot is driven by the caller flag, not SongTrack.isPlayback', () {
+    test(
+        'isPlaybackSlot is driven by the caller flag, not SongTrack.isPlayback',
+        () {
       const track = SongTrack(
         id: 'track-2',
         filePath: 'a.mp3',
@@ -76,7 +79,8 @@ void main() {
 
     test('round trips every Naipe value', () {
       for (final naipe in Naipe.values) {
-        final track = SongTrack(id: 'track-${naipe.name}', filePath: 'x.mp3', naipe: naipe);
+        final track = SongTrack(
+            id: 'track-${naipe.name}', filePath: 'x.mp3', naipe: naipe);
         final companion = SongTrackMapper.toCompanion(
           track,
           songId: 'song-1',
