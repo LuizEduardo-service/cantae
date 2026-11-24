@@ -445,6 +445,28 @@ void main() {
       expect(state.hasUnsavedChanges, isFalse);
     });
 
+    // Regression (sensor M2): AC7 rejects only an instant *earlier* than
+    // the previous line, so the same instant must be accepted.
+    test('accepts a mark at exactly the previous marked line\'s instant',
+        () async {
+      final s = _setUp(
+        song: _song(lyrics: const [
+          LyricLine(text: 'Ave verum corpus', onsetMs: 8000),
+          LyricLine(text: 'natum de Maria Virgine', onsetMs: null),
+        ]),
+      );
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _previewAt(s.container, s.engine, 8000);
+
+      _notifier(s.container).markNow();
+
+      final state = _state(s.container);
+      expect(state.markError, isNull);
+      expect(state.lines[1].onsetMs, 8000);
+      expect(state.nextUnmarkedIndex, isNull);
+    });
+
     test('compares against the nearest marked line before, skipping gaps',
         () async {
       final s = _setUp(

@@ -303,8 +303,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 **Requirement**: LYR-06
 
 **Done when**:
-- [ ] New test fails with `now < previousOnset` mutated to `<=` (M2) and passes without it
-- [ ] Gate check passes: `flutter test test/presentation/providers/lyrics_editor_notifier_test.dart`
+- [x] New test fails with `now < previousOnset` mutated to `<=` (M2) and passes without it
+- [x] Gate check passes: `flutter test test/presentation/providers/lyrics_editor_notifier_test.dart`
 
 **Tests**: unit
 **Gate**: quick
