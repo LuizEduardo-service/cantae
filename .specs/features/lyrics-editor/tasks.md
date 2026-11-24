@@ -240,13 +240,13 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: `flutter-ui-ux`, `flutter-widget-performance` (preview footer rebuilds on every `positionMs` tick - scope rebuilds to the footer/current-line only, not the whole list)
 
 **Done when**:
-- [ ] All 4 statuses render per design.md; empty-lines state shows `EmptyState`; tracks-empty shows `InlineBanner.warning` (never blocks editing/saving)
-- [ ] "Ouvir com a letra" toggles the preview footer ("Próxima: `<texto>` `<mm:ss.s>`" + Pausar + Marcar agora, disabled when nothing to mark)
-- [ ] "Salvar" is always visible/enabled regardless of preview state; unsaved-exit triggers `ConfirmSheet`
-- [ ] Both themes verified; system font scale 130% does not clip/overlap; touch targets ≥44dp; semantics for buttons/live status region per AGENTS.md §3/§7
-- [ ] `test/presentation/screens/lyrics_editor/lyrics_editor_screen_test.dart` covers: loading/notFound/error/loaded renders, empty-lines state, tracks-empty banner present but non-blocking, add-line action, "Marcar agora" disabled with nothing to mark, save success toast, save failure banner, dark theme smoke test, semantics check
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
-- [ ] Test count: ≥10 tests pass
+- [x] All 4 statuses render per design.md; empty-lines state shows `EmptyState`; tracks-empty shows `InlineBanner.warning` (never blocks editing/saving)
+- [x] "Ouvir com a letra" toggles the preview footer ("Próxima: `<texto>` `<mm:ss.s>`" + Pausar + Marcar agora, disabled when nothing to mark)
+- [x] "Salvar" is always visible/enabled regardless of preview state; unsaved-exit triggers `ConfirmSheet`
+- [x] Both themes verified; system font scale 130% does not clip/overlap; touch targets ≥44dp; semantics for buttons/live status region per AGENTS.md §3/§7
+- [x] `test/presentation/screens/lyrics_editor/lyrics_editor_screen_test.dart` covers: loading/notFound/error/loaded renders, empty-lines state, tracks-empty banner present but non-blocking, add-line action, "Marcar agora" disabled with nothing to mark, save success toast, save failure banner, dark theme smoke test, semantics check
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
+- [x] Test count: ≥10 tests pass
 
 **Tests**: widget (e2e-equivalent per AGENTS.md)
 **Gate**: build

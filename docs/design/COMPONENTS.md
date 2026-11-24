@@ -18,6 +18,7 @@ Pílula de navegação no topo.
 - Variantes: `back` ("‹ Biblioteca", "‹ Voltar"), `exit` ("Sair"), `cancel` ("Cancelar"), `action` ("Exportar", "Importar").
 - Altura 44, fundo `fillMuted`, texto `label` 15/500.
 - `exit` em sala abre `ConfirmSheet` antes de sair.
+- Sem `onTap`, fica desabilitada: texto `textDisabled` e semântica "não habilitado". Usar junto de uma frase que explique o motivo (ex.: banner "Sem faixas para ouvir" no Editor de letra).
 
 ### `StatusPill`
 Status à direita do topo.

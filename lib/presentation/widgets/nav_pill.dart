@@ -9,7 +9,8 @@ enum NavPillVariant { back, exit, cancel, action }
 
 /// Top navigation pill. `back` prefixes its [label] with "‹ "; the other
 /// three variants render [label] as-is (caller decides the exact copy, e.g.
-/// "Sair", "Cancelar", "Importar").
+/// "Sair", "Cancelar", "Importar"). A null [onTap] renders it disabled
+/// (`textDisabled` label, semantics not enabled).
 class NavPill extends StatelessWidget {
   const NavPill({
     super.key,
@@ -22,7 +23,7 @@ class NavPill extends StatelessWidget {
 
   final NavPillVariant variant;
   final String label;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -32,6 +33,7 @@ class NavPill extends StatelessWidget {
 
     return Semantics(
       button: true,
+      enabled: onTap != null,
       label: displayText,
       child: Material(
         color: colors.fillMuted,
@@ -51,7 +53,9 @@ class NavPill extends StatelessWidget {
               child: Center(
                 child: Text(
                   displayText,
-                  style: CantaeTypography.label.copyWith(color: colors.text),
+                  style: CantaeTypography.label.copyWith(
+                    color: onTap == null ? colors.textDisabled : colors.text,
+                  ),
                 ),
               ),
             ),
