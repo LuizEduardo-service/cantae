@@ -189,6 +189,13 @@ class LyricsEditorNotifier extends StateNotifier<LyricsEditorState> {
   bool _engineLoaded = false;
 
   void _onSongResult(AsyncValue<Result<Song, Failure>> async) {
+    // While re-fetching (after save or retry), Riverpod still carries the
+    // previous value. Applying it would briefly show stale lyrics, so keep
+    // the current state until the fresh result arrives.
+    if (async.isLoading) {
+      if (!async.hasValue) state = const LyricsEditorState.loading();
+      return;
+    }
     async.when(
       loading: () => state = const LyricsEditorState.loading(),
       error: (_, __) =>

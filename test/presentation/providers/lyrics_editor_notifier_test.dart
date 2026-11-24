@@ -592,6 +592,33 @@ void main() {
       expect(_state(s.container).lines.map((l) => l.text).toList(), ['Ave']);
     });
 
+    // Regression: while re-fetching after save, Riverpod hands the listener
+    // the previous (pre-save) song, and the notifier briefly replaced the
+    // edited lines with the old lyrics (a flash of stale text on screen).
+    test('re-fetch after save never shows the pre-save lyrics', () async {
+      final s = _setUp(
+        song: _song(lyrics: const [
+          LyricLine(text: 'Ave verum corpus', onsetMs: 1000),
+        ]),
+      );
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      _notifier(s.container).addLine();
+      _notifier(s.container).updateText(1, 'natum de Maria Virgine');
+
+      final seen = <List<String>>[];
+      s.container.listen<LyricsEditorState>(
+        lyricsEditorProvider('ave'),
+        (_, next) => seen.add(next.lines.map((l) => l.text).toList()),
+      );
+      await _notifier(s.container).save();
+      await s.container.read(songByIdProvider('ave').future);
+      await _flush();
+
+      expect(seen, isNot(contains(equals(['Ave verum corpus']))));
+      expect(seen.last, ['Ave verum corpus', 'natum de Maria Virgine']);
+    });
+
     test('failure keeps every edit and unsaved state, sets saveError',
         () async {
       final s = _setUp();
