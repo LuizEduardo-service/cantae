@@ -187,10 +187,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] All methods and getters from design.md's Components section are implemented exactly as specified (including `markNow()`'s backward-scan out-of-order rejection and `_stopPreview()`'s non-awaited `cancel()`)
-- [ ] `lyrics_editor_notifier_test.dart` covers, 1:1 to spec ACs: addLine appends+expands+dirties; updateText rejects empty/>200 chars; updateDynamics rejects >40 chars; updateNaipe always accepts; markNow no-ops when nothing to mark; markNow rejects a mark earlier than the previous marked line's onset (no mutation); markNow succeeds and advances `nextUnmarkedIndex`; togglePreview no-ops when `tracks.isEmpty`; togglePreview sets `previewError` on engine-load failure; save success clears `hasUnsavedChanges` and invalidates `songByIdProvider`; save failure preserves `lines`/sets `saveError`; `currentLineIndex` returns the greatest marked `onsetMs <= currentPositionMs` or null; `markedCount`/`nextUnmarkedIndex` correctness
-- [ ] Gate check passes: `flutter test test/presentation/providers/lyrics_editor_notifier_test.dart`
-- [ ] Test count: ≥13 tests pass (one per bullet above; no silent deletions)
+- [x] All methods and getters from design.md's Components section are implemented exactly as specified (including `markNow()`'s backward-scan out-of-order rejection and `_stopPreview()`'s non-awaited `cancel()`)
+- [x] `lyrics_editor_notifier_test.dart` covers, 1:1 to spec ACs: addLine appends+expands+dirties; updateText rejects empty/>200 chars; updateDynamics rejects >40 chars; updateNaipe always accepts; markNow no-ops when nothing to mark; markNow rejects a mark earlier than the previous marked line's onset (no mutation); markNow succeeds and advances `nextUnmarkedIndex`; togglePreview no-ops when `tracks.isEmpty`; togglePreview sets `previewError` on engine-load failure; save success clears `hasUnsavedChanges` and invalidates `songByIdProvider`; save failure preserves `lines`/sets `saveError`; `currentLineIndex` returns the greatest marked `onsetMs <= currentPositionMs` or null; `markedCount`/`nextUnmarkedIndex` correctness
+- [x] Gate check passes: `flutter test test/presentation/providers/lyrics_editor_notifier_test.dart`
+- [x] Test count: ≥13 tests pass (one per bullet above; no silent deletions)
 
 **Tests**: unit
 **Gate**: quick
