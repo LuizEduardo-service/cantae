@@ -37,6 +37,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final Map<String, int> _startDelayMsByTrackId = {};
   final Map<String, double> _baseGainByTrackId = {};
   final Map<String, bool> _mutedByTrackId = {};
+  final Map<String, double> _volumeByTrackId = {};
   final Map<String, int?> _fileDurationMsByTrackId = {};
   final StreamController<int> _positionMsController =
       StreamController<int>.broadcast();
@@ -64,6 +65,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
       _startDelayMsByTrackId[track.id] = track.startDelayMs;
       _baseGainByTrackId[track.id] = baseGain;
       _mutedByTrackId[track.id] = false;
+      _volumeByTrackId[track.id] = 1.0;
       _fileDurationMsByTrackId[track.id] = fileDuration?.inMilliseconds;
     }
 
@@ -100,6 +102,12 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   @override
+  Future<void> setTrackVolume(String trackId, double volume) async {
+    _volumeByTrackId[trackId] = volume.clamp(0.0, 1.0);
+    await _applyVolume(trackId);
+  }
+
+  @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {
     _startDelayMsByTrackId[trackId] = startDelayMs;
   }
@@ -128,12 +136,13 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   double _effectiveVolume(String trackId) {
-    final baseGain = _baseGainByTrackId[trackId] ?? 1.0;
+    final gain = (_baseGainByTrackId[trackId] ?? 1.0) *
+        (_volumeByTrackId[trackId] ?? 1.0);
     if (_soloTrackId != null) {
-      return trackId == _soloTrackId ? baseGain : 0.0;
+      return trackId == _soloTrackId ? gain : 0.0;
     }
     final muted = _mutedByTrackId[trackId] ?? false;
-    return muted ? 0.0 : baseGain;
+    return muted ? 0.0 : gain;
   }
 
   @override
@@ -183,6 +192,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     _startDelayMsByTrackId.clear();
     _baseGainByTrackId.clear();
     _mutedByTrackId.clear();
+    _volumeByTrackId.clear();
     _fileDurationMsByTrackId.clear();
     _soloTrackId = null;
   }

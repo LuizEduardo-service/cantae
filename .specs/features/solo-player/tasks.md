@@ -108,10 +108,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Tests in `multi_track_audio_engine_test.dart`: volume 0.3 → player volume 0.3; volume > 1 and < 0 clamp; muted track stays 0 after a volume change and returns to its volume on unmute; with another track soloed the track stays 0; the soloed track plays at its own volume
-- [ ] All existing engine tests unchanged and passing
-- [ ] Gate check passes: `flutter test` (full: interface change)
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests in `multi_track_audio_engine_test.dart`: volume 0.3 → player volume 0.3; volume > 1 and < 0 clamp; muted track stays 0 after a volume change and returns to its volume on unmute; with another track soloed the track stays 0; the soloed track plays at its own volume
+- [x] All existing engine tests unchanged and passing
+- [x] Gate check passes: `flutter test` (full: interface change)
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: full

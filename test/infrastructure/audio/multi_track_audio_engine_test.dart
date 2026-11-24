@@ -115,6 +115,74 @@ void main() {
     });
   });
 
+  group('setTrackVolume', () {
+    test('applies the volume to that track only', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final sopranoPlatform = fakePlatform.created[0];
+      final contraltoPlatform = fakePlatform.created[1];
+
+      await engine.setTrackVolume('s', 0.3);
+
+      expect(sopranoPlatform.setVolumeCalls.last.volume, closeTo(0.3, 1e-9));
+      expect(contraltoPlatform.setVolumeCalls.last.volume, 1.0);
+    });
+
+    test('clamps values above 1 and below 0', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final sopranoPlatform = fakePlatform.created[0];
+
+      await engine.setTrackVolume('s', 1.7);
+      expect(sopranoPlatform.setVolumeCalls.last.volume, 1.0);
+
+      await engine.setTrackVolume('s', -0.2);
+      expect(sopranoPlatform.setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('a muted track stays silent, and unmuting restores its volume',
+        () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final sopranoPlatform = fakePlatform.created[0];
+
+      await engine.setTrackMuted('s', true);
+      await engine.setTrackVolume('s', 0.4);
+      expect(sopranoPlatform.setVolumeCalls.last.volume, 0.0);
+
+      await engine.setTrackMuted('s', false);
+      expect(sopranoPlatform.setVolumeCalls.last.volume, closeTo(0.4, 1e-9));
+    });
+
+    test('while another track is soloed, the track stays silent', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final contraltoPlatform = fakePlatform.created[1];
+
+      await engine.setTrackSolo('s', true);
+      await engine.setTrackVolume('c', 0.5);
+
+      expect(contraltoPlatform.setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('the soloed track plays at its own volume', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final sopranoPlatform = fakePlatform.created[0];
+
+      await engine.setTrackVolume('s', 0.6);
+      await engine.setTrackSolo('s', true);
+
+      expect(sopranoPlatform.setVolumeCalls.last.volume, closeTo(0.6, 1e-9));
+    });
+
+    test('loading a song again resets every volume to 100 %', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.setTrackVolume('s', 0.2);
+
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.setTrackMuted('s', false);
+
+      final reloadedSoprano = fakePlatform.created[2];
+      expect(reloadedSoprano.setVolumeCalls.last.volume, 1.0);
+    });
+  });
+
   group('setTrackStartDelayMs', () {
     test('changes only the internal map, without reloading the file', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
