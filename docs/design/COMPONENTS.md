@@ -105,7 +105,13 @@ Número grande em mono (26) + legenda. Usado no Histórico.
 Barra segmentada por categoria (tons de `accent`) com legenda e valores em MB.
 
 ### `TrackAlignRow`
-Alinhamento de faixas: selo, nome, campo de atraso (`0:00.4`, mono), botões M (mudo) e S (solo), forma de onda deslocada. Mudo esmaece a onda (25%); solo destaca o card com borda `accent`.
+Alinhamento de faixas: selo, nome, campo de atraso (`0:00.4`, mono), botões M (mudo) e S (solo) via `MuteSoloToggle`, forma de onda deslocada. Mudo esmaece a onda (25%); solo destaca o card com borda `accent`.
+
+### `MuteSoloToggle`
+Botão quadrado 44×44 de mudo ("M") ou solo ("S") de uma faixa. Usado em `TrackAlignRow` e `MixTrackRow`.
+- Desligado: fundo `fillField`, texto `text2`. Ligado: fundo `accentSoft`, texto `onAccentSoft`.
+- Leitor de tela: nome completo ("Mudo", "Solo") e estado ligado/desligado (toggled), nunca só pela cor.
+- Props: `label`, `semanticLabel`, `active`, `onTap`.
 
 ---
 

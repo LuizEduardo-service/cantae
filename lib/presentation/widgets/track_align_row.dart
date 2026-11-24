@@ -6,6 +6,7 @@ import '../../domain/entities/naipe.dart';
 import '../theme/cantae_colors.dart';
 import '../theme/cantae_spacing.dart';
 import '../theme/cantae_typography.dart';
+import 'mute_solo_toggle.dart';
 import 'voice_part_badge.dart';
 
 String _naipeName(Naipe naipe) {
@@ -195,14 +196,14 @@ class _TrackAlignRowState extends State<TrackAlignRow> {
                 ),
               ),
               const SizedBox(width: CantaeSpacing.space2),
-              _ToggleButton(
+              MuteSoloToggle(
                 label: 'M',
                 semanticLabel: 'Mudo',
                 active: widget.muted,
                 onTap: () => widget.onMuteChanged(!widget.muted),
               ),
               const SizedBox(width: CantaeSpacing.space1),
-              _ToggleButton(
+              MuteSoloToggle(
                 label: 'S',
                 semanticLabel: 'Solo',
                 active: widget.solo,
@@ -220,49 +221,6 @@ class _TrackAlignRowState extends State<TrackAlignRow> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _ToggleButton extends StatelessWidget {
-  const _ToggleButton({
-    required this.label,
-    required this.semanticLabel,
-    required this.active,
-    required this.onTap,
-  });
-
-  final String label;
-  final String semanticLabel;
-  final bool active;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).extension<CantaeColors>()!;
-
-    return Semantics(
-      button: true,
-      label: semanticLabel,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(CantaeRadii.radiusXs),
-        child: Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: active ? colors.accentSoft : colors.fillField,
-            borderRadius: BorderRadius.circular(CantaeRadii.radiusXs),
-          ),
-          child: Text(
-            label,
-            style: CantaeTypography.label.copyWith(
-              color: active ? colors.onAccentSoft : colors.text2,
-            ),
-          ),
-        ),
       ),
     );
   }

@@ -156,10 +156,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] `test/presentation/widgets/mute_solo_toggle_test.dart`: off/on rendering, tap callback, semantics (button, label, toggled state), ≥ 44 dp, dark theme
-- [ ] `track_align_row_test.dart` and `track_align_screen_test.dart` pass **unchanged**
-- [ ] Gate check passes: `flutter test test/presentation/widgets test/presentation/screens/track_align`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] `test/presentation/widgets/mute_solo_toggle_test.dart`: off/on rendering, tap callback, semantics (button, label, toggled state), ≥ 44 dp, dark theme
+- [x] `track_align_row_test.dart` and `track_align_screen_test.dart` pass **unchanged**
+- [x] Gate check passes: `flutter test test/presentation/widgets test/presentation/screens/track_align`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: unit (widget)
 **Gate**: quick
