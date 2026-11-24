@@ -70,7 +70,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     }
 
     if (tracks.isNotEmpty) {
-      final referenceTrack = tracks.first;
+      final referenceTrack = _longestTrack(tracks);
       final referencePlayer = _playersByTrackId[referenceTrack.id]!;
       final referenceStartDelayMs = referenceTrack.startDelayMs;
       _referencePlaybackEventSubscription =
@@ -81,6 +81,24 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
         ));
       });
     }
+  }
+
+  /// The track that ends last on the timeline drives [positionMs]: a track
+  /// that ends earlier stops emitting, which would freeze the clock. Falls
+  /// back to the first track while durations are unknown.
+  SongTrack _longestTrack(List<SongTrack> tracks) {
+    var longest = tracks.first;
+    var longestEndMs = -1;
+    for (final track in tracks) {
+      final fileDurationMs = _fileDurationMsByTrackId[track.id];
+      if (fileDurationMs == null) continue;
+      final endMs = track.startDelayMs + fileDurationMs;
+      if (endMs > longestEndMs) {
+        longestEndMs = endMs;
+        longest = track;
+      }
+    }
+    return longest;
   }
 
   @override

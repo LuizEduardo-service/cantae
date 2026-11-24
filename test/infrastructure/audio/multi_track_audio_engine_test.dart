@@ -257,6 +257,45 @@ void main() {
       expect(events, contains(2500));
       await subscription.cancel();
     });
+
+    // Regression (solo-player design, Risks row 1): the position followed
+    // tracks.first. When that track ends before the others, its player stops
+    // emitting, the clock freezes and the end of the song is never reached.
+    test('follows the track that ends last, not the first track', () async {
+      fakePlatform.defaultLoadDuration = const Duration(seconds: 3);
+      // soprano ends at 0 + 3000; contralto ends at 2000 + 3000 = 5000.
+      await engine.loadSong(
+        songWith(sopranoId: 's', contraltoId: 'c', contraltoDelayMs: 2000),
+      );
+      final sopranoPlatform = fakePlatform.created[0];
+      final contraltoPlatform = fakePlatform.created[1];
+
+      final events = <int>[];
+      final subscription = engine.positionMs.listen(events.add);
+
+      PlaybackEventMessage at(Duration position) => PlaybackEventMessage(
+            processingState: ProcessingStateMessage.ready,
+            updateTime: DateTime.now(),
+            updatePosition: position,
+            bufferedPosition: position,
+            duration: const Duration(seconds: 3),
+            icyMetadata: null,
+            currentIndex: 0,
+            androidAudioSessionId: null,
+          );
+
+      sopranoPlatform.emitPlaybackEvent(at(const Duration(milliseconds: 2900)));
+      contraltoPlatform.emitPlaybackEvent(at(const Duration(seconds: 2)));
+      await Future<void>.delayed(Duration.zero);
+
+      // The fake also replays its load-time "ready" event (position 0) on
+      // subscribe, so only the soprano's 2900 and the contralto's 4000 matter.
+      expect(events, isNot(contains(2900)),
+          reason: 'the shorter soprano must not drive the timeline');
+      expect(events.last, 4000,
+          reason: 'the contralto (longest) drives it: 2000 delay + 2000 local');
+      await subscription.cancel();
+    });
   });
 
   group(

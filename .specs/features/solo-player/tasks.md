@@ -132,10 +132,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Regression test written first and failing on the current code: two tracks, the first one shorter; events from the longer track's player drive `positionMs`, events from the shorter do not
-- [ ] Existing "emits the reference track's position" test still passes (single-track/first-is-longest case)
-- [ ] Gate check passes: `flutter test` (full: the room's playback also reads `positionMs`)
-- [ ] Test count: all existing + ≥ 1 new
+- [x] Regression test written first and failing on the current code: two tracks, the first one shorter; events from the longer track's player drive `positionMs`, events from the shorter do not
+- [x] Existing "emits the reference track's position" test still passes (single-track/first-is-longest case)
+- [x] Gate check passes: `flutter test` (full: the room's playback also reads `positionMs`)
+- [x] Test count: all existing + ≥ 1 new
 
 **Tests**: unit
 **Gate**: full
