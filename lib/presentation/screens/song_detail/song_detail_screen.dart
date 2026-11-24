@@ -271,7 +271,10 @@ class _HubScaffold extends StatelessWidget {
               label: song.lyrics.isEmpty
                   ? 'Sincronizar letra · Letra não sincronizada'
                   : 'Sincronizar letra · ${song.lyrics.length} linhas',
-              onTap: () => context.goNamed('lyrics-editor'),
+              onTap: () => context.goNamed(
+                'lyrics-editor',
+                pathParameters: {'id': song.id},
+              ),
             ),
             _PreparaRow(
               label: 'Ensaios anteriores',

@@ -7,6 +7,7 @@ import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
+import 'package:cantae/presentation/screens/lyrics_editor/lyrics_editor_screen.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/screens/track_align/track_align_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
@@ -138,10 +139,26 @@ void main() {
       );
     });
 
+    testWidgets('lyrics-editor renders LyricsEditorScreen with the route id', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed('lyrics-editor', pathParameters: {'id': 'abc'});
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LyricsEditorScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<LyricsEditorScreen>(find.byType(LyricsEditorScreen))
+            .songId,
+        equals('abc'),
+      );
+    });
+
     for (final entry in {
       'solo-player': 'Modo solo',
       'studio': 'Studio — corte de áudio',
-      'lyrics-editor': 'Sincronizar letra',
       'song-history': 'Ensaios anteriores',
       'track-upload': 'Enviar faixa',
     }.entries) {

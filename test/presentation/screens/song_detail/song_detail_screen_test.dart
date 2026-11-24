@@ -71,9 +71,14 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             Text('route:track-align:${state.pathParameters['id']}'),
       ),
+      GoRoute(
+        path: '/lyrics-editor/:id',
+        name: 'lyrics-editor',
+        builder: (context, state) =>
+            Text('route:lyrics-editor:${state.pathParameters['id']}'),
+      ),
       for (final name in [
         'studio',
-        'lyrics-editor',
         'song-history',
         'solo-player',
         'room-create',
@@ -298,7 +303,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.textContaining('Sincronizar letra'));
       await tester.pumpAndSettle();
-      expect(find.text('route:lyrics-editor'), findsOneWidget);
+      expect(find.text('route:lyrics-editor:s1'), findsOneWidget);
     });
 
     testWidgets('"Ensaios anteriores" navigates to the song-history route', (

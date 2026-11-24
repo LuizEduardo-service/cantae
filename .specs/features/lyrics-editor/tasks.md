@@ -267,11 +267,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: `flutter-routing`
 
 **Done when**:
-- [ ] Route is `path: '/lyrics-editor/:id'`, `builder: (context, state) => LyricsEditorScreen(songId: state.pathParameters['id']!)`
-- [ ] `song_detail_screen.dart`'s "Sincronizar letra" row passes `pathParameters: {'id': song.id}` to `context.goNamed('lyrics-editor', ...)`
-- [ ] Existing `song_detail_screen_test.dart` (if it asserts on the nav call) updated to match; no regression
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
-- [ ] Test count: full suite passes, 0 regressions
+- [x] Route is `path: '/lyrics-editor/:id'`, `builder: (context, state) => LyricsEditorScreen(songId: state.pathParameters['id']!)`
+- [x] `song_detail_screen.dart`'s "Sincronizar letra" row passes `pathParameters: {'id': song.id}` to `context.goNamed('lyrics-editor', ...)`
+- [x] Existing `song_detail_screen_test.dart` (if it asserts on the nav call) updated to match; no regression
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
+- [x] Test count: full suite passes, 0 regressions
 
 **Tests**: none (routing wiring; covered transitively by screen test reaching the route and existing song_detail tests)
 **Gate**: build
