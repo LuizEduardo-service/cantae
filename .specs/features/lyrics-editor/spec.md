@@ -120,28 +120,28 @@ Quem prepara uma música hoje consegue cortar áudio, cadastrar faixas por naipe
 
 | Requirement ID | Story | Phase | Status |
 | --------------- | ----- | ----- | ------- |
-| LYR-01 | P1: Cadastrar e marcar linhas da letra (AC1 — acrescentar linha) | Design | Pending |
-| LYR-02 | P1 (AC2/AC3 — editar e validar texto) | Design | Pending |
-| LYR-03 | P1 (AC4 — iniciar "Ouvir com a letra") | Design | Pending |
-| LYR-04 | P1 (AC5 — rodapé "próxima" + tempo atual) | Design | Pending |
-| LYR-05 | P1 (AC6 — marcar agora avança "próxima") | Design | Pending |
-| LYR-06 | P1 (AC7 — rejeitar marcação fora de ordem) | Design | Pending |
-| LYR-07 | P1 (AC8 — "Marcar agora" desabilitado sem linha pendente) | Design | Pending |
-| LYR-08 | P1 (AC9 — pausar) | Design | Pending |
-| LYR-09 | P1 (AC10 — exibição "—"/mm:ss.s) | Design | Pending |
-| LYR-10 | P1 (AC11 — contagem "X de Y marcadas") | Design | Pending |
-| LYR-11 | P1 (AC12 — salvar persistindo ordem) | Design | Pending |
-| LYR-12 | P1 (AC13 — estado vazio) | Design | Pending |
-| LYR-13 | P1 (AC14 — linha atual destacada) | Design | Pending |
-| LYR-14 | P2: Naipe e dinâmica por linha (AC1-AC3 — seletor de naipe) | Design | Pending |
-| LYR-15 | P2 (AC4/AC5 — dinâmica opcional) | Design | Pending |
-| LYR-16 | P2 (AC6 — exibição selo + dinâmica) | Design | Pending |
-| LYR-17 | P3: Orientação sem faixas (AC1 — banner) | Design | Pending |
-| LYR-18 | P3 (AC2 — controles desabilitados sem bloquear edição de texto) | Design | Pending |
-| LYR-19 | Edge: não encontrada | Design | Pending |
-| LYR-20 | Edge: ConfirmSheet ao saír com alterações não salvas | Design | Pending |
-| LYR-21 | Edge: parar reprodução ao saír | Design | Pending |
-| LYR-22 | Edge: falha ao salvar preserva alterações | Design | Pending |
+| LYR-01 | P1: Cadastrar e marcar linhas da letra (AC1 — acrescentar linha) | Execute | Verified |
+| LYR-02 | P1 (AC2/AC3 — editar e validar texto) | Execute | Verified |
+| LYR-03 | P1 (AC4 — iniciar "Ouvir com a letra") | Execute | Verified |
+| LYR-04 | P1 (AC5 — rodapé "próxima" + tempo atual) | Execute | Verified |
+| LYR-05 | P1 (AC6 — marcar agora avança "próxima") | Execute | Verified |
+| LYR-06 | P1 (AC7 — rejeitar marcação fora de ordem) | Execute | Verified |
+| LYR-07 | P1 (AC8 — "Marcar agora" desabilitado sem linha pendente) | Execute | Verified |
+| LYR-08 | P1 (AC9 — pausar) | Execute | Verified |
+| LYR-09 | P1 (AC10 — exibição "—"/mm:ss.s) | Execute | Verified |
+| LYR-10 | P1 (AC11 — contagem "X de Y marcadas") | Execute | Verified |
+| LYR-11 | P1 (AC12 — salvar persistindo ordem) | Execute | Verified |
+| LYR-12 | P1 (AC13 — estado vazio) | Execute | Verified |
+| LYR-13 | P1 (AC14 — linha atual destacada) | Execute | Verified |
+| LYR-14 | P2: Naipe e dinâmica por linha (AC1-AC3 — seletor de naipe) | Execute | Verified |
+| LYR-15 | P2 (AC4/AC5 — dinâmica opcional) | Execute | Verified |
+| LYR-16 | P2 (AC6 — exibição selo + dinâmica) | Execute | Verified |
+| LYR-17 | P3: Orientação sem faixas (AC1 — banner) | Execute | Verified |
+| LYR-18 | P3 (AC2 — controles desabilitados sem bloquear edição de texto) | Execute | Verified |
+| LYR-19 | Edge: não encontrada | Execute | Verified |
+| LYR-20 | Edge: ConfirmSheet ao saír com alterações não salvas | Execute | Verified |
+| LYR-21 | Edge: parar reprodução ao saír | Execute | Verified |
+| LYR-22 | Edge: falha ao salvar preserva alterações | Execute | Verified |
 
 **ID format:** `LYR-[NUMBER]`
 

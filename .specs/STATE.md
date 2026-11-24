@@ -80,13 +80,30 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, and **song-detail-screen** are merged to `develop`. **track-align-screen** (Alinhamento de faixas) is complete and verified, on branch `feature/phase-5-track-align-screen` (not yet merged to `develop`), HEAD `4f56b74`. Project follows **Gitflow**: `develop` is integration, `master` only receives `release/*`/`hotfix/*`.
-- `track-align-screen`: 8 tasks (T1-T8), single batch, executed inline. First feature to make `AudioPlaybackEngine`/`MultiTrackAudioEngine` unit-testable at all: `FakeJustAudioPlatform`/`FakeAudioPlayerPlatform` (new test double, `test/infrastructure/audio/fakes/`) implements `just_audio_platform_interface` so `AudioPlayer` runs under plain `flutter test`. Engine gains 5 new members (`setTrackMuted`, `setTrackSolo` — exclusive, `setTrackStartDelayMs` — live, no reload, `durationMs`, `positionMs`) with no existing member's signature changed. New `audioPlaybackEngineProvider` (first Riverpod provider for the engine). New `TrackAlignNotifier`/`TrackAlignState` (`StateNotifierProvider.autoDispose.family` — autoDispose is load-bearing: it's what makes `dispose()`'s `engine.stop()` actually fire when the screen unmounts, per spec's "don't leave audio playing in the background" edge case). New shared widgets `TrackAlignRow` (offset field, M/S toggles, stylized waveform) and `Toast` (first consumer). New `TrackAlignScreen` (all 5 states). `track-align` route gains a `:id` segment; `song_detail_screen.dart`'s "Alinhar entradas" now sends it.
-- Verifier: **2 iterations**. Iteration 1 FAIL — 17/21 ACs cleanly evidenced, 3 minor spec-precision gaps accepted as low-priority (ALIGN-07/16/21 — functionally covered by other tests of the same shared logic, just not scenario-exact), and 2 real evidence-or-zero gaps: ALIGN-19's `ConfirmSheet` cancel branch ("Continuar editando") and the "não encontrada" screen state were both implemented but never exercised by a screen-level test. Fixed with a test-only commit (no production code changed) — same gap *pattern* as song-detail-screen's L-013/L-014 (implemented-but-untested branch), now a second corroborating occurrence. Iteration 2 PASS — 21/21 ACs, 474/474 tests, discrimination sensor (5 targeted mutations: solo exclusivity, offset validation, mute/opacity, ConfirmSheet gating, loop-reposition target) all killed in iteration 1 and reconfirmed valid via `git diff --stat` showing zero `lib/` changes since. Gate clean (`flutter analyze`, `check_layers.py`, `dart analyze lib/domain/`). `validate_state.py track-align-screen` exits 0.
-- Report: `.specs/features/track-align-screen/validation.md`.
-- A real bug was found and fixed mid-feature (not by the Verifier, during T7's own test-writing): `trackAlignProvider` needed `.autoDispose` (fixed before T7 even existed, as its own commit) — without it, a loop test left running would never stop when the screen unmounted. Also mid-T7: `TrackAlignNotifier._stopTest` awaited a `StreamSubscription.cancel()` whose Future never resolves for a never-emitted broadcast stream under `flutter test`'s FakeAsync zone — fixed by not awaiting it (nothing depended on completion).
-- Two known-flaky, pre-existing, unrelated tests surfaced during this feature's full-suite runs (`song_sync_coordinator_test.dart`, `playback_command_handler_test.dart`'s "idle -> scheduled -> playing") — both use real wall-clock delays and fail only under full-suite load, pass reliably in isolation. Not caused by this feature; worth a future look if they keep showing up.
-- `lib/presentation/` gains `screens/track_align/` (1 file), `widgets/track_align_row.dart`, `widgets/toast.dart`, `providers/audio_playback_engine_provider.dart`, `providers/track_align_notifier.dart`. `lib/domain/audio/` and `lib/infrastructure/audio/` both extended, not replaced. New dev-only dependency: `just_audio_platform_interface` (test double only, mirrors the existing `nsd_platform_interface` precedent).
-- Not yet done, deliberately out of scope: visually running the app on a device/emulator; the Studio/Letra/Histórico/Modo-solo/Enviar-faixa screens themselves (all still `ComingSoonScreen` placeholders).
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen** and **track-align-screen** are merged to `develop`. **lyrics-editor** (Editor de letra) is complete and verified on branch `feature/phase-5-lyrics-editor` (not yet merged to `develop`). Project follows **Gitflow**: `develop` is integration; `master` only receives `release/*` and `hotfix/*`.
 
-**Next:** Merge `feature/phase-5-track-align-screen` → `develop` needs explicit go-ahead (Gitflow convention). After that, per `docs/prd-cantae-ux-telas.md` §5's nav map, the next candidate screen is one of the Detalhe da música's own remaining "em breve" targets (**Letra sincronizada**, or **Modo solo**), or the **Studio** (corte de áudio) feature, eligible since Phase 2, if UI is deprioritized.
+- **lyrics-editor scope:** 8 tasks (T1–T8) plus 2 fix tasks (F1, F2), single batch, executed inline.
+  - **Data and domain:**
+    - `LyricLine.onsetMs` is now `int?` (null = not yet marked).
+    - Schema v3 rebuilds `lyric_lines` with `alterTable` so `onset_ms` is nullable.
+    - Lyrics come back in saved (`rowId`) order. This supersedes LIB-15.
+  - **New code:**
+    - `LyricsEditorNotifier` and `LyricDraftLine`. Drafts may have empty text; empty drafts are skipped at save.
+    - Shared widget `LyricLineRow`.
+    - `LyricsEditorScreen` with all states.
+    - Real route `/lyrics-editor/:id`, opened from "Sincronizar letra".
+  - **Shared widgets extended:** `SegmentedOption.semanticLabel`, and `NavPill` can be disabled (`onTap: null`).
+- **User decisions:**
+  - "rascunho na tela";
+  - "Pausar" keeps marking mode and "Continuar" resumes without seeking.
+- **Standing rule from the user:** every bug gets a regression test that fails first, in the same commit as the fix.
+  - A bug found mid-T7 (stale lyrics flashing after save) was fixed this way in `2ba116c`.
+- **Verifier:** standalone fallback, run by the author. The sub-agent call was blocked by auto mode because the `context-mode` plugin rewrites Agent prompts; the user approved the fallback.
+  - Iteration 1 FAIL: 18/20 mutants killed. M14 (v2→v3 `alterTable` removed) and M2 (equal-instant mark boundary) survived.
+  - Iteration 2 PASS: test-only fixes F1 and F2, 20/20 killed, 548 tests, analyze and format clean.
+  - Lessons L-016 and L-017 were recorded as candidates.
+  - Report: `.specs/features/lyrics-editor/validation.md`.
+- **Known flaky tests, unrelated:** wall-clock-delay tests (`chunked_file_receiver_test`, `song_sync_coordinator_test`, `playback_command_handler_test`) fail only under full-suite load.
+- **Known debt:** no l10n setup. Every screen inlines pt-BR strings.
+
+**Next:** merging `feature/phase-5-lyrics-editor` into `develop` needs the user's explicit go-ahead. After that, the remaining "em breve" targets are **Modo solo**, **Ensaios anteriores**, **Enviar faixa** and **Studio**.
