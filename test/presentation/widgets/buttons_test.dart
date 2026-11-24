@@ -132,6 +132,86 @@ void main() {
     });
   });
 
+  group('TonalButton', () {
+    Color fillOf(WidgetTester tester) => tester
+        .widget<Material>(find.descendant(
+          of: find.byType(TonalButton),
+          matching: find.byType(Material),
+        ))
+        .color!;
+
+    testWidgets('neutral uses fillOnSurface and fires onPressed', (
+      tester,
+    ) async {
+      var tapped = false;
+      await tester.pumpWidget(_wrap(
+        TonalButton(
+          label: 'Marcar início do loop',
+          onPressed: () => tapped = true,
+        ),
+        theme: AppTheme.light,
+      ));
+      final colors = AppTheme.light.extension<CantaeColors>()!;
+
+      expect(fillOf(tester), colors.fillOnSurface);
+      await tester.tap(find.text('Marcar início do loop'));
+      expect(tapped, isTrue);
+    });
+
+    testWidgets('positive uses accentSoft with onAccentSoft text', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(
+        TonalButton(label: 'Desligar loop', positive: true, onPressed: () {}),
+        theme: AppTheme.light,
+      ));
+      final colors = AppTheme.light.extension<CantaeColors>()!;
+
+      expect(fillOf(tester), colors.accentSoft);
+      final text = tester.widget<Text>(find.text('Desligar loop'));
+      expect(text.style!.color, colors.onAccentSoft);
+    });
+
+    testWidgets('disabled (no onPressed): blocks taps, announced as disabled',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(_wrap(
+        const TonalButton(label: 'Marcar início do loop'),
+        theme: AppTheme.light,
+      ));
+      final colors = AppTheme.light.extension<CantaeColors>()!;
+
+      final node = tester.getSemantics(find.byType(TonalButton));
+      expect(node.flagsCollection.isButton, isTrue);
+      expect(node.flagsCollection.isEnabled, Tristate.isFalse);
+      final text = tester.widget<Text>(find.text('Marcar início do loop'));
+      expect(text.style!.color, colors.textDisabled);
+      handle.dispose();
+    });
+
+    testWidgets('is 44 dp tall', (tester) async {
+      await tester.pumpWidget(_wrap(
+        TonalButton(label: 'Desligar loop', onPressed: () {}),
+        theme: AppTheme.light,
+      ));
+
+      expect(tester.getSize(find.byType(TonalButton)).height, 44);
+    });
+
+    testWidgets('renders under the dark theme with its tokens', (
+      tester,
+    ) async {
+      await tester.pumpWidget(_wrap(
+        TonalButton(label: 'Desligar loop', positive: true, onPressed: () {}),
+        theme: AppTheme.dark,
+      ));
+      final colors = AppTheme.dark.extension<CantaeColors>()!;
+
+      expect(tester.takeException(), isNull);
+      expect(fillOf(tester), colors.accentSoft);
+    });
+  });
+
   group('DestructiveButton', () {
     testWidgets('tonal variant renders dangerBg background and onDanger text', (
       tester,

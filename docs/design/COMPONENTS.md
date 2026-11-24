@@ -40,7 +40,9 @@ Rótulo de seção ("Naipes", "Seus dados"). `caption` 13/600 `text2`. Pode ter 
 Fundo `fillSecondary`, texto `text`. Mesmas medidas do primário.
 
 ### `TonalButton`
-Dentro de cards. Fundo `fillOnSurface` (neutro) ou `accentSoft` (positivo). Altura 36–44.
+Dentro de cards ou ao lado do botão primário (ações de loop do Modo solo). Fundo `fillOnSurface` (neutro, texto `text`) ou `accentSoft` (positivo, texto `onAccentSoft`). Altura 44, pílula, ocupa a largura disponível.
+- Desabilitado (sem `onPressed`): fundo `fillField`, texto `textDisabled`, semântica "não habilitado".
+- Props: `label`, `onPressed`, `positive`.
 
 ### `DestructiveButton`
 - `tonal`: `dangerBg` + `onDanger` — inicia o fluxo ("Apagar desta música", "Encerrar").

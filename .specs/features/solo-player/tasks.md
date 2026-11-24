@@ -180,9 +180,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Tests in `test/presentation/widgets/buttons_test.dart`: neutral and positive colors from tokens, disabled state (`onPressed: null`), ≥ 44 dp, semantics button + enabled flag, dark theme
-- [ ] Gate check passes: `flutter test test/presentation/widgets/buttons_test.dart`
-- [ ] Test count: existing + ≥ 4 new
+- [x] Tests in `test/presentation/widgets/buttons_test.dart`: neutral and positive colors from tokens, disabled state (`onPressed: null`), ≥ 44 dp, semantics button + enabled flag, dark theme
+- [x] Gate check passes: `flutter test test/presentation/widgets/buttons_test.dart`
+- [x] Test count: existing + ≥ 4 new
 
 **Tests**: unit (widget)
 **Gate**: quick
