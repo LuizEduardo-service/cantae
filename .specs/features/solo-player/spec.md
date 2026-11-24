@@ -89,7 +89,7 @@ A pessoa que quer ensaiar sozinha não tem como tocar uma música da biblioteca 
 3. WHEN a pessoa toca M numa faixa THEN o sistema SHALL silenciar essa faixa; WHEN toca M de novo THEN o sistema SHALL devolver o volume escolhido para ela.
 4. WHEN a pessoa toca S numa faixa THEN o sistema SHALL tocar só essa faixa (com o volume dela) e silenciar todas as outras; WHEN toca S de novo na mesma faixa THEN o sistema SHALL voltar a tocar todas as faixas não mudas.
 5. WHEN a pessoa toca S numa faixa enquanto outra faixa está isolada THEN o sistema SHALL isolar a nova e desfazer o isolar da anterior.
-6. The system SHALL mostrar mudo e isolar com texto ou ícone além da cor (estado "ligado" do botão + rótulo semântico "Mudo"/"Isolado"), conforme RNF-UX-05.
+6. The system SHALL mostrar mudo e isolar com texto ou ícone além da cor (estado "ligado" do botão + rótulo semântico "Mudo"/"Solo", igual ao Alinhamento de faixas), conforme RNF-UX-05.
 7. The system SHALL valer os ajustes de mix só enquanto o Modo solo está aberto: ao abrir de novo, toda faixa começa em 100 %, sem mudo e sem isolar.
 
 **Independent Test**: Tocar uma música com 4 faixas, baixar o Tenor para 30 %, mutar o Baixo, isolar o Soprano e conferir no motor de áudio o volume efetivo de cada faixa; desfazer o isolar e conferir que Tenor volta a 30 % e Baixo continua mudo.
