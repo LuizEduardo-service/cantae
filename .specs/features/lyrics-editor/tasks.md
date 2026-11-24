@@ -211,14 +211,14 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: `flutter-ui-ux` (tokens-only visuals, AA contrast, 44dp touch targets, no literal colors/spacing)
 
 **Done when**:
-- [ ] Collapsed state renders tempo (mono, "—" when `onsetMs == null`), texto, naipe selo + dinâmica, "Editar"
-- [ ] Expanded state renders texto field, `SegmentedControl<Naipe?>` (4 naipes + "Nenhum"), dinâmica field; blur reverts invalid input instead of showing a modal error
-- [ ] `isCurrent: true` applies the "linha atual destacada" visual treatment using theme tokens only (no literal colors)
-- [ ] Renders correctly under both `AppTheme.light` and `AppTheme.dark`
-- [ ] `lib/docs/design/COMPONENTS.md` updated with the new component's name, props, and states in the same commit
-- [ ] `test/presentation/widgets/lyric_line_row_test.dart` covers: collapsed render, expanded render + each `on*Changed` callback, blur-revert on invalid text/dinâmica, `isCurrent` highlight, dark theme smoke test
-- [ ] Gate check passes: `flutter test test/presentation/widgets/lyric_line_row_test.dart`
-- [ ] Test count: ≥7 tests pass
+- [x] Collapsed state renders tempo (mono, "—" when `onsetMs == null`), texto, naipe selo + dinâmica, "Editar"
+- [x] Expanded state renders texto field, `SegmentedControl<Naipe?>` (4 naipes + "Nenhum"), dinâmica field; blur reverts invalid input instead of showing a modal error
+- [x] `isCurrent: true` applies the "linha atual destacada" visual treatment using theme tokens only (no literal colors)
+- [x] Renders correctly under both `AppTheme.light` and `AppTheme.dark`
+- [x] `lib/docs/design/COMPONENTS.md` updated with the new component's name, props, and states in the same commit
+- [x] `test/presentation/widgets/lyric_line_row_test.dart` covers: collapsed render, expanded render + each `on*Changed` callback, blur-revert on invalid text/dinâmica, `isCurrent` highlight, dark theme smoke test
+- [x] Gate check passes: `flutter test test/presentation/widgets/lyric_line_row_test.dart`
+- [x] Test count: ≥7 tests pass
 
 **Tests**: unit (widget)
 **Gate**: quick

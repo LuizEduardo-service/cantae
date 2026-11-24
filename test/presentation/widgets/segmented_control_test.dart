@@ -75,6 +75,34 @@ void main() {
     });
 
     testWidgets(
+        'semanticLabel replaces a short visible label for screen readers', (
+      tester,
+    ) async {
+      final handle = tester.ensureSemantics();
+      await tester.pumpWidget(
+        _wrap(
+          SegmentedControl<String>(
+            options: const [
+              SegmentedOption(label: 'S', value: 's', semanticLabel: 'Soprano'),
+              SegmentedOption(
+                  label: 'C', value: 'c', semanticLabel: 'Contralto'),
+            ],
+            selected: 's',
+            onChanged: (_) {},
+          ),
+          theme: AppTheme.light,
+        ),
+      );
+
+      expect(find.text('S'), findsOneWidget);
+      expect(find.bySemanticsLabel('Soprano'), findsOneWidget);
+      expect(find.bySemanticsLabel('Contralto'), findsOneWidget);
+      expect(find.bySemanticsLabel('S'), findsNothing,
+          reason: 'the short visible letter must not be read out instead');
+      handle.dispose();
+    });
+
+    testWidgets(
       'visual selection state follows the selected prop (segmentSelected background)',
       (tester) async {
         await tester.pumpWidget(
