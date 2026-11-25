@@ -207,10 +207,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Tests with an injected temp directory: success writes `metronome_<songId>.wav` and returns its path; with accent off, the file has no downbeat beeps; a second build overwrites the same file; an unwritable directory returns `Result.failure(PlaybackFailure)` without throwing
-- [ ] `scripts/check_layers.py` passes (domain interface is plugin-free)
-- [ ] Gate check passes: `flutter test test/infrastructure/audio/file_click_track_builder_test.dart`
-- [ ] Test count: ≥ 4 tests pass
+- [x] Tests with an injected temp directory: success writes `metronome_<songId>.wav` and returns its path; with accent off, the file has no downbeat beeps; a second build overwrites the same file; an unwritable directory returns `Result.failure(PlaybackFailure)` without throwing
+- [x] `scripts/check_layers.py` passes (domain interface is plugin-free)
+- [x] Gate check passes: `flutter test test/infrastructure/audio/file_click_track_builder_test.dart`
+- [x] Test count: ≥ 4 tests pass
 
 **Tests**: unit
 **Gate**: quick
