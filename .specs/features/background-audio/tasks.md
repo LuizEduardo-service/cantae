@@ -273,9 +273,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Every P1–P3 acceptance criterion that needs the OS maps to at least one numbered step
-- [ ] STATE.md lists the pending device run and the `BackgroundAudioHandler` debt
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test integration_test && flutter test`
+- [x] Every P1–P3 acceptance criterion that needs the OS maps to at least one numbered step
+- [x] STATE.md lists the pending device run and the `BackgroundAudioHandler` debt
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test integration_test && flutter test`
 
 **Tests**: none
 **Gate**: build

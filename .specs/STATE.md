@@ -80,38 +80,24 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor** and **solo-player** are merged to `develop`, which is pushed to `origin` up to `d157434`. Only `develop` and `master` exist, locally and on the remote. **solo-metronome** (Metrônomo solo) is complete and verified on branch `feature/phase-5-solo-metronome` (not yet merged). Project follows **Gitflow**.
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is in progress on branch `feature/phase-5-background-audio`. Project follows **Gitflow**.
 
-- **solo-metronome scope:** 10 tasks, executed inline in sequence.
-  - **Audio fixes, red-first, affecting every playback path:**
-    - T1 `playAt` no longer awaits each `play()`. In just_audio that future completes only on pause, so on a device only the first track played.
-    - T2 the position comes from `positionStream`. `playbackEventStream` is event-only, so the clock froze.
-    - T3 metronome pulses at rounded absolute positions (it had ~70 ms of drift at 3 min / 72 BPM).
-  - **Engine:** `addTrack` / `removeTrack` (with `exemptFromSolo`).
-  - **Click track:**
-    - `ClickTrackWav`: a PCM 16-bit mono WAV, 22050 Hz, 30 ms beeps (1500 Hz downbeat, 1000 Hz otherwise);
-    - `ClickTrackBuilder` (domain interface, returns `Result`) + `FileClickTrackBuilder` (`Isolate.run`, temp dir).
-  - **Modo solo:**
-    - metronome on/off; the tempo sheet saves `MetronomeConfig` to the song (RF50);
-    - a received song is read-only;
-    - the click volume + M row in the mix;
-    - "ligar ao abrir" is honored;
-    - the footer now has two rows.
-  - **New shared widget:** `TempoSheet`. `MixTrackRow` gains `showSolo`.
-- **User decisions:**
-  - the tempo is defined in Modo solo and saved;
-  - the click volume is a mix row;
-  - the audio bugs are the first tasks.
-  - Decided in T4 (recorded in the spec): soloing a voice does not silence the click.
-- **Verifier:** standalone fallback by the author (sub-agent blocked by the `context-mode` plugin). 30/30 mutants killed in iteration 1, 701 tests, gate clean. Lesson L-019 recorded as a candidate. Report: `.specs/features/solo-metronome/validation.md`.
+- **background-audio scope:** 9 tasks, executed inline in sequence.
+  - **Engine:** `setDucked` (×0.5 on every track, click included); players built with `handleInterruptions: false` (`MultiTrackAudioEngine.defaultPlayer`).
+  - **Contracts (domain):** `AudioInterruptions` (pause/duck/headphones) and `PlaybackRemote` (`NowPlaying` out, `RemoteCommand` in), each with a no-op default.
+  - **Infrastructure:** `AudioSessionInterruptions`, `CantaeAudioHandler` (the single `audio_service` handler: title, "Modo solo", Tocar/Pausar + seek), `bootstrapBackgroundAudio` (session `.music()`, `AudioService.init`, never throws). `main.dart` runs it before `runApp`. iOS declares `UIBackgroundModes: audio`.
+  - **Modo solo:** publishes on ready/play/pause/seek/loop jump/end; lock-screen commands run the in-app paths; stop and leaving clear the notification; interruptions and headphones pause all without auto-resume; duck lowers the volume; toast on return.
+- **User decisions:** notification has Tocar/Pausar + the position bar; no device available now, so a device script and an integration test are delivered but not run.
+- **Pending device run (BGA-17):** neither `docs/device-test-background-audio.md` nor `integration_test/background_audio_test.dart` has run on a device. They also cover the solo-metronome T1/T2 fixes, still unverified on a device. The Android 13+ notification permission exemption is an unconfirmed assumption (script step 2).
 - **Known debt:**
+  - two `audio_service` handlers in the code: only `CantaeAudioHandler` is registered; the phase-4 room `BackgroundAudioHandler` (used by its integration test) must fold into `PlaybackRemote` when the room screens land;
+  - `handleInterruptions: false` is not observable under `flutter test`; only the device script (steps 8–9) guards it;
   - no l10n;
   - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
-  - wall-clock flaky tests: `song_sync_coordinator_test` failed in 2 of 4 full runs this feature, plus `chunked_file_receiver_test` and `playback_command_handler_test`.
-- **Not verified on a device:** the T1/T2 fixes, the click-track sync and end-of-song detection. This needs a real-device pass, best done in the background-playback feature.
+  - wall-clock flaky tests (`song_sync_coordinator_test`, `chunked_file_receiver_test`, `playback_command_handler_test`).
 
-**Next:** merging `feature/phase-5-solo-metronome` into `develop` needs the user's go-ahead. Candidates:
-- background playback for Modo solo (RF24), which includes the device checks;
+**Next:** feature-level verification of background-audio, then merge to `develop` with the user's go-ahead. Candidates after that:
+- run the device script;
 - fixing the flaky wall-clock tests;
 - **Ensaios anteriores**;
 - **Enviar faixa**;
