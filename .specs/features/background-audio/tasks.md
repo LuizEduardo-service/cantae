@@ -204,9 +204,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests written first: `pauseBegan` while playing → engine paused, `playing` false, `externalPause == interruption`, published paused; `pauseEnded` → no play; `headphonesDisconnected` → `externalPause == headphones`; headphones while paused → no `externalPause`; duck began/ended → `setDucked(true/false)`; engine pause throws → `playing` stays true, `externalPause` null; acknowledge clears it
-- [ ] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
-- [ ] Test count: all existing + ≥ 7 new
+- [x] Tests written first: `pauseBegan` while playing → engine paused, `playing` false, `externalPause == interruption`, published paused; `pauseEnded` → no play; `headphonesDisconnected` → `externalPause == headphones`; headphones while paused → no `externalPause`; duck began/ended → `setDucked(true/false)`; engine pause throws → `playing` stays true, `externalPause` null; acknowledge clears it
+- [x] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
+- [x] Test count: all existing + ≥ 7 new
 
 **Tests**: unit
 **Gate**: quick

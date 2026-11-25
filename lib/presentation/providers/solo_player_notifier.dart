@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/audio/audio_interruptions.dart';
 import '../../domain/audio/audio_playback_engine.dart';
 import '../../domain/audio/click_track_builder.dart';
 import '../../domain/audio/loop_controller.dart';
@@ -32,6 +33,9 @@ const String metronomeTrackId = 'metronome';
 
 /// Subtitle on the lock screen and the notification (BGA-05).
 const String soloSubtitle = 'Modo solo';
+
+/// Why the music paused without the person asking (BGA-14).
+enum ExternalPause { interruption, headphones }
 
 /// One track's session-only mix (spec P2-AC7: never persisted).
 class TrackMix {
@@ -67,6 +71,7 @@ class SoloPlayerState {
     this.metronomeBusy = false,
     this.metronomeError,
     this.tempoSaveError,
+    this.externalPause,
   });
 
   const SoloPlayerState.loading() : this(status: SoloPlayerStatus.loading);
@@ -102,6 +107,10 @@ class SoloPlayerState {
   final bool metronomeBusy;
   final String? metronomeError;
   final String? tempoSaveError;
+
+  /// Set when a call, another app or the headphones paused the music;
+  /// cleared once the screen told the person, or on the next play.
+  final ExternalPause? externalPause;
 
   MetronomeConfig? get metronomeConfig => song?.metronomeConfig;
 
@@ -145,6 +154,8 @@ class SoloPlayerState {
     bool clearMetronomeError = false,
     String? tempoSaveError,
     bool clearTempoSaveError = false,
+    ExternalPause? externalPause,
+    bool clearExternalPause = false,
   }) {
     return SoloPlayerState(
       status: status ?? this.status,
@@ -166,6 +177,8 @@ class SoloPlayerState {
           clearMetronomeError ? null : (metronomeError ?? this.metronomeError),
       tempoSaveError:
           clearTempoSaveError ? null : (tempoSaveError ?? this.tempoSaveError),
+      externalPause:
+          clearExternalPause ? null : (externalPause ?? this.externalPause),
     );
   }
 }
@@ -184,6 +197,8 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
         _remote = _ref.read(playbackRemoteProvider),
         super(const SoloPlayerState.loading()) {
     _commandSubscription = _remote.commands.listen(_onRemoteCommand);
+    _interruptionSubscription =
+        _ref.read(audioInterruptionsProvider).events.listen(_onInterruption);
     _ref.listen<AsyncValue<Result<Song, Failure>>>(
       songByIdProvider(_songId),
       (previous, next) => _onSongResult(next),
@@ -198,6 +213,41 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   final PlaybackRemote _remote;
   StreamSubscription<int>? _positionSubscription;
   late final StreamSubscription<RemoteCommand> _commandSubscription;
+  late final StreamSubscription<AudioInterruption> _interruptionSubscription;
+
+  /// The Modo solo owns the interruption policy (BGA-11/12/13): one pause
+  /// for every track and the click, and never an automatic resume.
+  Future<void> _onInterruption(AudioInterruption event) async {
+    switch (event) {
+      case AudioInterruption.pauseBegan:
+        await _pauseFor(ExternalPause.interruption);
+      case AudioInterruption.headphonesDisconnected:
+        await _pauseFor(ExternalPause.headphones);
+      case AudioInterruption.duckBegan:
+        await _engine.setDucked(true);
+      case AudioInterruption.duckEnded:
+        await _engine.setDucked(false);
+      case AudioInterruption.pauseEnded:
+        break;
+    }
+  }
+
+  Future<void> _pauseFor(ExternalPause reason) async {
+    if (!state.playing) return;
+    try {
+      await _engine.pause();
+    } catch (_) {
+      // Still audible: keep showing "Pausar" (spec P3-AC6).
+      return;
+    }
+    if (!mounted) return;
+    state = state.copyWith(playing: false, externalPause: reason);
+    _publish();
+  }
+
+  /// The screen showed the reason (BGA-14).
+  void acknowledgeExternalPause() =>
+      state = state.copyWith(clearExternalPause: true);
 
   /// Lock screen and notification (BGA-05/06). Sent on discrete events
   /// only; the OS extrapolates the position while playing.
@@ -342,6 +392,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       playing: true,
       ended: false,
       positionMs: restart ? 0 : null,
+      clearExternalPause: true,
     );
     _publish();
     if (restart) await _engine.seekAllTo(0);
@@ -548,6 +599,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     // TrackAlignNotifier._stopTest.
     _positionSubscription?.cancel();
     _commandSubscription.cancel();
+    _interruptionSubscription.cancel();
     _remote.clear();
     _engine.stop();
     super.dispose();

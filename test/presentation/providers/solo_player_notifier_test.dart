@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cantae/domain/audio/audio_interruptions.dart';
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
 import 'package:cantae/domain/audio/click_track_builder.dart';
 import 'package:cantae/domain/audio/playback_remote.dart';
@@ -43,8 +44,13 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
   @override
   Future<void> playAt(DateTime scheduledStart) async => calls.add('play');
 
+  bool throwOnPause = false;
+
   @override
-  Future<void> pause() async => calls.add('pause');
+  Future<void> pause() async {
+    if (throwOnPause) throw Exception('pause failed');
+    calls.add('pause');
+  }
 
   @override
   Future<void> stop() async => calls.add('stop');
@@ -178,6 +184,18 @@ class _FakeRemote implements PlaybackRemote {
   Stream<RemoteCommand> get commands => _commands.stream;
 }
 
+class _FakeInterruptions implements AudioInterruptions {
+  final _events = StreamController<AudioInterruption>.broadcast();
+
+  Future<void> emit(AudioInterruption event) async {
+    _events.add(event);
+    await _flush();
+  }
+
+  @override
+  Stream<AudioInterruption> get events => _events.stream;
+}
+
 const _soprano = SongTrack(
   id: 'soprano',
   filePath: '/tmp/soprano.mp3',
@@ -217,9 +235,11 @@ Song _song({
   _FakeSongRepository repo,
   _FakeClickTrackBuilder builder,
   _FakeRemote remote,
+  _FakeInterruptions interruptions,
 }) _setUp({Song? song, bool notFound = false, Failure? failure}) {
   final engine = _FakeAudioPlaybackEngine();
   final remote = _FakeRemote();
+  final interruptions = _FakeInterruptions();
   final builder = _FakeClickTrackBuilder();
   final repo = _FakeSongRepository(
     song: notFound ? null : (song ?? _song()),
@@ -231,6 +251,7 @@ Song _song({
       songRepositoryProvider.overrideWithValue(repo),
       clickTrackBuilderProvider.overrideWithValue(builder),
       playbackRemoteProvider.overrideWithValue(remote),
+      audioInterruptionsProvider.overrideWithValue(interruptions),
     ],
   );
   return (
@@ -239,6 +260,7 @@ Song _song({
     repo: repo,
     builder: builder,
     remote: remote,
+    interruptions: interruptions,
   );
 }
 
@@ -1069,6 +1091,121 @@ void main() {
       expect(s.engine.calls, isNot(contains('pause')));
       expect(s.engine.calls.last, 'seek:41000');
       expect(_state(s.container).playing, isTrue);
+    });
+  });
+
+  group('interruptions and headphones (BGA-11 to BGA-13)', () {
+    test('a call pauses every track and the click, and says why', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+
+      expect(s.engine.calls.last, 'pause');
+      expect(_state(s.container).playing, isFalse);
+      expect(_state(s.container).externalPause, ExternalPause.interruption);
+      expect(s.remote.last.playing, isFalse);
+    });
+
+    test('the end of the call does not resume', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+      final calls = List.of(s.engine.calls);
+
+      await s.interruptions.emit(AudioInterruption.pauseEnded);
+
+      expect(s.engine.calls, calls);
+      expect(_state(s.container).playing, isFalse);
+    });
+
+    test('headphones disconnected pauses and says why', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+
+      await s.interruptions.emit(AudioInterruption.headphonesDisconnected);
+
+      expect(s.engine.calls.last, 'pause');
+      expect(_state(s.container).playing, isFalse);
+      expect(_state(s.container).externalPause, ExternalPause.headphones);
+    });
+
+    test('an interruption while paused changes nothing and says nothing',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      final calls = List.of(s.engine.calls);
+
+      await s.interruptions.emit(AudioInterruption.headphonesDisconnected);
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+
+      expect(s.engine.calls, calls);
+      expect(_state(s.container).externalPause, isNull);
+    });
+
+    test('a short sound ducks the engine and restores it, without pausing',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+
+      await s.interruptions.emit(AudioInterruption.duckBegan);
+      expect(s.engine.calls.last, 'ducked:true');
+      expect(_state(s.container).playing, isTrue);
+
+      await s.interruptions.emit(AudioInterruption.duckEnded);
+      expect(s.engine.calls.last, 'ducked:false');
+      expect(_state(s.container).playing, isTrue);
+      expect(_state(s.container).externalPause, isNull);
+    });
+
+    test('if pausing fails, the screen keeps showing it plays, with no reason',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+      s.engine.throwOnPause = true;
+
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+
+      expect(_state(s.container).playing, isTrue);
+      expect(_state(s.container).externalPause, isNull);
+      expect(s.remote.last.playing, isTrue);
+    });
+
+    test('acknowledging the reason clears it and keeps the pause', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+
+      _notifier(s.container).acknowledgeExternalPause();
+
+      expect(_state(s.container).externalPause, isNull);
+      expect(_state(s.container).playing, isFalse);
+    });
+
+    test('playing again after an external pause clears the reason', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+
+      await _notifier(s.container).togglePlay();
+
+      expect(_state(s.container).playing, isTrue);
+      expect(_state(s.container).externalPause, isNull);
     });
   });
 }
