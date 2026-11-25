@@ -80,7 +80,16 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is merged to `develop` (pushed up to `b94af29`). **stabilize-flaky-tests** is complete on branch `feature/stabilize-flaky-tests` (not yet merged).
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (RF24) and **stabilize-flaky-tests** are merged to `develop` (pushed up to `dda2959`). **rehearsal-history** (Ensaios anteriores, RF39/RF40) is complete and verified on branch `feature/phase-5-rehearsal-history` (not yet merged).
+
+- **rehearsal-history:** 8 tasks + 1 fix, executed inline in sequence.
+  - Domain `RehearsalLog` + pure `RehearsalSessionTracker` (playing time only, loop jumps, 60 s minimum).
+  - `rehearsal_logs` table (schema v4, FK cascade from songs), `DriftRehearsalRepository`, hand-rolled `uuidV4`.
+  - App-scoped `RehearsalRecorder`: saves, marks the song rehearsed, refreshes the Library and the counts. `SoloPlayerNotifier` feeds it via a `state` setter override and records on dispose.
+  - Ensaios screen (UI_SPEC §6.16) with `StatTile` (new `monoStat` token), route `/song-history/:id`, detail row "Ensaios anteriores (N)". A received song keeps that row in its own "Ensaios" section (PRD > UI_SPEC).
+  - Verifier: author fallback; 19/19 requirements, 39/39 mutants (R8 re-run in generated code), 829 tests. Report: `.specs/features/rehearsal-history/validation.md`.
+  - Bug found and fixed red-first: `StatTile` tiles merged into one screen-reader item inside a list item (`39541d9`).
+  - Known limit: a rehearsal is lost if the OS kills the app before leaving Modo solo.
 
 - **stabilize-flaky-tests:** the wall-clock "flaky" tests had four root causes; three were production bugs, each fixed with a red-first regression test:
   - `RoomSessionController.dispose()` left the transport subscriptions alive; late frames hit a closed stream (`a32a458`).
@@ -105,8 +114,7 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
   - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
-**Next:** merging `feature/stabilize-flaky-tests` into `develop` needs the user's go-ahead. Candidates after that:
+**Next:** merging `feature/phase-5-rehearsal-history` into `develop` needs the user's go-ahead. Candidates after that:
 - run the device script;
-- **Ensaios anteriores**;
 - **Enviar faixa**;
 - **Studio**.

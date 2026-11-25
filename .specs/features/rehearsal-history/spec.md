@@ -143,31 +143,31 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| HIST-01 | P1-AC1: duração = tempo tocando | Execute | Implementing |
-| HIST-02 | P1-AC2: loops = voltas ao início do trecho | Execute | Implementing |
-| HIST-03 | P1-AC3: grava ao sair com ≥ 60 s, com todos os campos | Execute | Implementing |
-| HIST-04 | P1-AC4: não grava abaixo de 60 s | Execute | Implementing |
-| HIST-05 | P1-AC5: atualiza o último ensaio da música | Execute | Implementing |
-| HIST-06 | P1-AC6: sem áudio, letra ou dados de terceiros | Execute | Implementing |
-| HIST-07 | P1-AC7: falha ao gravar não trava a saída | Execute | Implementing |
-| HIST-08 | P2-AC1/AC2: linha "Ensaios anteriores (N)" abre a tela | Execute | Implementing |
-| HIST-09 | P2-AC3: topo, título e frase | Execute | Implementing |
-| HIST-10 | P2-AC4: 3 resumos | Execute | Implementing |
-| HIST-11 | P2-AC5: lista do mais recente, com data, modo, duração e loops | Execute | Implementing |
-| HIST-12 | P2-AC6: vazio com "Ensaiar agora" | Execute | Implementing |
-| HIST-13 | P2-AC7/AC8/AC9: carregando, erro, música não encontrada | Execute | Implementing |
-| HIST-14 | P3-AC1/AC2/AC4: apagar desta música com confirmação | Execute | Implementing |
-| HIST-15 | P3-AC3/AC4: apagar tudo com confirmação | Execute | Implementing |
-| HIST-16 | P3-AC5: falha ao apagar | Execute | Implementing |
-| HIST-17 | P3-AC6: toast e contagem atualizada | Execute | Implementing |
-| HIST-18 | P3-AC7: apagar a música apaga os ensaios | Execute | Implementing |
-| HIST-19 | Edge: fim e tocar de novo, interrupções, segundo plano, nunca tocou | Execute | Implementing |
+| HIST-01 | P1-AC1: duração = tempo tocando | Execute | Verified |
+| HIST-02 | P1-AC2: loops = voltas ao início do trecho | Execute | Verified |
+| HIST-03 | P1-AC3: grava ao sair com ≥ 60 s, com todos os campos | Execute | Verified |
+| HIST-04 | P1-AC4: não grava abaixo de 60 s | Execute | Verified |
+| HIST-05 | P1-AC5: atualiza o último ensaio da música | Execute | Verified |
+| HIST-06 | P1-AC6: sem áudio, letra ou dados de terceiros | Execute | Verified |
+| HIST-07 | P1-AC7: falha ao gravar não trava a saída | Execute | Verified |
+| HIST-08 | P2-AC1/AC2: linha "Ensaios anteriores (N)" abre a tela | Execute | Verified |
+| HIST-09 | P2-AC3: topo, título e frase | Execute | Verified |
+| HIST-10 | P2-AC4: 3 resumos | Execute | Verified |
+| HIST-11 | P2-AC5: lista do mais recente, com data, modo, duração e loops | Execute | Verified |
+| HIST-12 | P2-AC6: vazio com "Ensaiar agora" | Execute | Verified |
+| HIST-13 | P2-AC7/AC8/AC9: carregando, erro, música não encontrada | Execute | Verified |
+| HIST-14 | P3-AC1/AC2/AC4: apagar desta música com confirmação | Execute | Verified |
+| HIST-15 | P3-AC3/AC4: apagar tudo com confirmação | Execute | Verified |
+| HIST-16 | P3-AC5: falha ao apagar | Execute | Verified |
+| HIST-17 | P3-AC6: toast e contagem atualizada | Execute | Verified |
+| HIST-18 | P3-AC7: apagar a música apaga os ensaios | Execute | Verified |
+| HIST-19 | Edge: fim e tocar de novo, interrupções, segundo plano, nunca tocou | Execute | Verified |
 
 **ID format:** `HIST-[NUMBER]`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 19 total, 0 mapped to tasks, 19 unmapped
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped
 
 ---
 
