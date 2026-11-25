@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -136,13 +137,73 @@ class SoloPlayerScreen extends ConsumerWidget {
           ),
         );
       case SoloPlayerStatus.ready:
-        return _ReadyScaffold(
+        return _ExternalPauseToast(
           songId: songId,
-          view: view,
-          notifier: notifier,
-          onBack: back,
+          child: _ReadyScaffold(
+            songId: songId,
+            view: view,
+            notifier: notifier,
+            onBack: back,
+          ),
         );
     }
+  }
+}
+
+/// Says why the music paused without the person asking (BGA-14). While the
+/// app is in the background the toast would disappear unseen, so it waits
+/// for the return.
+class _ExternalPauseToast extends ConsumerStatefulWidget {
+  const _ExternalPauseToast({required this.songId, required this.child});
+
+  final String songId;
+  final Widget child;
+
+  @override
+  ConsumerState<_ExternalPauseToast> createState() =>
+      _ExternalPauseToastState();
+}
+
+class _ExternalPauseToastState extends ConsumerState<_ExternalPauseToast> {
+  late final AppLifecycleListener _lifecycle;
+
+  @override
+  void initState() {
+    super.initState();
+    _lifecycle = AppLifecycleListener(onResume: _showPending);
+  }
+
+  @override
+  void dispose() {
+    _lifecycle.dispose();
+    super.dispose();
+  }
+
+  void _showPending() {
+    final provider = soloPlayerProvider(widget.songId);
+    final reason = ref.read(provider).externalPause;
+    if (reason == null || !mounted) return;
+    final lifecycle = SchedulerBinding.instance.lifecycleState;
+    if (lifecycle != null && lifecycle != AppLifecycleState.resumed) return;
+    Toast.show(
+      context,
+      switch (reason) {
+        ExternalPause.interruption => 'Música pausada: outro áudio começou',
+        ExternalPause.headphones => 'Música pausada: fone desconectado',
+      },
+    );
+    ref.read(provider.notifier).acknowledgeExternalPause();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    ref.listen(
+      soloPlayerProvider(widget.songId).select((s) => s.externalPause),
+      (_, next) {
+        if (next != null) _showPending();
+      },
+    );
+    return widget.child;
   }
 }
 

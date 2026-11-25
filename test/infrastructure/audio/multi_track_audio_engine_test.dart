@@ -185,6 +185,71 @@ void main() {
     });
   });
 
+  // Failure modes for setDucked (BGA-12): the duck is forgotten by a later
+  // volume change; un-ducking does not restore the chosen volume; a track
+  // added during a duck plays at full volume; a muted track becomes audible
+  // at half volume; only some tracks duck.
+  group('setDucked', () {
+    const click = SongTrack(
+      id: 'metronome',
+      filePath: '/tmp/metronome.wav',
+      naipe: Naipe.custom,
+    );
+
+    test('halves every track, click included, and restores on false', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click, exemptFromSolo: true);
+      await engine.setTrackVolume('s', 0.8);
+
+      await engine.setDucked(true);
+
+      expect(fakePlatform.created[0].setVolumeCalls.last.volume,
+          closeTo(0.4, 1e-9));
+      expect(fakePlatform.created[1].setVolumeCalls.last.volume,
+          closeTo(0.5, 1e-9));
+      expect(fakePlatform.created[2].setVolumeCalls.last.volume,
+          closeTo(0.5, 1e-9));
+
+      await engine.setDucked(false);
+
+      expect(fakePlatform.created[0].setVolumeCalls.last.volume,
+          closeTo(0.8, 1e-9));
+      expect(fakePlatform.created[1].setVolumeCalls.last.volume, 1.0);
+      expect(fakePlatform.created[2].setVolumeCalls.last.volume, 1.0);
+    });
+
+    test('a volume change while ducked stays halved', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.setDucked(true);
+
+      await engine.setTrackVolume('s', 0.6);
+
+      expect(fakePlatform.created[0].setVolumeCalls.last.volume,
+          closeTo(0.3, 1e-9));
+    });
+
+    test('a track added while ducked starts halved', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.setDucked(true);
+
+      await engine.addTrack(click);
+
+      expect(fakePlatform.created[2].setVolumeCalls.last.volume,
+          closeTo(0.5, 1e-9));
+    });
+
+    test('a muted track stays silent while ducked and after', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.setTrackMuted('s', true);
+
+      await engine.setDucked(true);
+      expect(fakePlatform.created[0].setVolumeCalls.last.volume, 0.0);
+
+      await engine.setDucked(false);
+      expect(fakePlatform.created[0].setVolumeCalls.last.volume, 0.0);
+    });
+  });
+
   group('addTrack / removeTrack', () {
     const click = SongTrack(
       id: 'metronome',

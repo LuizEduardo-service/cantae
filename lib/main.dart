@@ -1,11 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'infrastructure/audio/background_audio_bootstrap.dart';
+import 'presentation/providers/background_audio_providers.dart';
 import 'presentation/routing/app_router.dart';
 import 'presentation/theme/app_theme.dart';
 
-void main() {
-  runApp(const ProviderScope(child: CantaeApp()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Before any screen plays (BGA-01/02); never throws (BGA-18).
+  final audio = await bootstrapBackgroundAudio();
+  runApp(ProviderScope(
+    overrides: [
+      playbackRemoteProvider.overrideWithValue(audio.remote),
+      audioInterruptionsProvider.overrideWithValue(audio.interruptions),
+    ],
+    child: const CantaeApp(),
+  ));
 }
 
 class CantaeApp extends ConsumerWidget {

@@ -43,10 +43,19 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final StreamController<int> _positionMsController =
       StreamController<int>.broadcast();
   String? _soloTrackId;
+  bool _ducked = false;
   StreamSubscription<Duration>? _referencePositionSubscription;
 
   MultiTrackAudioEngine({AudioPlayer Function()? playerFactory})
-      : _playerFactory = playerFactory ?? AudioPlayer.new;
+      : _playerFactory = playerFactory ?? defaultPlayer;
+
+  /// `just_audio` would pause each player on its own and resume it when an
+  /// interruption ends. The Modo solo owns that policy instead: one pause
+  /// for every track and no automatic resume (background-audio BGA-11).
+  static AudioPlayer defaultPlayer() => AudioPlayer(handleInterruptions: false);
+
+  /// Same factor `just_audio` uses for its own ducking.
+  static const double duckFactor = 0.5;
 
   @override
   Future<void> loadSong(Song song) async {
@@ -156,6 +165,14 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   @override
+  Future<void> setDucked(bool ducked) async {
+    _ducked = ducked;
+    for (final id in _playersByTrackId.keys) {
+      await _applyVolume(id);
+    }
+  }
+
+  @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {
     _startDelayMsByTrackId[trackId] = startDelayMs;
   }
@@ -185,7 +202,8 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
 
   double _effectiveVolume(String trackId) {
     final gain = (_baseGainByTrackId[trackId] ?? 1.0) *
-        (_volumeByTrackId[trackId] ?? 1.0);
+        (_volumeByTrackId[trackId] ?? 1.0) *
+        (_ducked ? duckFactor : 1.0);
     if (_soloTrackId != null && !_soloExemptTrackIds.contains(trackId)) {
       return trackId == _soloTrackId ? gain : 0.0;
     }

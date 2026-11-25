@@ -36,6 +36,11 @@ abstract class AudioPlaybackEngine {
   /// no-op.
   Future<void> removeTrack(String trackId);
 
+  /// Lowers every track (including solo-exempt ones) to half its current
+  /// gain while another app plays a short sound, and restores it on
+  /// `false`. Volume, mute and solo changes made meanwhile keep the duck.
+  Future<void> setDucked(bool ducked);
+
   /// Changes the start delay used by [seekAllTo] for this track, without
   /// reloading its audio file.
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs);

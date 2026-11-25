@@ -70,6 +70,9 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
   Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async {}
 
   @override
+  Future<void> setDucked(bool ducked) async {}
+
+  @override
   Future<void> removeTrack(String trackId) async {}
 
   @override

@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/audio/audio_interruptions.dart';
 import '../../domain/audio/audio_playback_engine.dart';
 import '../../domain/audio/click_track_builder.dart';
 import '../../domain/audio/loop_controller.dart';
+import '../../domain/audio/playback_remote.dart';
 import '../../domain/core/failures.dart';
 import '../../domain/core/result.dart';
 import '../../domain/entities/metronome_config.dart';
@@ -13,6 +15,7 @@ import '../../domain/entities/song.dart';
 import '../../domain/entities/song_origin.dart';
 import '../../domain/entities/song_track.dart';
 import 'audio_playback_engine_provider.dart';
+import 'background_audio_providers.dart';
 import 'click_track_builder_provider.dart';
 import 'library_providers.dart';
 import 'song_detail_providers.dart';
@@ -27,6 +30,12 @@ const String tempoSaveFailedMessage = 'Não foi possível salvar o andamento.';
 
 /// Engine track id of the metronome's click track.
 const String metronomeTrackId = 'metronome';
+
+/// Subtitle on the lock screen and the notification (BGA-05).
+const String soloSubtitle = 'Modo solo';
+
+/// Why the music paused without the person asking (BGA-14).
+enum ExternalPause { interruption, headphones }
 
 /// One track's session-only mix (spec P2-AC7: never persisted).
 class TrackMix {
@@ -62,6 +71,7 @@ class SoloPlayerState {
     this.metronomeBusy = false,
     this.metronomeError,
     this.tempoSaveError,
+    this.externalPause,
   });
 
   const SoloPlayerState.loading() : this(status: SoloPlayerStatus.loading);
@@ -97,6 +107,10 @@ class SoloPlayerState {
   final bool metronomeBusy;
   final String? metronomeError;
   final String? tempoSaveError;
+
+  /// Set when a call, another app or the headphones paused the music;
+  /// cleared once the screen told the person, or on the next play.
+  final ExternalPause? externalPause;
 
   MetronomeConfig? get metronomeConfig => song?.metronomeConfig;
 
@@ -140,6 +154,8 @@ class SoloPlayerState {
     bool clearMetronomeError = false,
     String? tempoSaveError,
     bool clearTempoSaveError = false,
+    ExternalPause? externalPause,
+    bool clearExternalPause = false,
   }) {
     return SoloPlayerState(
       status: status ?? this.status,
@@ -161,6 +177,8 @@ class SoloPlayerState {
           clearMetronomeError ? null : (metronomeError ?? this.metronomeError),
       tempoSaveError:
           clearTempoSaveError ? null : (tempoSaveError ?? this.tempoSaveError),
+      externalPause:
+          clearExternalPause ? null : (externalPause ?? this.externalPause),
     );
   }
 }
@@ -176,7 +194,11 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   SoloPlayerNotifier(this._ref, this._songId)
       : _engine = _ref.read(audioPlaybackEngineProvider),
         _clickTrackBuilder = _ref.read(clickTrackBuilderProvider),
+        _remote = _ref.read(playbackRemoteProvider),
         super(const SoloPlayerState.loading()) {
+    _commandSubscription = _remote.commands.listen(_onRemoteCommand);
+    _interruptionSubscription =
+        _ref.read(audioInterruptionsProvider).events.listen(_onInterruption);
     _ref.listen<AsyncValue<Result<Song, Failure>>>(
       songByIdProvider(_songId),
       (previous, next) => _onSongResult(next),
@@ -188,7 +210,73 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   final String _songId;
   final AudioPlaybackEngine _engine;
   final ClickTrackBuilder _clickTrackBuilder;
+  final PlaybackRemote _remote;
   StreamSubscription<int>? _positionSubscription;
+  late final StreamSubscription<RemoteCommand> _commandSubscription;
+  late final StreamSubscription<AudioInterruption> _interruptionSubscription;
+
+  /// The Modo solo owns the interruption policy (BGA-11/12/13): one pause
+  /// for every track and the click, and never an automatic resume.
+  Future<void> _onInterruption(AudioInterruption event) async {
+    switch (event) {
+      case AudioInterruption.pauseBegan:
+        await _pauseFor(ExternalPause.interruption);
+      case AudioInterruption.headphonesDisconnected:
+        await _pauseFor(ExternalPause.headphones);
+      case AudioInterruption.duckBegan:
+        await _engine.setDucked(true);
+      case AudioInterruption.duckEnded:
+        await _engine.setDucked(false);
+      case AudioInterruption.pauseEnded:
+        break;
+    }
+  }
+
+  Future<void> _pauseFor(ExternalPause reason) async {
+    if (!state.playing) return;
+    try {
+      await _engine.pause();
+    } catch (_) {
+      // Still audible: keep showing "Pausar" (spec P3-AC6).
+      return;
+    }
+    if (!mounted) return;
+    state = state.copyWith(playing: false, externalPause: reason);
+    _publish();
+  }
+
+  /// The screen showed the reason (BGA-14).
+  void acknowledgeExternalPause() =>
+      state = state.copyWith(clearExternalPause: true);
+
+  /// Lock screen and notification (BGA-05/06). Sent on discrete events
+  /// only; the OS extrapolates the position while playing.
+  void _publish() {
+    final song = state.song;
+    if (song == null || state.status != SoloPlayerStatus.ready) return;
+    _remote.publish(NowPlaying(
+      title: song.name,
+      subtitle: soloSubtitle,
+      durationMs: state.durationMs,
+      playing: state.playing,
+      positionMs: state.positionMs,
+    ));
+  }
+
+  /// Lock-screen taps run the in-app paths (BGA-07/08/10).
+  Future<void> _onRemoteCommand(RemoteCommand command) async {
+    switch (command) {
+      case RemotePlay():
+        if (!state.playing) await togglePlay();
+      case RemotePause():
+        if (state.playing) await togglePlay();
+      case RemoteSeek(:final positionMs):
+        await seekTo(positionMs);
+      case RemoteStop():
+        if (state.playing) await togglePlay();
+        _remote.clear();
+    }
+  }
 
   void _onSongResult(AsyncValue<Result<Song, Failure>> async) {
     // While re-fetching, Riverpod still carries the previous value; keep the
@@ -253,6 +341,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       metronomeBusy: false,
       clearMetronomeError: true,
     );
+    _publish();
     if (state.metronomeConfig?.enabledByDefault ?? false) {
       await _turnMetronomeOn();
     }
@@ -263,6 +352,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     if (loop != null && loop.shouldReposition(positionMs)) {
       state = state.copyWith(positionMs: loop.repositionTarget);
       _engine.seekAllTo(loop.repositionTarget);
+      _publish();
       return;
     }
     final durationMs = state.durationMs;
@@ -273,6 +363,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
         positionMs: durationMs,
       );
       _engine.pause();
+      _publish();
       return;
     }
     state = state.copyWith(positionMs: positionMs);
@@ -292,6 +383,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     if (state.status != SoloPlayerStatus.ready) return;
     if (state.playing) {
       state = state.copyWith(playing: false);
+      _publish();
       await _engine.pause();
       return;
     }
@@ -300,7 +392,9 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       playing: true,
       ended: false,
       positionMs: restart ? 0 : null,
+      clearExternalPause: true,
     );
+    _publish();
     if (restart) await _engine.seekAllTo(0);
     await _engine.playAt(DateTime.now());
   }
@@ -309,6 +403,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     if (state.status != SoloPlayerStatus.ready) return;
     final target = ms.clamp(0, state.durationMs);
     state = state.copyWith(positionMs: target, ended: false);
+    _publish();
     await _engine.seekAllTo(target);
   }
 
@@ -503,6 +598,9 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     // Not awaited: same never-resolving cancel() under FakeAsync seen in
     // TrackAlignNotifier._stopTest.
     _positionSubscription?.cancel();
+    _commandSubscription.cancel();
+    _interruptionSubscription.cancel();
+    _remote.clear();
     _engine.stop();
     super.dispose();
   }
