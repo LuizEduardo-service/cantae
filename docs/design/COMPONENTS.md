@@ -136,6 +136,13 @@ Editor de letra: uma linha da letra, com edição inline.
 - **Linha atual:** borda 2 px `accent`, texto em `listTitle` (mais forte) e rótulo semântico "Linha atual" — nunca só cor.
 - Props: `line` (`LyricDraftLine`), `isCurrent`, `expanded`, `onToggleExpanded`, `onTextChanged`, `onNaipeChanged`, `onDynamicsChanged`.
 
+### `MixTrackRow`
+Modo solo, "Mix por naipe": uma faixa por linha.
+- Selo do naipe + nome (`listTitle`); a faixa de Playback mostra "Playback", sem selo.
+- `MuteSoloToggle` M e S à direita; abaixo, slider de volume `accent` (0–100 %).
+- Leitor de tela: "Volume do Tenor", valor "30 %"; M e S anunciam ligado/desligado.
+- Props: `naipe` (nulo = Playback), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`.
+
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".
 - Arrastar a barra mostra o tempo do dedo e só busca (`onSeek`) ao soltar, uma vez.

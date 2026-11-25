@@ -272,9 +272,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] `test/presentation/widgets/mix_track_row_test.dart`: naipe row shows selo + "Tenor"; playback row shows "Playback"; slider reports the new volume; semantics "Volume do Tenor" with value "30 %"; M and S callbacks; M/S toggled state in semantics (not only color); ≥ 44 dp; dark theme; 360 dp at 130%
-- [ ] Gate check passes: `flutter test test/presentation/widgets/mix_track_row_test.dart`
-- [ ] Test count: ≥ 7 tests pass
+- [x] `test/presentation/widgets/mix_track_row_test.dart`: naipe row shows selo + "Tenor"; playback row shows "Playback"; slider reports the new volume; semantics "Volume do Tenor" with value "30 %"; M and S callbacks; M/S toggled state in semantics (not only color); ≥ 44 dp; dark theme; 360 dp at 130%
+- [x] Gate check passes: `flutter test test/presentation/widgets/mix_track_row_test.dart`
+- [x] Test count: ≥ 7 tests pass
 
 **Tests**: unit (widget)
 **Gate**: quick
