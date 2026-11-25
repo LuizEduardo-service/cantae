@@ -12,6 +12,8 @@ class TcpSessionTransport implements SessionTransport {
   final Map<ParticipantId, Socket> _sockets = {};
   final Map<ParticipantId, StreamController<Uint8List>> _receiveControllers =
       {};
+  final Map<ParticipantId, StreamSubscription<Uint8List>> _socketSubscriptions =
+      {};
   final _incomingController = StreamController<ParticipantId>.broadcast();
   final _closedController = StreamController<ParticipantId>.broadcast();
 
@@ -47,8 +49,11 @@ class TcpSessionTransport implements SessionTransport {
     // them, since nothing is listening yet at the moment they arrive.
     final controller = StreamController<Uint8List>();
     _receiveControllers[id] = controller;
-    socket.listen(
-      (data) => controller.add(Uint8List.fromList(data)),
+    _socketSubscriptions[id] = socket.listen(
+      (data) {
+        // Bytes already in flight when this side closed are meaningless.
+        if (!controller.isClosed) controller.add(Uint8List.fromList(data));
+      },
       onDone: () => _handlePeerClosed(id),
       onError: (_) => _handlePeerClosed(id),
       cancelOnError: true,
@@ -58,6 +63,7 @@ class TcpSessionTransport implements SessionTransport {
 
   void _handlePeerClosed(ParticipantId id) {
     if (_sockets.remove(id) != null) {
+      _socketSubscriptions.remove(id);
       _receiveControllers.remove(id)?.close();
       _closedController.add(id);
     }
@@ -87,6 +93,7 @@ class TcpSessionTransport implements SessionTransport {
     // Not awaited: a single-subscription controller's close() future only
     // resolves once a listener has drained it, and receive(id) may never
     // have been listened to.
+    unawaited(_socketSubscriptions.remove(id)?.cancel());
     unawaited(_receiveControllers.remove(id)?.close());
     await socket.close();
   }
@@ -100,6 +107,7 @@ class TcpSessionTransport implements SessionTransport {
     if (socket == null) {
       return;
     }
+    unawaited(_socketSubscriptions.remove(id)?.cancel());
     unawaited(_receiveControllers.remove(id)?.close());
     socket.destroy();
   }

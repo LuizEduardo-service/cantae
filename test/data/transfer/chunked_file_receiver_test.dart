@@ -86,6 +86,84 @@ Future<ParticipantSession> _connectAndApprove(
 
 void main() {
   group('ChunkedFileReceiver (XFER-05, XFER-06, XFER-07, XFER-10)', () {
+    // Regression (flaky-tests): the first attempt only started listening
+    // after `await File(finalPath).exists()`. A TransferBegin or chunk that
+    // arrived during that disk check was dropped, the transfer stalled and
+    // the progress stream never finished (a 5 s timeout under load).
+    test('messages arriving while the dedup check is still running are kept',
+        () async {
+      final bus = StreamController<DiscoveredRoom>.broadcast();
+      final master = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitor = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-device'),
+      );
+      addTearDown(() {
+        master.dispose();
+        visitor.dispose();
+        bus.close();
+      });
+      final participant = await _connectAndApprove(master, visitor, bus);
+      final storageRoot = Directory.systemTemp.createTempSync('receiver_slow');
+      addTearDown(() => storageRoot.deleteSync(recursive: true));
+
+      final bytes = Uint8List.fromList([1, 2, 3]);
+      final expectedSha256 = sha256.convert(bytes).toString();
+      final checkStarted = Completer<void>();
+      final checkAnswer = Completer<bool>();
+      final receiver = ChunkedFileReceiver(
+        controller: visitor,
+        storageRoot: storageRoot,
+        fileExists: (_) {
+          checkStarted.complete();
+          return checkAnswer.future;
+        },
+      );
+      final arrived = visitor.applicationMessages.take(2).toList();
+      final done = receiver
+          .receiveTrack(
+            trackId: 'track-slow',
+            expectedSha256: expectedSha256,
+            totalSizeBytes: bytes.length,
+          )
+          .toList();
+      await checkStarted.future;
+
+      await master.sendEnvelopeTo(
+        participant.id,
+        TransferBeginMessage(
+          songId: 'song-1',
+          trackId: 'track-slow',
+          totalSizeBytes: bytes.length,
+          sha256Declared: expectedSha256,
+          chunkSize: 64 * 1024,
+        ).encode(),
+      );
+      await master.sendEnvelopeTo(
+        participant.id,
+        ChunkDataMessage(trackId: 'track-slow', chunkIndex: 0, bytes: bytes)
+            .encode(),
+      );
+      await arrived.timeout(const Duration(seconds: 5));
+      checkAnswer.complete(false);
+
+      final progress = await done.timeout(const Duration(seconds: 5));
+      expect(progress.last.phase, TransferPhase.available);
+      final finalPath = LibraryStoragePaths.trackFilePath(
+        root: storageRoot,
+        sha256: expectedSha256,
+        extension: 'bin',
+      );
+      expect(await File(finalPath).readAsBytes(), bytes);
+    });
+
     test(
         'full happy path with ChunkedFileSender: reassembled file hash-matches and is promoted to its content-addressed path',
         () async {

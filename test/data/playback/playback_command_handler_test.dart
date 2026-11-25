@@ -31,9 +31,13 @@ class FakeAudioPlaybackEngine implements AudioPlaybackEngine {
     loadSongCalls.add(song);
   }
 
+  /// Like a real engine, starting takes a moment after the call is made,
+  /// so `playAtCalls` fills before the handler reports `playing`
+  /// (regression, flaky-tests: the tests read the phase too early).
   @override
   Future<void> playAt(DateTime scheduledStart) async {
     playAtCalls.add(scheduledStart);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
   }
 
   @override
@@ -136,9 +140,75 @@ Future<ParticipantSession> _joinAndApprove(
   return connected;
 }
 
+/// playAt that signals when it is called and finishes only when released.
+class _GatedEngine extends FakeAudioPlaybackEngine {
+  final started = Completer<void>();
+  final release = Completer<void>();
+
+  @override
+  Future<void> playAt(DateTime scheduledStart) async {
+    playAtCalls.add(scheduledStart);
+    started.complete();
+    await release.future;
+  }
+}
+
+/// Completes when the handler *publishes* [phase] on its snapshot stream.
+/// Call it before the message that leads there. Waiting on `playAtCalls`
+/// read the phase before it changed, and polling `current` resumed before
+/// the asynchronous stream delivered it to other listeners (flaky-tests).
+Future<void> _phasePublished(
+  PlaybackCommandHandler handler,
+  PlaybackPhase phase,
+) =>
+    handler.snapshots
+        .firstWhere((s) => s.phase == phase)
+        .timeout(const Duration(seconds: 2));
+
 void main() {
   group('PlaybackCommandHandler (SYNC-01, SYNC-03, SYNC-05, SYNC-06, SYNC-08)',
       () {
+    // Regression (flaky-tests): dispose() closed the snapshot stream but
+    // left the scheduled Timer running. A disposed handler still called
+    // engine.playAt at the scheduled time, and a playAt still starting at
+    // dispose emitted into the closed stream ("Cannot add new events after
+    // calling close").
+    test('disposing before the scheduled time never calls the engine',
+        () async {
+      final engine = FakeAudioPlaybackEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      handler.handleApplicationMessage(PlayCommandMessage(
+        songId: 'song-1',
+        masterSendEpochMs: DateTime.now()
+            .add(const Duration(milliseconds: 50))
+            .millisecondsSinceEpoch,
+      ));
+
+      handler.dispose();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+
+      expect(engine.playAtCalls, isEmpty);
+    });
+
+    test('disposing while the engine is starting emits nothing afterwards',
+        () async {
+      final engine = _GatedEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      final phases = <PlaybackPhase>[];
+      handler.snapshots.listen((s) => phases.add(s.phase));
+      handler.handleApplicationMessage(PlayCommandMessage(
+        songId: 'song-1',
+        masterSendEpochMs: DateTime.now().millisecondsSinceEpoch,
+      ));
+      await engine.started.future.timeout(const Duration(seconds: 2));
+
+      handler.dispose();
+      engine.release.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(phases, isNot(contains(PlaybackPhase.playing)));
+    });
+
     test(
         'snapshots transition idle -> scheduled -> playing on a PlayCommandMessage, calling the fake engine playAt at the scheduled epoch',
         () async {
@@ -152,6 +222,7 @@ void main() {
       final targetEpoch = DateTime.now()
           .add(const Duration(milliseconds: 50))
           .millisecondsSinceEpoch;
+      final playing = _phasePublished(handler, PlaybackPhase.playing);
       handler.handleApplicationMessage(
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
@@ -159,10 +230,7 @@ void main() {
       expect(handler.current.phase, equals(PlaybackPhase.scheduled));
       expect(engine.playAtCalls, isEmpty);
 
-      final deadline = DateTime.now().add(const Duration(seconds: 2));
-      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-      }
+      await playing;
 
       expect(engine.playAtCalls, hasLength(1));
       expect(
@@ -194,14 +262,12 @@ void main() {
           reason: 'waiting must not call the engine on its own');
 
       final targetEpoch = DateTime.now().millisecondsSinceEpoch;
+      final playing = _phasePublished(handler, PlaybackPhase.playing);
       handler.handleApplicationMessage(
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
 
-      final deadline = DateTime.now().add(const Duration(seconds: 2));
-      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-      }
+      await playing;
       expect(engine.playAtCalls, hasLength(1));
       expect(handler.current.phase, equals(PlaybackPhase.playing));
     });

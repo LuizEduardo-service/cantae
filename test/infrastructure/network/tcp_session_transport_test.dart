@@ -86,5 +86,32 @@ void main() {
       );
       expect(closedId, equals(masterConnId));
     });
+    // Regression (flaky-tests): close() closed the receive controller but
+    // kept listening to the socket, so bytes the peer sent afterwards were
+    // added to a closed controller: "Bad state: Cannot add event after
+    // closing", an uncaught error in whichever test was running.
+    for (final abrupt in [false, true]) {
+      test('bytes arriving after ${abrupt ? 'destroy' : 'close'}() are dropped',
+          () async {
+        final master = TcpSessionTransport();
+        final visitor = TcpSessionTransport();
+        await master.listen(0);
+        final incoming = master.incomingConnections.first;
+        final visitorConnId =
+            await visitor.connect('127.0.0.1', master.boundPort);
+        final masterConnId = await incoming;
+
+        if (abrupt) {
+          await master.destroy(masterConnId);
+        } else {
+          await master.close(masterConnId);
+        }
+        await visitor.send(visitorConnId, Uint8List.fromList([1, 2, 3]));
+        // Long enough for the loopback bytes to reach the master.
+        await Future<void>.delayed(const Duration(milliseconds: 300));
+
+        await visitor.close(visitorConnId);
+      });
+    }
   });
 }

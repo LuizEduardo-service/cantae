@@ -80,7 +80,15 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is complete and verified on branch `feature/phase-5-background-audio` (not yet merged). Project follows **Gitflow**.
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is merged to `develop` (pushed up to `b94af29`). **stabilize-flaky-tests** is complete on branch `feature/stabilize-flaky-tests` (not yet merged).
+
+- **stabilize-flaky-tests:** the wall-clock "flaky" tests had four root causes; three were production bugs, each fixed with a red-first regression test:
+  - `RoomSessionController.dispose()` left the transport subscriptions alive; late frames hit a closed stream (`a32a458`).
+  - `TcpSessionTransport.close()/destroy()` kept reading the socket (`1f735b0`).
+  - `PlaybackCommandHandler.dispose()` left scheduled Timers running: a handler that left the room still called `engine.playAt` (`ff34073`).
+  - `ChunkedFileReceiver.receiveTrack` dropped messages that arrived during the dedup disk check, stalling the transfer (`c308cab`); the check is now injectable.
+  - Test-only: two playback handler tests read the phase too early; they now await the published snapshot (`2931a81`, `02623a5`).
+  - Evidence: before, 4 of 13 full runs failed; after, 15 of 15 passed (765 tests). Project follows **Gitflow**.
 
 - **background-audio scope:** 9 tasks, executed inline in sequence.
   - **Engine:** `setDucked` (×0.5 on every track, click included); players built with `handleInterruptions: false` (`MultiTrackAudioEngine.defaultPlayer`).
@@ -95,11 +103,10 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - `handleInterruptions: false` is not observable under `flutter test`; only the device script (steps 8–9) guards it;
   - no l10n;
   - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
-  - wall-clock flaky tests (`song_sync_coordinator_test`, `chunked_file_receiver_test`, `playback_command_handler_test`).
+  - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
-**Next:** merging `feature/phase-5-background-audio` into `develop` needs the user's go-ahead. Candidates after that:
+**Next:** merging `feature/stabilize-flaky-tests` into `develop` needs the user's go-ahead. Candidates after that:
 - run the device script;
-- fixing the flaky wall-clock tests;
 - **Ensaios anteriores**;
 - **Enviar faixa**;
 - **Studio**.

@@ -79,9 +79,17 @@ class ChunkedFileReceiver {
     required Directory storageRoot,
     this.maxWholeTrackRetries = 2,
     ChunkWriter? writeChunk,
+    Future<bool> Function(String path)? fileExists,
   })  : _controller = controller,
         _storageRoot = storageRoot,
-        _writeChunk = writeChunk ?? _defaultChunkWriter;
+        _writeChunk = writeChunk ?? _defaultChunkWriter,
+        _fileExists = fileExists ?? _defaultFileExists;
+
+  /// The dedup check (XFER-07). Injectable so a test can hold it while
+  /// messages arrive.
+  final Future<bool> Function(String path) _fileExists;
+
+  static Future<bool> _defaultFileExists(String path) => File(path).exists();
 
   /// Receives [trackId]'s file. If a file already exists at the
   /// content-addressed final path for [expectedSha256], the transfer is
@@ -185,9 +193,17 @@ class ChunkedFileReceiver {
       }
     });
 
+    // The first attempt accepts messages right away: a TransferBegin that
+    // arrives while the dedup check below is still on disk must not be
+    // dropped, or the transfer stalls (flaky-tests regression).
+    attemptCompleter = Completer<_AttemptOutcome>();
+
     unawaited(() async {
-      if (await File(finalPath).exists()) {
+      if (await _fileExists(finalPath)) {
         await subscription.cancel();
+        // Chunks written while the check ran are not needed.
+        final partial = File(partialPath);
+        if (await partial.exists()) await partial.delete();
         progress.add(const TransferProgress(
           phase: TransferPhase.available,
           lastAckedChunkIndex: -1,
@@ -197,10 +213,12 @@ class ChunkedFileReceiver {
       }
 
       for (var attempt = 0; attempt <= maxWholeTrackRetries; attempt++) {
-        chunkSize = null;
-        totalChunks = null;
-        receivedChunks = <int>{};
-        attemptCompleter = Completer<_AttemptOutcome>();
+        if (attempt > 0) {
+          chunkSize = null;
+          totalChunks = null;
+          receivedChunks = <int>{};
+          attemptCompleter = Completer<_AttemptOutcome>();
+        }
         final outcome = await attemptCompleter!.future;
 
         if (outcome == _AttemptOutcome.storageFailure) {

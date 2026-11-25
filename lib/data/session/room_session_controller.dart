@@ -38,6 +38,11 @@ class RoomSessionController {
   final _applicationMessagesController =
       StreamController<(ParticipantId, Uint8List)>.broadcast();
   final Map<RoomId, DiscoveredRoom> _knownRooms = {};
+
+  /// Every transport subscription this controller opened; [dispose] cancels
+  /// them so no frame is handled after the output streams close.
+  final List<StreamSubscription<Object?>> _subscriptions = [];
+  bool _disposed = false;
   final Map<ParticipantId, FrameReassembler> _reassemblers = {};
 
   // Master side: connection handle <-> admitted domain participant id.
@@ -101,8 +106,9 @@ class RoomSessionController {
     _emitSnapshot();
     await _discovery.advertise(roomId, _transport.boundPort);
 
-    _transport.incomingConnections.listen(_handleIncomingConnection);
-    _transport.closedConnections.listen(_handleConnectionClosed);
+    _subscriptions
+      ..add(_transport.incomingConnections.listen(_handleIncomingConnection))
+      ..add(_transport.closedConnections.listen(_handleConnectionClosed));
     _startTicking();
 
     return Result.success(roomId);
@@ -127,11 +133,11 @@ class RoomSessionController {
       discovered.port,
     );
     _masterConnection = connection;
-    _transport.receive(connection).listen((chunk) {
+    _subscriptions.add(_transport.receive(connection).listen((chunk) {
       for (final frame in _reassemble(connection, chunk)) {
         unawaited(_handleVisitorMessage(SessionWireMessage.decode(frame)));
       }
-    });
+    }));
 
     await _sendMessage(
       connection,
@@ -309,13 +315,13 @@ class RoomSessionController {
   }
 
   void _handleIncomingConnection(ParticipantId connection) {
-    _transport.receive(connection).listen((chunk) {
+    _subscriptions.add(_transport.receive(connection).listen((chunk) {
       for (final frame in _reassemble(connection, chunk)) {
         unawaited(
           _handleMasterMessage(connection, SessionWireMessage.decode(frame)),
         );
       }
-    });
+    }));
   }
 
   Future<void> _handleMasterMessage(
@@ -383,7 +389,7 @@ class RoomSessionController {
         requiresMasterRole: message.requiresMasterRole,
       );
       if (result.isSuccess) {
-        _applicationMessagesController.add((message.senderId, message.payload));
+        _publishApplicationMessage(message.senderId, message.payload);
       }
       _emitSnapshot();
     }
@@ -438,8 +444,7 @@ class RoomSessionController {
       result.when(
         success: (_) {
           _visitorLastAcceptedFromMaster = message.sequence;
-          _applicationMessagesController
-              .add((message.senderId, message.payload));
+          _publishApplicationMessage(message.senderId, message.payload);
         },
         failure: (_) {},
       );
@@ -497,9 +502,16 @@ class RoomSessionController {
     }
   }
 
+  /// A frame already being verified when [dispose] ran may finish after
+  /// it; its result is dropped instead of added to a closed stream.
+  void _publishApplicationMessage(ParticipantId sender, Uint8List payload) {
+    if (_disposed) return;
+    _applicationMessagesController.add((sender, payload));
+  }
+
   void _emitSnapshot() {
     final machine = _stateMachine;
-    if (machine == null) {
+    if (machine == null || _disposed) {
       return;
     }
     final snapshot = RoomSessionSnapshot(
@@ -518,7 +530,12 @@ class RoomSessionController {
   String _generateCode() => (1000 + _random.nextInt(9000)).toString();
 
   void dispose() {
+    _disposed = true;
     _tickTimer?.cancel();
+    for (final subscription in _subscriptions) {
+      unawaited(subscription.cancel());
+    }
+    _subscriptions.clear();
     unawaited(_snapshotsController.close());
     unawaited(_applicationMessagesController.close());
   }
