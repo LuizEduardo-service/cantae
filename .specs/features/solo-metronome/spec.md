@@ -153,31 +153,31 @@ Ao investigar como fazer o clique cair no tempo da música, apareceram três bug
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| MET-01 | P1-AC1/AC2: tocar inicia todas as faixas sem esperar | Specify | Pending |
-| MET-02 | P1-AC3: posição contínua | Specify | Pending |
-| MET-03 | P1-AC4: pulsos sem atraso acumulado | Specify | Pending |
-| MET-04 | P2-AC1: botão "Metrônomo ♩ BPM" | Specify | Pending |
-| MET-05 | P2-AC2/AC3: ligar e desligar | Specify | Pending |
-| MET-06 | P2-AC4: cliques nos tempos, com acento | Specify | Pending |
-| MET-07 | P2-AC5: clique alinhado ao pausar/arrastar/loop | Specify | Pending |
-| MET-08 | P2-AC6: ligar ao abrir | Specify | Pending |
-| MET-09 | P2-AC7: falha ao preparar o clique | Specify | Pending |
-| MET-10 | P3-AC1/AC2: folha "Andamento" | Specify | Pending |
-| MET-11 | P3-AC3: limites | Specify | Pending |
-| MET-12 | P3-AC4: salvar andamento | Specify | Pending |
-| MET-13 | P3-AC5: falha ao salvar | Specify | Pending |
-| MET-14 | P3-AC6/AC7: música recebida | Specify | Pending |
-| MET-15 | P4-AC1/AC2: linha e volume do metrônomo | Specify | Pending |
-| MET-16 | P4-AC3: M do metrônomo | Specify | Pending |
-| MET-17 | P4-AC4: volume e M só na sessão | Specify | Pending |
-| MET-18 | Edge: ligar tocando / trocar andamento ligado alinha à posição | Specify | Pending |
-| MET-19 | Edge: preparar o clique fora da UI thread | Specify | Pending |
+| MET-01 | P1-AC1/AC2: tocar inicia todas as faixas sem esperar | Execute | Verified |
+| MET-02 | P1-AC3: posição contínua | Execute | Verified |
+| MET-03 | P1-AC4: pulsos sem atraso acumulado | Execute | Verified |
+| MET-04 | P2-AC1: botão "Metrônomo ♩ BPM" | Execute | Verified |
+| MET-05 | P2-AC2/AC3: ligar e desligar | Execute | Verified |
+| MET-06 | P2-AC4: cliques nos tempos, com acento | Execute | Verified |
+| MET-07 | P2-AC5: clique alinhado ao pausar/arrastar/loop | Execute | Verified |
+| MET-08 | P2-AC6: ligar ao abrir | Execute | Verified |
+| MET-09 | P2-AC7: falha ao preparar o clique | Execute | Verified |
+| MET-10 | P3-AC1/AC2: folha "Andamento" | Execute | Verified |
+| MET-11 | P3-AC3: limites | Execute | Verified |
+| MET-12 | P3-AC4: salvar andamento | Execute | Verified |
+| MET-13 | P3-AC5: falha ao salvar | Execute | Verified |
+| MET-14 | P3-AC6/AC7: música recebida | Execute | Verified |
+| MET-15 | P4-AC1/AC2: linha e volume do metrônomo | Execute | Verified |
+| MET-16 | P4-AC3: M do metrônomo | Execute | Verified |
+| MET-17 | P4-AC4: volume e M só na sessão | Execute | Verified |
+| MET-18 | Edge: ligar tocando / trocar andamento ligado alinha à posição | Execute | Verified |
+| MET-19 | Edge: preparar o clique fora da UI thread | Execute | Verified |
 
 **ID format:** `MET-[NUMBER]`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 19 total, 0 mapped to tasks (Tasks phase pending)
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped
 
 ---
 

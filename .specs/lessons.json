@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 19,
+  "next_id": 20,
   "lessons": [
     {
       "id": "L-003",
@@ -292,6 +292,24 @@
       ],
       "created": "2026-11-25T00:37:50Z",
       "last_seen": "2026-11-25T00:37:50Z"
+    },
+    {
+      "id": "L-019",
+      "key": "spec_precision_gap::when adding a new kind of track to a shared mix specify how it interacts with existing mute and solo rules",
+      "text": "When adding a new kind of track to a shared mix, specify how it interacts with existing mute and solo rules",
+      "signal": "spec_precision_gap",
+      "scope": "audio",
+      "status": "candidate",
+      "features": [
+        "solo-metronome"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "spec.md Assumptions: 'Isolar (S) uma faixa com o metrônomo ligado' (found in T4) (audio)"
+      ],
+      "created": "2026-11-25T01:46:36Z",
+      "last_seen": "2026-11-25T01:46:36Z"
     }
   ]
 }
