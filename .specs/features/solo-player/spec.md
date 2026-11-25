@@ -166,37 +166,37 @@ A pessoa que quer ensaiar sozinha não tem como tocar uma música da biblioteca 
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| SOLO-01 | P1-AC1: rota a partir do Detalhe | Specify | Pending |
-| SOLO-02 | P1-AC2: carregar faixas, estado inicial | Specify | Pending |
-| SOLO-03 | P1-AC3/AC4: tocar e pausar | Specify | Pending |
-| SOLO-04 | P1-AC5: tempo atual | Specify | Pending |
-| SOLO-05 | P1-AC6: arrastar a barra | Specify | Pending |
-| SOLO-06 | P1-AC7: fim da música | Specify | Pending |
-| SOLO-07 | P1-AC8: parar ao sair | Specify | Pending |
-| SOLO-08 | P1-AC9: sem rede | Specify | Pending |
-| SOLO-09 | P2-AC1/AC6: linhas de mix e estado não só por cor | Specify | Pending |
-| SOLO-10 | P2-AC2: volume por faixa | Specify | Pending |
-| SOLO-11 | P2-AC3: mudo | Specify | Pending |
-| SOLO-12 | P2-AC4/AC5: isolar exclusivo | Specify | Pending |
-| SOLO-13 | P2-AC7: mix só na sessão | Specify | Pending |
-| SOLO-14 | P3-AC1/AC2/AC7: marcar início | Specify | Pending |
-| SOLO-15 | P3-AC3/AC4: marcar fim e validar | Specify | Pending |
-| SOLO-16 | P3-AC5: repetir o trecho | Specify | Pending |
-| SOLO-17 | P3-AC6: desligar seguindo da posição atual | Specify | Pending |
-| SOLO-18 | P3-AC8: trecho na barra de progresso | Specify | Pending |
-| SOLO-19 | P4-AC1/AC2: LyricView passada/atual/próxima | Specify | Pending |
-| SOLO-20 | P4-AC3: selo + "Naipe · dinâmica" | Specify | Pending |
-| SOLO-21 | P4-AC4: sem letra sincronizada | Specify | Pending |
-| SOLO-22 | P4-AC5: região viva | Specify | Pending |
-| SOLO-23 | Edge: não encontrada / erro de leitura | Specify | Pending |
-| SOLO-24 | Edge: música sem faixas | Specify | Pending |
-| SOLO-25 | Edge: falha ao carregar o áudio | Specify | Pending |
+| SOLO-01 | P1-AC1: rota a partir do Detalhe | Execute | Verified |
+| SOLO-02 | P1-AC2: carregar faixas, estado inicial | Execute | Verified |
+| SOLO-03 | P1-AC3/AC4: tocar e pausar | Execute | Verified |
+| SOLO-04 | P1-AC5: tempo atual | Execute | Verified |
+| SOLO-05 | P1-AC6: arrastar a barra | Execute | Verified |
+| SOLO-06 | P1-AC7: fim da música | Execute | Verified |
+| SOLO-07 | P1-AC8: parar ao sair | Execute | Verified |
+| SOLO-08 | P1-AC9: sem rede | Execute | Verified |
+| SOLO-09 | P2-AC1/AC6: linhas de mix e estado não só por cor | Execute | Verified |
+| SOLO-10 | P2-AC2: volume por faixa | Execute | Verified |
+| SOLO-11 | P2-AC3: mudo | Execute | Verified |
+| SOLO-12 | P2-AC4/AC5: isolar exclusivo | Execute | Verified |
+| SOLO-13 | P2-AC7: mix só na sessão | Execute | Verified |
+| SOLO-14 | P3-AC1/AC2/AC7: marcar início | Execute | Verified |
+| SOLO-15 | P3-AC3/AC4: marcar fim e validar | Execute | Verified |
+| SOLO-16 | P3-AC5: repetir o trecho | Execute | Verified |
+| SOLO-17 | P3-AC6: desligar seguindo da posição atual | Execute | Verified |
+| SOLO-18 | P3-AC8: trecho na barra de progresso | Execute | Verified |
+| SOLO-19 | P4-AC1/AC2: LyricView passada/atual/próxima | Execute | Verified |
+| SOLO-20 | P4-AC3: selo + "Naipe · dinâmica" | Execute | Verified |
+| SOLO-21 | P4-AC4: sem letra sincronizada | Execute | Verified |
+| SOLO-22 | P4-AC5: região viva | Execute | Verified |
+| SOLO-23 | Edge: não encontrada / erro de leitura | Execute | Verified |
+| SOLO-24 | Edge: música sem faixas | Execute | Verified |
+| SOLO-25 | Edge: falha ao carregar o áudio | Execute | Verified |
 
 **ID format:** `SOLO-[NUMBER]`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 25 total, 0 mapped to tasks (Tasks phase pending)
+**Coverage:** 25 total, 25 mapped to tasks, 0 unmapped
 
 ---
 
