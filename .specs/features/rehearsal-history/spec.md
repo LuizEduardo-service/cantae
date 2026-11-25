@@ -159,7 +159,7 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 | HIST-15 | P3-AC3/AC4: apagar tudo com confirmação | - | Pending |
 | HIST-16 | P3-AC5: falha ao apagar | - | Pending |
 | HIST-17 | P3-AC6: toast e contagem atualizada | - | Pending |
-| HIST-18 | P3-AC7: apagar a música apaga os ensaios | - | Pending |
+| HIST-18 | P3-AC7: apagar a música apaga os ensaios | Execute | Implementing |
 | HIST-19 | Edge: fim e tocar de novo, interrupções, segundo plano, nunca tocou | Execute | Implementing |
 
 **ID format:** `HIST-[NUMBER]`

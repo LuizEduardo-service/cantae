@@ -111,9 +111,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: a v3 file with a song upgrades to v4 with the song intact and the table present; a fresh v4 install has the table; deleting a song deletes its rows (cascade)
-- [ ] Gate check passes: `flutter test` (full: schema change)
-- [ ] Test count: all existing + ≥ 3 new
+- [x] Failure modes listed first, then tests: a v3 file with a song upgrades to v4 with the song intact and the table present; a fresh v4 install has the table; deleting a song deletes its rows (cascade)
+- [x] Gate check passes: `flutter test` (full: schema change)
+- [x] Test count: all existing + ≥ 3 new
 
 **Tests**: unit
 **Gate**: full
