@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:cantae/domain/audio/audio_interruptions.dart';
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
 import 'package:cantae/domain/audio/click_track_builder.dart';
+import 'package:cantae/domain/audio/playback_remote.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
@@ -13,6 +15,7 @@ import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/audio_playback_engine_provider.dart';
+import 'package:cantae/presentation/providers/background_audio_providers.dart';
 import 'package:cantae/presentation/providers/click_track_builder_provider.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/screens/solo_player/solo_player_screen.dart';
@@ -145,6 +148,26 @@ class _FakeClickTrackBuilder implements ClickTrackBuilder {
   }
 }
 
+class _FakeInterruptions implements AudioInterruptions {
+  final controller = StreamController<AudioInterruption>.broadcast();
+
+  @override
+  Stream<AudioInterruption> get events => controller.stream;
+}
+
+class _FakeRemote implements PlaybackRemote {
+  final controller = StreamController<RemoteCommand>.broadcast();
+
+  @override
+  void publish(NowPlaying info) {}
+
+  @override
+  void clear() {}
+
+  @override
+  Stream<RemoteCommand> get commands => controller.stream;
+}
+
 const _tracks = [
   SongTrack(id: 'soprano', filePath: '/tmp/s.mp3', naipe: Naipe.soprano),
   SongTrack(id: 'contralto', filePath: '/tmp/c.mp3', naipe: Naipe.contralto),
@@ -212,6 +235,8 @@ Future<
       _FakeAudioPlaybackEngine engine,
       _FakeSongRepository repo,
       _FakeClickTrackBuilder builder,
+      _FakeInterruptions interruptions,
+      _FakeRemote remote,
     })> _open(
   WidgetTester tester, {
   Song? song,
@@ -223,6 +248,8 @@ Future<
 }) async {
   final engine = _FakeAudioPlaybackEngine()..throwOnLoad = throwOnLoad;
   final builder = _FakeClickTrackBuilder()..fail = clickFails;
+  final interruptions = _FakeInterruptions();
+  final remote = _FakeRemote();
   final repo = _FakeSongRepository(
     song: notFound ? null : (song ?? _song()),
     failure: failure,
@@ -232,6 +259,8 @@ Future<
       audioPlaybackEngineProvider.overrideWithValue(engine),
       songRepositoryProvider.overrideWithValue(repo),
       clickTrackBuilderProvider.overrideWithValue(builder),
+      audioInterruptionsProvider.overrideWithValue(interruptions),
+      playbackRemoteProvider.overrideWithValue(remote),
     ],
     child: MaterialApp.router(
       theme: theme ?? AppTheme.light,
@@ -239,7 +268,13 @@ Future<
     ),
   ));
   await tester.pumpAndSettle();
-  return (engine: engine, repo: repo, builder: builder);
+  return (
+    engine: engine,
+    repo: repo,
+    builder: builder,
+    interruptions: interruptions,
+    remote: remote,
+  );
 }
 
 /// The stream delivers in a microtask: one pump applies it to the state,
@@ -706,6 +741,92 @@ void main() {
         expect(tester.getSize(button).height, greaterThanOrEqualTo(44),
             reason: label);
       }
+    });
+  });
+
+  group('external pause (BGA-14)', () {
+    Future<void> interrupt(
+      WidgetTester tester,
+      _FakeInterruptions interruptions,
+      AudioInterruption event,
+    ) async {
+      interruptions.controller.add(event);
+      await tester.pump();
+      await tester.pump();
+    }
+
+    testWidgets('a call while the app is open: "Tocar" and the toast now',
+        (tester) async {
+      final s = await _open(tester);
+      await _tapText(tester, 'Tocar');
+
+      await interrupt(tester, s.interruptions, AudioInterruption.pauseBegan);
+
+      expect(find.text('Tocar'), findsOneWidget);
+      expect(find.text('Música pausada: outro áudio começou'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('headphones disconnected: its own toast', (tester) async {
+      final s = await _open(tester);
+      await _tapText(tester, 'Tocar');
+
+      await interrupt(
+          tester, s.interruptions, AudioInterruption.headphonesDisconnected);
+
+      expect(find.text('Música pausada: fone desconectado'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets(
+        'paused in the background: the toast waits for the return, '
+        'and shows once', (tester) async {
+      final s = await _open(tester);
+      await _tapText(tester, 'Tocar');
+      final binding = tester.binding;
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+
+      await interrupt(tester, s.interruptions, AudioInterruption.pauseBegan);
+      expect(find.text('Música pausada: outro áudio começou'), findsNothing);
+
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.hidden);
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(find.text('Música pausada: outro áudio começou'), findsOneWidget);
+      expect(find.text('Tocar'), findsOneWidget);
+
+      await tester.pump(const Duration(seconds: 3));
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+      await tester.pump();
+      expect(find.text('Música pausada: outro áudio começou'), findsNothing);
+    });
+
+    testWidgets('Pausar from the lock screen: "Tocar" without a toast',
+        (tester) async {
+      final s = await _open(tester);
+      await _tapText(tester, 'Tocar');
+
+      s.remote.controller.add(const RemotePause());
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('Tocar'), findsOneWidget);
+      expect(find.textContaining('Música pausada'), findsNothing);
+    });
+
+    testWidgets('the toast renders under the dark theme', (tester) async {
+      final s = await _open(tester, theme: AppTheme.dark);
+      await _tapText(tester, 'Tocar');
+
+      await interrupt(tester, s.interruptions, AudioInterruption.pauseBegan);
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Música pausada: outro áudio começou'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
     });
   });
 }

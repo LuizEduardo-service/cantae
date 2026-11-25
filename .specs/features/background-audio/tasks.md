@@ -227,9 +227,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests written first: interruption while resumed → toast now and button shows "Tocar"; headphones → its own text; interruption while paused (lifecycle `paused`) → no toast until `resumed`, then shown once; a remote `RemotePause` → screen shows "Tocar" without a toast; dark theme
-- [ ] Gate check passes: `flutter test test/presentation/screens/solo_player/solo_player_screen_test.dart`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests written first: interruption while resumed → toast now and button shows "Tocar"; headphones → its own text; interruption while paused (lifecycle `paused`) → no toast until `resumed`, then shown once; a remote `RemotePause` → screen shows "Tocar" without a toast; dark theme
+- [x] Gate check passes: `flutter test test/presentation/screens/solo_player/solo_player_screen_test.dart`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: widget
 **Gate**: build

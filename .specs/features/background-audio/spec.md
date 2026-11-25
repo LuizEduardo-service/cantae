@@ -171,7 +171,7 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 | BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | Execute | Implementing |
 | BGA-12 | P3-AC3: som curto abaixa o volume sem pausar | Execute | Implementing |
 | BGA-13 | P3-AC4: fone desconectado pausa | Execute | Implementing |
-| BGA-14 | P3-AC5/AC6: tela e toast após pausa externa | - | Pending |
+| BGA-14 | P3-AC5/AC6: tela e toast após pausa externa | Execute | Implementing |
 | BGA-15 | P4-AC1: roteiro de teste em aparelho | - | Pending |
 | BGA-16 | P4-AC2: teste de integração com log | - | Pending |
 | BGA-17 | P4-AC3: pendência registrada no STATE.md | - | Pending |

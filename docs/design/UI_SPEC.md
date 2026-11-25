@@ -154,7 +154,13 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
   - erro de leitura ("Tentar de novo");
   - sem faixas (EmptyState "Esta música ainda não tem faixas" + "Enviar faixa");
   - falha ao carregar o áudio ("Tentar de novo").
-  - Sem estados de rede. Sair da tela para o áudio; ainda não toca em segundo plano.
+  - Sem estados de rede. Sair da tela para o áudio e tira a notificação.
+- **Segundo plano e tela bloqueada:**
+  - A música continua com a tela bloqueada ou em outro app, com mix, loop e metrônomo valendo.
+  - Notificação e tela bloqueada: nome da música, "Modo solo", Tocar/Pausar e a barra de posição (arrastar busca). Mesmo efeito dos controles da tela.
+  - Fechar o app pela lista de recentes para o áudio.
+  - Ligação ou outro app que toma o áudio: pausa tudo e não volta sozinho. Fone desconectado: pausa. Som curto de outro app: o volume abaixa e volta, sem pausar.
+  - Ao voltar para a tela depois de uma pausa assim: botão "Tocar" e o toast "Música pausada: outro áudio começou" ou "Música pausada: fone desconectado" (uma vez).
 
 ## 6.13 Perfil e Preferências — Tema
 - **Topo:** ‹ Biblioteca.
