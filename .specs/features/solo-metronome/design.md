@@ -74,7 +74,7 @@ graph TD
 ### `AudioPlaybackEngine.addTrack` / `removeTrack` (T4)
 
 - **Interfaces**:
-  - `Future<void> addTrack(SongTrack track)`: loads one more player with the same per-track state as `loadSong` (volume 1.0, not muted). It does not change the position reference.
+  - `Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false})`: loads one more player with the same per-track state as `loadSong` (volume 1.0, not muted). It does not change the position reference. With `exemptFromSolo`, soloing another track does not silence it. The metronome uses this; the gap was found in T4 and recorded in the spec Assumptions.
   - `Future<void> removeTrack(String trackId)`: stops and disposes that player and clears its state. A no-op for unknown ids.
 - **Ripple**: all 7 test fakes that `implements AudioPlaybackEngine` gain recording no-ops.
 

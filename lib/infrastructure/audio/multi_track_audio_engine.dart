@@ -38,6 +38,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final Map<String, double> _baseGainByTrackId = {};
   final Map<String, bool> _mutedByTrackId = {};
   final Map<String, double> _volumeByTrackId = {};
+  final Set<String> _soloExemptTrackIds = {};
   final Map<String, int?> _fileDurationMsByTrackId = {};
   final StreamController<int> _positionMsController =
       StreamController<int>.broadcast();
@@ -57,16 +58,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     ];
 
     for (final track in tracks) {
-      final player = _playerFactory();
-      final baseGain = track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0);
-      final fileDuration = await player.setFilePath(track.filePath);
-      await player.setVolume(baseGain);
-      _playersByTrackId[track.id] = player;
-      _startDelayMsByTrackId[track.id] = track.startDelayMs;
-      _baseGainByTrackId[track.id] = baseGain;
-      _mutedByTrackId[track.id] = false;
-      _volumeByTrackId[track.id] = 1.0;
-      _fileDurationMsByTrackId[track.id] = fileDuration?.inMilliseconds;
+      await _loadTrack(track);
     }
 
     if (tracks.isNotEmpty) {
@@ -102,6 +94,41 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
       }
     }
     return longest;
+  }
+
+  Future<void> _loadTrack(SongTrack track) async {
+    final player = _playerFactory();
+    final baseGain = track.isPlayback ? 1.0 : AudioMixCalculator.ownGain(1.0);
+    final fileDuration = await player.setFilePath(track.filePath);
+    await player.setVolume(baseGain);
+    _playersByTrackId[track.id] = player;
+    _startDelayMsByTrackId[track.id] = track.startDelayMs;
+    _baseGainByTrackId[track.id] = baseGain;
+    _mutedByTrackId[track.id] = false;
+    _volumeByTrackId[track.id] = 1.0;
+    _fileDurationMsByTrackId[track.id] = fileDuration?.inMilliseconds;
+  }
+
+  @override
+  Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async {
+    await removeTrack(track.id);
+    await _loadTrack(track);
+    if (exemptFromSolo) _soloExemptTrackIds.add(track.id);
+    await _applyVolume(track.id);
+  }
+
+  @override
+  Future<void> removeTrack(String trackId) async {
+    final player = _playersByTrackId.remove(trackId);
+    if (player == null) return;
+    _startDelayMsByTrackId.remove(trackId);
+    _baseGainByTrackId.remove(trackId);
+    _mutedByTrackId.remove(trackId);
+    _volumeByTrackId.remove(trackId);
+    _fileDurationMsByTrackId.remove(trackId);
+    _soloExemptTrackIds.remove(trackId);
+    if (_soloTrackId == trackId) _soloTrackId = null;
+    await player.dispose();
   }
 
   @override
@@ -159,7 +186,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   double _effectiveVolume(String trackId) {
     final gain = (_baseGainByTrackId[trackId] ?? 1.0) *
         (_volumeByTrackId[trackId] ?? 1.0);
-    if (_soloTrackId != null) {
+    if (_soloTrackId != null && !_soloExemptTrackIds.contains(trackId)) {
       return trackId == _soloTrackId ? gain : 0.0;
     }
     final muted = _mutedByTrackId[trackId] ?? false;
@@ -218,6 +245,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     _baseGainByTrackId.clear();
     _mutedByTrackId.clear();
     _volumeByTrackId.clear();
+    _soloExemptTrackIds.clear();
     _fileDurationMsByTrackId.clear();
     _soloTrackId = null;
   }

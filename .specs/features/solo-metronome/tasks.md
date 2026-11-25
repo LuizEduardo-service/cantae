@@ -160,9 +160,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Tests: `addTrack` creates one more player at volume 1.0 without reloading the others; `seekAllTo` then moves it too; `setTrackVolume`/`setTrackMuted` apply to it; `removeTrack` disposes only that player; unknown id is a no-op; the position reference does not change
-- [ ] Gate check passes: `flutter test` (full: interface change)
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests: `addTrack` creates one more player at volume 1.0 without reloading the others; `seekAllTo` then moves it too; `setTrackVolume`/`setTrackMuted` apply to it; `removeTrack` disposes only that player; unknown id is a no-op; the position reference does not change
+- [x] Gate check passes: `flutter test` (full: interface change)
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: full

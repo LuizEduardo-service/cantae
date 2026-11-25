@@ -41,6 +41,7 @@ Ao investigar como fazer o clique cair no tempo da música, apareceram três bug
 | Primeiro tempo | O tempo 1 cai em `0 ms` da timeline compartilhada; não há deslocamento | O `MetronomeConfig` não tem campo de deslocamento; acrescentá-lo é mudança de domínio sem pedido | n: assumido; anacruse registrada como Out of Scope |
 | Limites | BPM inteiro de 30 a 300; tempos por compasso de 2 a 16 | Os mesmos limites que o `MetronomeConfig` já impõe em asserts | n: segue o domínio |
 | Ligar ao abrir | Se `enabledByDefault` for verdadeiro, o metrônomo já começa ligado ao abrir o Modo solo | Campo já existente no domínio (RF50) | n: assumido |
+| Isolar (S) uma faixa com o metrônomo ligado | O clique continua soando: isolar silencia as outras vozes, não o metrônomo | Ensaiar uma voz isolada com o clique é o uso típico do metrônomo; no motor, isolar silenciava todas as outras faixas | n: decidido no T4 (lacuna do design) |
 | Ajustes de volume e M do metrônomo | Valem só enquanto a tela está aberta, como o mix das faixas | Mesma regra do Modo solo (SOLO-13) | n: segue o precedente |
 
 **Open questions:** none; all resolved or logged above.

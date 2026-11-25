@@ -185,6 +185,100 @@ void main() {
     });
   });
 
+  group('addTrack / removeTrack', () {
+    const click = SongTrack(
+      id: 'metronome',
+      filePath: '/tmp/metronome.wav',
+      naipe: Naipe.custom,
+    );
+
+    test('adds one more player at full volume without reloading the others',
+        () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+
+      await engine.addTrack(click);
+
+      expect(fakePlatform.created, hasLength(3));
+      expect(fakePlatform.created[0].loadCalls, hasLength(1));
+      expect(fakePlatform.created[1].loadCalls, hasLength(1));
+      expect(fakePlatform.created[2].setVolumeCalls.last.volume, 1.0);
+    });
+
+    test('the added track follows seekAllTo, volume and mute', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click);
+      final clickPlatform = fakePlatform.created[2];
+
+      await engine.seekAllTo(41000);
+      expect(clickPlatform.seekCalls.last.position,
+          const Duration(milliseconds: 41000));
+
+      await engine.setTrackVolume('metronome', 0.4);
+      expect(clickPlatform.setVolumeCalls.last.volume, closeTo(0.4, 1e-9));
+
+      await engine.setTrackMuted('metronome', true);
+      expect(clickPlatform.setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('a solo-exempt track keeps sounding while a voice is soloed',
+        () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click, exemptFromSolo: true);
+      final clickPlatform = fakePlatform.created[2];
+
+      await engine.setTrackSolo('s', true);
+
+      expect(clickPlatform.setVolumeCalls.last.volume, 1.0);
+      expect(fakePlatform.created[1].setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('removeTrack disposes only that player', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click);
+
+      await engine.removeTrack('metronome');
+
+      expect(fakePlatform.created[2].disposed, isTrue);
+      expect(fakePlatform.created[0].disposed, isFalse);
+      expect(fakePlatform.created[1].disposed, isFalse);
+      await engine.seekAllTo(1000);
+      expect(fakePlatform.created[2].seekCalls, isEmpty,
+          reason: 'a removed track no longer follows the timeline');
+    });
+
+    test('removeTrack with an unknown id does nothing', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+
+      await engine.removeTrack('nope');
+
+      expect(fakePlatform.created.every((p) => !p.disposed), isTrue);
+    });
+
+    test('adding a track does not change the position reference', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final events = <int>[];
+      final subscription = engine.positionMs.listen(events.add);
+      await engine.addTrack(click);
+      await Future<void>.delayed(Duration.zero);
+      events.clear();
+
+      fakePlatform.created[2].emitPlaybackEvent(PlaybackEventMessage(
+        processingState: ProcessingStateMessage.ready,
+        updateTime: DateTime.now(),
+        updatePosition: const Duration(seconds: 7),
+        bufferedPosition: const Duration(seconds: 7),
+        duration: null,
+        icyMetadata: null,
+        currentIndex: 0,
+        androidAudioSessionId: null,
+      ));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events, isNot(contains(7000)));
+      await subscription.cancel();
+    });
+  });
+
   group('setTrackStartDelayMs', () {
     test('changes only the internal map, without reloading the file', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
