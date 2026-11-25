@@ -141,7 +141,7 @@ Modo solo, "Mix por naipe": uma faixa por linha.
 - Selo do naipe + nome (`listTitle`); a faixa de Playback mostra "Playback", sem selo.
 - `MuteSoloToggle` M e S à direita; abaixo, slider de volume `accent` (0–100 %).
 - Leitor de tela: "Volume do Tenor", valor "30 %"; M e S anunciam ligado/desligado.
-- Props: `naipe` (nulo = Playback), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`.
+- Props: `naipe` (nulo = Playback ou Metrônomo), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`, `showSolo` (padrão verdadeiro; falso esconde o S, como na linha "Metrônomo").
 
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".

@@ -112,6 +112,36 @@ void main() {
       }
     });
 
+    testWidgets('showSolo: false renders M only (metronome row)',
+        (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        theme: AppTheme.light,
+        home: Scaffold(
+          body: MixTrackRow(
+            naipe: null,
+            label: 'Metrônomo',
+            volume: 1.0,
+            muted: false,
+            solo: false,
+            showSolo: false,
+            onVolumeChanged: (_) {},
+            onMuteToggled: () {},
+            onSoloToggled: () {},
+          ),
+        ),
+      ));
+
+      expect(find.widgetWithText(MuteSoloToggle, 'M'), findsOneWidget);
+      expect(find.widgetWithText(MuteSoloToggle, 'S'), findsNothing);
+      expect(find.text('Metrônomo'), findsOneWidget);
+    });
+
+    testWidgets('by default both M and S are shown', (tester) async {
+      await tester.pumpWidget(_row(_Calls()));
+
+      expect(find.byType(MuteSoloToggle), findsNWidgets(2));
+    });
+
     testWidgets('renders under the dark theme', (tester) async {
       await tester
           .pumpWidget(_row(_Calls(), muted: true, theme: AppTheme.dark));
