@@ -104,6 +104,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md M2 (lib/presentation/providers/lyrics_editor_notifier.dart:336) (presentation)
 - last seen: 2026-11-24T22:58:06Z
 
+### L-018 - When a guard applies to several actions, test it on each action, not only the first
+- signal: `surviving_mutant` · recurrence: 1 feature(s) · scope: `presentation` · harmful: 0
+- features: solo-player
+- evidence: validation.md S9 (lib/presentation/providers/solo_player_notifier.dart:293) (presentation)
+- last seen: 2026-11-25T00:37:50Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

@@ -24,6 +24,7 @@ Pílula de navegação no topo.
 Status à direita do topo.
 - Variantes: `synced` (accentSoft, ponto accent, "Sincronizado"), `weak` (warningBg, "Conexão fraca"), `offline` (dangerBg, "× Sem rede"), `neutral` ("Visitante", "Sala 4827").
 - Altura 44, região viva para leitor de tela.
+- Implementado até agora: só `neutral` (fundo `fillMuted`, texto `text2`), usado no Modo solo ("Funciona offline"). As demais variantes chegam com as telas de sala.
 
 ### `SectionLabel`
 Rótulo de seção ("Naipes", "Seus dados"). `caption` 13/600 `text2`. Pode ter texto auxiliar à direita ("3 de 4 com faixa").
@@ -40,7 +41,9 @@ Rótulo de seção ("Naipes", "Seus dados"). `caption` 13/600 `text2`. Pode ter 
 Fundo `fillSecondary`, texto `text`. Mesmas medidas do primário.
 
 ### `TonalButton`
-Dentro de cards. Fundo `fillOnSurface` (neutro) ou `accentSoft` (positivo). Altura 36–44.
+Dentro de cards ou ao lado do botão primário (ações de loop do Modo solo). Fundo `fillOnSurface` (neutro, texto `text`) ou `accentSoft` (positivo, texto `onAccentSoft`). Altura 44, pílula, ocupa a largura disponível.
+- Desabilitado (sem `onPressed`): fundo `fillField`, texto `textDisabled`, semântica "não habilitado".
+- Props: `label`, `onPressed`, `positive`.
 
 ### `DestructiveButton`
 - `tonal`: `dangerBg` + `onDanger` — inicia o fluxo ("Apagar desta música", "Encerrar").
@@ -105,7 +108,13 @@ Número grande em mono (26) + legenda. Usado no Histórico.
 Barra segmentada por categoria (tons de `accent`) com legenda e valores em MB.
 
 ### `TrackAlignRow`
-Alinhamento de faixas: selo, nome, campo de atraso (`0:00.4`, mono), botões M (mudo) e S (solo), forma de onda deslocada. Mudo esmaece a onda (25%); solo destaca o card com borda `accent`.
+Alinhamento de faixas: selo, nome, campo de atraso (`0:00.4`, mono), botões M (mudo) e S (solo) via `MuteSoloToggle`, forma de onda deslocada. Mudo esmaece a onda (25%); solo destaca o card com borda `accent`.
+
+### `MuteSoloToggle`
+Botão quadrado 44×44 de mudo ("M") ou solo ("S") de uma faixa. Usado em `TrackAlignRow` e `MixTrackRow`.
+- Desligado: fundo `fillField`, texto `text2`. Ligado: fundo `accentSoft`, texto `onAccentSoft`.
+- Leitor de tela: nome completo ("Mudo", "Solo") e estado ligado/desligado (toggled), nunca só pela cor.
+- Props: `label`, `semanticLabel`, `active`, `onTap`.
 
 ---
 
@@ -116,7 +125,9 @@ Componente compartilhado por Cantor, Mestre, Visitante e Modo solo.
 - `LyricLine.past` — `lyricPast`, `text3`.
 - `LyricLine.active` — card `surface` com selo do naipe + "Naipe · dinâmica" e texto `lyricActive`.
 - `LyricLine.next` — rótulo "Próxima" ou "Próxima é sua" (cor do naipe do usuário) + texto `lyricNext`.
-- Props: `lines`, `activeIndex`, `userVoicePart`.
+- Sem dinâmica, o card mostra selo + nome do naipe; sem naipe, só a dinâmica. A linha atual é região viva com rótulo "Linha atual".
+- Antes da primeira linha, só "Próxima" + a primeira linha; na última linha, não há "Próxima".
+- Props: `lines` (só linhas com tempo, na ordem da letra), `cursor` (de `LyricCursor.at`, no domínio), `userVoicePart` (opcional; sem ele, não há "Próxima é sua").
 
 ### `LyricLineRow`
 Editor de letra: uma linha da letra, com edição inline.
@@ -125,8 +136,18 @@ Editor de letra: uma linha da letra, com edição inline.
 - **Linha atual:** borda 2 px `accent`, texto em `listTitle` (mais forte) e rótulo semântico "Linha atual" — nunca só cor.
 - Props: `line` (`LyricDraftLine`), `isCurrent`, `expanded`, `onToggleExpanded`, `onTextChanged`, `onNaipeChanged`, `onDynamicsChanged`.
 
+### `MixTrackRow`
+Modo solo, "Mix por naipe": uma faixa por linha.
+- Selo do naipe + nome (`listTitle`); a faixa de Playback mostra "Playback", sem selo.
+- `MuteSoloToggle` M e S à direita; abaixo, slider de volume `accent` (0–100 %).
+- Leitor de tela: "Volume do Tenor", valor "30 %"; M e S anunciam ligado/desligado.
+- Props: `naipe` (nulo = Playback), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`.
+
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".
+- Arrastar a barra mostra o tempo do dedo e só busca (`onSeek`) ao soltar, uma vez.
+- Leitor de tela: "Posição da música", valor em `m:ss.s`.
+- Props: `positionMs`, `durationMs`, `onSeek`, `loopStartMs`, `loopEndMs` (região só com os dois), `caption`.
 
 ### `RoomCodeDisplay`
 Card `surface` raio 24: rótulo "Código da sala", código em `monoLarge`, botão "Copiar" (toast "Código copiado"), frase de instrução.

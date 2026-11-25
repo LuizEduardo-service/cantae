@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 18,
+  "next_id": 19,
   "lessons": [
     {
       "id": "L-003",
@@ -274,6 +274,24 @@
       ],
       "created": "2026-11-24T22:58:06Z",
       "last_seen": "2026-11-24T22:58:06Z"
+    },
+    {
+      "id": "L-018",
+      "key": "surviving_mutant::when a guard applies to several actions test it on each action not only the first",
+      "text": "When a guard applies to several actions, test it on each action, not only the first",
+      "signal": "surviving_mutant",
+      "scope": "presentation",
+      "status": "candidate",
+      "features": [
+        "solo-player"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "validation.md S9 (lib/presentation/providers/solo_player_notifier.dart:293) (presentation)"
+      ],
+      "created": "2026-11-25T00:37:50Z",
+      "last_seen": "2026-11-25T00:37:50Z"
     }
   ]
 }

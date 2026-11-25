@@ -121,6 +121,68 @@ class SecondaryButton extends StatelessWidget {
   }
 }
 
+/// Secondary action inside a card or beside a primary button (e.g. the
+/// loop actions in Modo solo). Neutral (`fillOnSurface`) or [positive]
+/// (`accentSoft`), 44 dp tall. See `COMPONENTS.md`'s `TonalButton`.
+class TonalButton extends StatelessWidget {
+  const TonalButton({
+    super.key,
+    required this.label,
+    this.onPressed,
+    this.positive = false,
+  });
+
+  static const double _height = 44;
+
+  final String label;
+  final VoidCallback? onPressed;
+  final bool positive;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<CantaeColors>()!;
+    final radius = CantaeRadii.radiusPill(_height);
+    final enabled = onPressed != null;
+    final Color fill;
+    final Color textColor;
+    if (!enabled) {
+      fill = colors.fillField;
+      textColor = colors.textDisabled;
+    } else if (positive) {
+      fill = colors.accentSoft;
+      textColor = colors.onAccentSoft;
+    } else {
+      fill = colors.fillOnSurface;
+      textColor = colors.text;
+    }
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      child: SizedBox(
+        width: double.infinity,
+        height: _height,
+        child: Material(
+          color: fill,
+          borderRadius: BorderRadius.circular(radius),
+          child: InkWell(
+            onTap: onPressed,
+            borderRadius: BorderRadius.circular(radius),
+            child: Center(
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: CantaeTypography.label.copyWith(color: textColor),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// `tonal` starts a destructive flow (e.g. "Apagar desta música"); `solid`
 /// confirms it (e.g. "Apagar definitivamente"). See `COMPONENTS.md`'s
 /// `DestructiveButton`.

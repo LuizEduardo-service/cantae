@@ -37,6 +37,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final Map<String, int> _startDelayMsByTrackId = {};
   final Map<String, double> _baseGainByTrackId = {};
   final Map<String, bool> _mutedByTrackId = {};
+  final Map<String, double> _volumeByTrackId = {};
   final Map<String, int?> _fileDurationMsByTrackId = {};
   final StreamController<int> _positionMsController =
       StreamController<int>.broadcast();
@@ -64,11 +65,12 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
       _startDelayMsByTrackId[track.id] = track.startDelayMs;
       _baseGainByTrackId[track.id] = baseGain;
       _mutedByTrackId[track.id] = false;
+      _volumeByTrackId[track.id] = 1.0;
       _fileDurationMsByTrackId[track.id] = fileDuration?.inMilliseconds;
     }
 
     if (tracks.isNotEmpty) {
-      final referenceTrack = tracks.first;
+      final referenceTrack = _longestTrack(tracks);
       final referencePlayer = _playersByTrackId[referenceTrack.id]!;
       final referenceStartDelayMs = referenceTrack.startDelayMs;
       _referencePlaybackEventSubscription =
@@ -79,6 +81,24 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
         ));
       });
     }
+  }
+
+  /// The track that ends last on the timeline drives [positionMs]: a track
+  /// that ends earlier stops emitting, which would freeze the clock. Falls
+  /// back to the first track while durations are unknown.
+  SongTrack _longestTrack(List<SongTrack> tracks) {
+    var longest = tracks.first;
+    var longestEndMs = -1;
+    for (final track in tracks) {
+      final fileDurationMs = _fileDurationMsByTrackId[track.id];
+      if (fileDurationMs == null) continue;
+      final endMs = track.startDelayMs + fileDurationMs;
+      if (endMs > longestEndMs) {
+        longestEndMs = endMs;
+        longest = track;
+      }
+    }
+    return longest;
   }
 
   @override
@@ -97,6 +117,12 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     for (final id in _playersByTrackId.keys) {
       await _applyVolume(id);
     }
+  }
+
+  @override
+  Future<void> setTrackVolume(String trackId, double volume) async {
+    _volumeByTrackId[trackId] = volume.clamp(0.0, 1.0);
+    await _applyVolume(trackId);
   }
 
   @override
@@ -128,12 +154,13 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   double _effectiveVolume(String trackId) {
-    final baseGain = _baseGainByTrackId[trackId] ?? 1.0;
+    final gain = (_baseGainByTrackId[trackId] ?? 1.0) *
+        (_volumeByTrackId[trackId] ?? 1.0);
     if (_soloTrackId != null) {
-      return trackId == _soloTrackId ? baseGain : 0.0;
+      return trackId == _soloTrackId ? gain : 0.0;
     }
     final muted = _mutedByTrackId[trackId] ?? false;
-    return muted ? 0.0 : baseGain;
+    return muted ? 0.0 : gain;
   }
 
   @override
@@ -183,6 +210,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     _startDelayMsByTrackId.clear();
     _baseGainByTrackId.clear();
     _mutedByTrackId.clear();
+    _volumeByTrackId.clear();
     _fileDurationMsByTrackId.clear();
     _soloTrackId = null;
   }

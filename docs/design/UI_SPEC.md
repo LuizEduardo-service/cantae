@@ -132,10 +132,22 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Rodapé:** frase fixa explicando por que não há controles.
 
 ## 6.12 Modo solo — Tema
-- **Topo:** Voltar · "Sozinha · funciona offline".
-- **Conteúdo:** título; letra compacta; "Mix por naipe" com barra de volume, M e S por naipe.
-- **Rodapé:** `PlaybackProgress`; Loop ligado (tonal) · Metrônomo ♩ 72 · [P] Tocar/Pausar.
-- **Estados:** tocando, pausado, em loop. Sem estados de rede.
+- **Topo:** ‹ Voltar (→ Detalhe da música) · `StatusPill` neutro "Funciona offline". O texto não diz "Sozinha", para não supor o gênero de quem usa.
+- **Conteúdo:**
+  - título (nome da música) e autor;
+  - letra compacta (`LyricView`: passada, atual, "Próxima"), ou "Esta música ainda não tem letra sincronizada";
+  - "Mix por naipe": um `MixTrackRow` por faixa, incluindo o Playback, com volume, M e S.
+- **Rodapé:** `PlaybackProgress` (arrastar busca ao soltar) · loop (tonal) · [P] Tocar/Pausar.
+  - **Loop:** "Marcar início do loop" → "Marcar fim do loop" → "Desligar loop" (positivo), com a legenda "Repetindo trecho 0:41–1:12". Marcar só funciona tocando. Um fim antes do início mostra o banner "Trecho recusado".
+  - **Metrônomo:** fica para uma feature própria e não aparece por enquanto.
+- **Estados:**
+  - tocando, pausado, em loop e fim da música (o próximo "Tocar" recomeça do zero);
+  - carregando;
+  - não encontrada ("Voltar à Biblioteca");
+  - erro de leitura ("Tentar de novo");
+  - sem faixas (EmptyState "Esta música ainda não tem faixas" + "Enviar faixa");
+  - falha ao carregar o áudio ("Tentar de novo").
+  - Sem estados de rede. Sair da tela para o áudio; ainda não toca em segundo plano.
 
 ## 6.13 Perfil e Preferências — Tema
 - **Topo:** ‹ Biblioteca.

@@ -80,30 +80,35 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen** and **track-align-screen** are merged to `develop`. **lyrics-editor** (Editor de letra) is complete and verified on branch `feature/phase-5-lyrics-editor` (not yet merged to `develop`). Project follows **Gitflow**: `develop` is integration; `master` only receives `release/*` and `hotfix/*`.
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen** and **lyrics-editor** are merged to `develop`, which is pushed to `origin` up to `0b4cad4`. **solo-player** (Modo solo) is complete and verified on branch `feature/phase-5-solo-player` (not yet merged). Project follows **Gitflow**.
 
-- **lyrics-editor scope:** 8 tasks (T1–T8) plus 2 fix tasks (F1, F2), single batch, executed inline.
-  - **Data and domain:**
-    - `LyricLine.onsetMs` is now `int?` (null = not yet marked).
-    - Schema v3 rebuilds `lyric_lines` with `alterTable` so `onset_ms` is nullable.
-    - Lyrics come back in saved (`rowId`) order. This supersedes LIB-15.
-  - **New code:**
-    - `LyricsEditorNotifier` and `LyricDraftLine`. Drafts may have empty text; empty drafts are skipped at save.
-    - Shared widget `LyricLineRow`.
-    - `LyricsEditorScreen` with all states.
-    - Real route `/lyrics-editor/:id`, opened from "Sincronizar letra".
-  - **Shared widgets extended:** `SegmentedOption.semanticLabel`, and `NavPill` can be disabled (`onTap: null`).
+- **solo-player scope:** 12 tasks (T1–T12) plus fix F1, executed inline in sequence (user: "seguir com as tarefas em sequência realizando os commits").
+  - **Domain:** new `LyricCursor`.
+  - **Audio engine:**
+    - `setTrackVolume` added; the 5 test fakes are updated.
+    - Fix: the timeline position now follows the track that ends last, not `tracks.first`. This affects room playback too.
+  - **New shared widgets** (all in `COMPONENTS.md`):
+    - `MuteSoloToggle` (extracted from `TrackAlignRow`, now with toggled semantics);
+    - `TonalButton`;
+    - `StatusPill` (neutral variant only);
+    - `PlaybackProgress`;
+    - `LyricView`;
+    - `MixTrackRow`;
+    - helper `naipe_labels.dart`.
+  - **Screen and route:** `SoloPlayerNotifier` and `SoloPlayerScreen` (UI_SPEC §6.12 rewritten); route `/solo-player/:id` from "Ensaiar só".
 - **User decisions:**
-  - "rascunho na tela";
-  - "Pausar" keeps marking mode and "Continuar" resumes without seeking.
-- **Standing rule from the user:** every bug gets a regression test that fails first, in the same commit as the fix.
-  - A bug found mid-T7 (stale lyrics flashing after save) was fixed this way in `2ba116c`.
-- **Verifier:** standalone fallback, run by the author. The sub-agent call was blocked by auto mode because the `context-mode` plugin rewrites Agent prompts; the user approved the fallback.
-  - Iteration 1 FAIL: 18/20 mutants killed. M14 (v2→v3 `alterTable` removed) and M2 (equal-instant mark boundary) survived.
-  - Iteration 2 PASS: test-only fixes F1 and F2, 20/20 killed, 548 tests, analyze and format clean.
-  - Lessons L-016 and L-017 were recorded as candidates.
-  - Report: `.specs/features/lyrics-editor/validation.md`.
-- **Known flaky tests, unrelated:** wall-clock-delay tests (`chunked_file_receiver_test`, `song_sync_coordinator_test`, `playback_command_handler_test`) fail only under full-suite load.
-- **Known debt:** no l10n setup. Every screen inlines pt-BR strings.
+  - metronome and background/lock-screen playback are separate features;
+  - the loop is marked with start and end during playback;
+  - the mix has volume + M + S per track and lasts the session only.
+- **Verifier:** standalone fallback by the author (sub-agent blocked by auto mode, `context-mode` plugin).
+  - Iteration 1: 24/25 mutants killed; S9 (loop end while paused) survived.
+  - Iteration 2 after F1: 25/25, 644 tests, gate clean.
+  - Lesson L-018 recorded as a candidate.
+  - Report: `.specs/features/solo-player/validation.md`.
+- **Known debt:**
+  - no l10n (inline pt-BR strings);
+  - naipe name/selo mapping still duplicated privately in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
+  - wall-clock flaky tests (`chunked_file_receiver_test`, `song_sync_coordinator_test`, `playback_command_handler_test`).
+- **Not verified on a device:** the last position may stop a few ms short of `durationMs` on real hardware (design Risks row 2). Check it in the background-playback feature.
 
-**Next:** merging `feature/phase-5-lyrics-editor` into `develop` needs the user's explicit go-ahead. After that, the remaining "em breve" targets are **Modo solo**, **Ensaios anteriores**, **Enviar faixa** and **Studio**.
+**Next:** merging `feature/phase-5-solo-player` into `develop` needs the user's go-ahead. Candidate next features: **Metrônomo solo (RF54)**, **background playback for Modo solo (RF24)**, **Ensaios anteriores**, **Enviar faixa**, **Studio**.

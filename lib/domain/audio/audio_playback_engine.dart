@@ -19,6 +19,11 @@ abstract class AudioPlaybackEngine {
   /// Passing `solo: false` clears solo only if `trackId` currently holds it.
   Future<void> setTrackSolo(String trackId, bool solo);
 
+  /// Sets a track's volume, clamped to `0.0..1.0`. It multiplies the track's
+  /// base gain and still obeys [setTrackMuted] and [setTrackSolo]: a muted
+  /// track, or any track other than the soloed one, stays silent.
+  Future<void> setTrackVolume(String trackId, double volume);
+
   /// Changes the start delay used by [seekAllTo] for this track, without
   /// reloading its audio file.
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs);
