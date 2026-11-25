@@ -152,11 +152,11 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 | HIST-08 | P2-AC1/AC2: linha "Ensaios anteriores (N)" abre a tela | - | Pending |
 | HIST-09 | P2-AC3: topo, título e frase | - | Pending |
 | HIST-10 | P2-AC4: 3 resumos | - | Pending |
-| HIST-11 | P2-AC5: lista do mais recente, com data, modo, duração e loops | - | Pending |
+| HIST-11 | P2-AC5: lista do mais recente, com data, modo, duração e loops | Execute | Implementing |
 | HIST-12 | P2-AC6: vazio com "Ensaiar agora" | - | Pending |
 | HIST-13 | P2-AC7/AC8/AC9: carregando, erro, música não encontrada | - | Pending |
-| HIST-14 | P3-AC1/AC2/AC4: apagar desta música com confirmação | - | Pending |
-| HIST-15 | P3-AC3/AC4: apagar tudo com confirmação | - | Pending |
+| HIST-14 | P3-AC1/AC2/AC4: apagar desta música com confirmação | Execute | Implementing |
+| HIST-15 | P3-AC3/AC4: apagar tudo com confirmação | Execute | Implementing |
 | HIST-16 | P3-AC5: falha ao apagar | - | Pending |
 | HIST-17 | P3-AC6: toast e contagem atualizada | - | Pending |
 | HIST-18 | P3-AC7: apagar a música apaga os ensaios | Execute | Implementing |

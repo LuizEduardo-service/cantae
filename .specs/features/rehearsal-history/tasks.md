@@ -134,9 +134,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: every field round-trips (role null and set); getBySong newest first and only that song; deleteBySong leaves other songs; deleteAll empties; a closed database → `StorageFailure` from each method; uuid matches the v4 pattern and 1000 calls are distinct
-- [ ] Gate check passes: `flutter test test/data`
-- [ ] Test count: all existing + ≥ 8 new
+- [x] Failure modes listed first, then tests: every field round-trips (role null and set); getBySong newest first and only that song; deleteBySong leaves other songs; deleteAll empties; a closed database → `StorageFailure` from each method; uuid matches the v4 pattern and 1000 calls are distinct
+- [x] Gate check passes: `flutter test test/data`
+- [x] Test count: all existing + ≥ 8 new
 
 **Tests**: unit
 **Gate**: build
