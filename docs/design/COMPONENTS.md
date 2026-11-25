@@ -125,7 +125,9 @@ Componente compartilhado por Cantor, Mestre, Visitante e Modo solo.
 - `LyricLine.past` — `lyricPast`, `text3`.
 - `LyricLine.active` — card `surface` com selo do naipe + "Naipe · dinâmica" e texto `lyricActive`.
 - `LyricLine.next` — rótulo "Próxima" ou "Próxima é sua" (cor do naipe do usuário) + texto `lyricNext`.
-- Props: `lines`, `activeIndex`, `userVoicePart`.
+- Sem dinâmica, o card mostra selo + nome do naipe; sem naipe, só a dinâmica. A linha atual é região viva com rótulo "Linha atual".
+- Antes da primeira linha, só "Próxima" + a primeira linha; na última linha, não há "Próxima".
+- Props: `lines` (só linhas com tempo, na ordem da letra), `cursor` (de `LyricCursor.at`, no domínio), `userVoicePart` (opcional; sem ele, não há "Próxima é sua").
 
 ### `LyricLineRow`
 Editor de letra: uma linha da letra, com edição inline.

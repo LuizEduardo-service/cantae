@@ -249,9 +249,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] `test/presentation/widgets/lyric_view_test.dart`: before the first line only "Próxima" + first line; middle: past, active, next; last line: no "Próxima"; active line with naipe + dinâmica shows selo + "Tenor · piano"; naipe only → selo only; dinâmica only → dinâmica text; active line is a live region; dark theme; 360 dp at 130%
-- [ ] Gate check passes: `flutter test test/presentation/widgets/lyric_view_test.dart`
-- [ ] Test count: ≥ 7 tests pass
+- [x] `test/presentation/widgets/lyric_view_test.dart`: before the first line only "Próxima" + first line; middle: past, active, next; last line: no "Próxima"; active line with naipe + dinâmica shows selo + "Tenor · piano"; naipe only → selo + naipe name (spec P4-AC3); dinâmica only → dinâmica text; active line is a live region; dark theme; 360 dp at 130%
+- [x] Gate check passes: `flutter test test/presentation/widgets/lyric_view_test.dart`
+- [x] Test count: ≥ 7 tests pass
 
 **Tests**: unit (widget)
 **Gate**: quick
