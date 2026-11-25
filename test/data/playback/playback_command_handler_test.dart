@@ -31,9 +31,13 @@ class FakeAudioPlaybackEngine implements AudioPlaybackEngine {
     loadSongCalls.add(song);
   }
 
+  /// Like a real engine, starting takes a moment after the call is made,
+  /// so `playAtCalls` fills before the handler reports `playing`
+  /// (regression, flaky-tests: the tests read the phase too early).
   @override
   Future<void> playAt(DateTime scheduledStart) async {
     playAtCalls.add(scheduledStart);
+    await Future<void>.delayed(const Duration(milliseconds: 20));
   }
 
   @override
@@ -149,6 +153,19 @@ class _GatedEngine extends FakeAudioPlaybackEngine {
   }
 }
 
+/// Waits until the handler reports [phase]. The engine call is made before
+/// the phase changes, so waiting on `playAtCalls` alone reads the phase too
+/// early (flaky-tests).
+Future<void> _waitForPhase(
+  PlaybackCommandHandler handler,
+  PlaybackPhase phase,
+) async {
+  final deadline = DateTime.now().add(const Duration(seconds: 2));
+  while (handler.current.phase != phase && DateTime.now().isBefore(deadline)) {
+    await Future<void>.delayed(const Duration(milliseconds: 10));
+  }
+}
+
 void main() {
   group('PlaybackCommandHandler (SYNC-01, SYNC-03, SYNC-05, SYNC-06, SYNC-08)',
       () {
@@ -213,10 +230,7 @@ void main() {
       expect(handler.current.phase, equals(PlaybackPhase.scheduled));
       expect(engine.playAtCalls, isEmpty);
 
-      final deadline = DateTime.now().add(const Duration(seconds: 2));
-      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-      }
+      await _waitForPhase(handler, PlaybackPhase.playing);
 
       expect(engine.playAtCalls, hasLength(1));
       expect(
@@ -252,10 +266,7 @@ void main() {
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
 
-      final deadline = DateTime.now().add(const Duration(seconds: 2));
-      while (engine.playAtCalls.isEmpty && DateTime.now().isBefore(deadline)) {
-        await Future<void>.delayed(const Duration(milliseconds: 10));
-      }
+      await _waitForPhase(handler, PlaybackPhase.playing);
       expect(engine.playAtCalls, hasLength(1));
       expect(handler.current.phase, equals(PlaybackPhase.playing));
     });
