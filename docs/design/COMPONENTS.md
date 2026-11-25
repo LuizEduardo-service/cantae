@@ -169,6 +169,14 @@ Folha inferior com scrim.
 - Props: `title`, `message`, `safeLabel`, `destructiveLabel`, `steps` (1 ou 2), `typedConfirmation` (ex.: `"APAGAR"`).
 - Na etapa 2, botão final desabilitado até a confirmação digitada coincidir (sem diferenciar maiúsculas).
 
+### `TempoSheet`
+Folha inferior "Andamento" do metrônomo (RF50), com o mesmo scrim e raio da `ConfirmSheet`.
+- Campos numéricos em mono: "BPM" (30–300) e "Tempos por compasso" (2–16), com o limite em `dangerSolid` abaixo do campo quando inválido ("Entre 30 e 300", "Entre 2 e 16").
+- `SegmentedControl` "Com acento" / "Sem acento".
+- [P] "Salvar andamento", desabilitado enquanto algum campo é inválido; com carregamento enquanto salva.
+- Erro ao salvar: banner de erro na folha, que continua aberta com os valores digitados.
+- API: `TempoSheet.show(context, initial:, onSave:)`; `onSave` devolve nulo (fecha) ou a mensagem de erro.
+
 ### `EmptyState`
 Ícone 72×72 em `accentSoft`, título 28/700, frase, ação primária + secundária opcional.
 

@@ -289,7 +289,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Tests:
+- [x] Tests:
   - prefilled values shown;
   - BPM 29 or 301 → "Entre 30 e 300" and save disabled; beats 1 or 17 → "Entre 2 e 16" and save disabled;
   - valid values → `onSave` receives `MetronomeConfig(bpm, beatsPerMeasure, downbeatAccent)` and the sheet closes on null;
@@ -297,8 +297,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
   - semantics labels on the fields;
   - dark theme;
   - 360 dp at 130%.
-- [ ] Gate check passes: `flutter test test/presentation/widgets/tempo_sheet_test.dart`
-- [ ] Test count: ≥ 7 tests pass
+- [x] Gate check passes: `flutter test test/presentation/widgets/tempo_sheet_test.dart`
+- [x] Test count: ≥ 7 tests pass
 
 **Tests**: unit (widget)
 **Gate**: quick
