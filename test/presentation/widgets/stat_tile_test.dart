@@ -48,6 +48,21 @@ void main() {
       handle.dispose();
     });
 
+    // Regression (rehearsal-history T8): without its own semantics node,
+    // tiles side by side in a list item merged into one screen-reader item.
+    testWidgets('three in a row are three separate screen-reader items',
+        (tester) async {
+      final handle = tester.ensureSemantics();
+      // Inside a list item, as on the History screen: that is where the
+      // tiles merged.
+      await _pump(tester, ListView(children: const [_row]));
+
+      expect(find.bySemanticsLabel('ensaios: 12'), findsOneWidget);
+      expect(find.bySemanticsLabel('tempo: 1:02:03'), findsOneWidget);
+      expect(find.bySemanticsLabel('loops: 148'), findsOneWidget);
+      handle.dispose();
+    });
+
     testWidgets('renders under the dark theme', (tester) async {
       await _pump(tester, _row, theme: AppTheme.dark);
 

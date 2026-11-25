@@ -16,7 +16,10 @@ class StatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<CantaeColors>()!;
 
+    // Its own node: side by side inside a list item, tiles without one
+    // merged into a single screen-reader item.
     return Semantics(
+      container: true,
       label: '$caption: $value',
       excludeSemantics: true,
       child: Container(
