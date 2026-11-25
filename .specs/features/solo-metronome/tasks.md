@@ -183,10 +183,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first in the test header (CLAUDE.md rule 3): wrong header sizes; samples off by the pulse position; beep past the end of the file; downbeat not distinguishable; zero duration
-- [ ] `test/infrastructure/audio/click_track_wav_test.dart`: header fields (RIFF/WAVE/fmt/data, 22050 Hz, 16-bit, mono, data size = samples × 2); length = `durationMs × 22050 / 1000` samples; silence before the first pulse and between pulses; non-zero samples starting at each pulse's sample index; downbeat beep has more zero crossings than a regular beep; a pulse near the end is truncated without error; `durationMs: 0` → header only
-- [ ] Gate check passes: `flutter test test/infrastructure/audio/click_track_wav_test.dart`
-- [ ] Test count: ≥ 7 tests pass
+- [x] Failure modes listed first in the test header (CLAUDE.md rule 3): wrong header sizes; samples off by the pulse position; beep past the end of the file; downbeat not distinguishable; zero duration
+- [x] `test/infrastructure/audio/click_track_wav_test.dart`: header fields (RIFF/WAVE/fmt/data, 22050 Hz, 16-bit, mono, data size = samples × 2); length = `durationMs × 22050 / 1000` samples; silence before the first pulse and between pulses; non-zero samples starting at each pulse's sample index; downbeat beep has more zero crossings than a regular beep; a pulse near the end is truncated without error; `durationMs: 0` → header only
+- [x] Gate check passes: `flutter test test/infrastructure/audio/click_track_wav_test.dart`
+- [x] Test count: ≥ 7 tests pass
 
 **Tests**: unit
 **Gate**: quick
