@@ -203,9 +203,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests first: shows value and caption; value uses the mono style; semantics label; dark theme; three tiles in a row at 360 dp / 130 % without overflow
-- [ ] Gate check passes: `flutter test test/presentation/widgets/stat_tile_test.dart`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests first: shows value and caption; value uses the mono style; semantics label; dark theme; three tiles in a row at 360 dp / 130 % without overflow
+- [x] Gate check passes: `flutter test test/presentation/widgets/stat_tile_test.dart`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick

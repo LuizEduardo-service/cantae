@@ -102,7 +102,7 @@ Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carr
 Sala encontrada na rede: código em mono, nome do Mestre, "música · N pessoas", chevron. Borda 2 px `accent` quando é a sala do pedido em andamento.
 
 ### `StatTile`
-Número grande em mono (26) + legenda. Usado no Histórico.
+Número grande em mono (`monoStat`, 26) + legenda (`caption`, `text2`), em cartão `surface` de raio `radiusMd`. Usado no Histórico, três lado a lado. Leitor de tela: um só item "legenda: valor". O número encolhe para caber numa linha.
 
 ### `StorageBar`
 Barra segmentada por categoria (tons de `accent`) com legenda e valores em MB.
