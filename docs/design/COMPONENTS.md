@@ -24,6 +24,7 @@ Pílula de navegação no topo.
 Status à direita do topo.
 - Variantes: `synced` (accentSoft, ponto accent, "Sincronizado"), `weak` (warningBg, "Conexão fraca"), `offline` (dangerBg, "× Sem rede"), `neutral` ("Visitante", "Sala 4827").
 - Altura 44, região viva para leitor de tela.
+- Implementado até agora: só `neutral` (fundo `fillMuted`, texto `text2`), usado no Modo solo ("Funciona offline"). As demais variantes chegam com as telas de sala.
 
 ### `SectionLabel`
 Rótulo de seção ("Naipes", "Seus dados"). `caption` 13/600 `text2`. Pode ter texto auxiliar à direita ("3 de 4 com faixa").

@@ -203,9 +203,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] `test/presentation/widgets/status_pill_test.dart`: renders label, height 44, live region semantics, dark theme
-- [ ] Gate check passes: `flutter test test/presentation/widgets/status_pill_test.dart`
-- [ ] Test count: ≥ 3 tests pass
+- [x] `test/presentation/widgets/status_pill_test.dart`: renders label, height 44, live region semantics, dark theme
+- [x] Gate check passes: `flutter test test/presentation/widgets/status_pill_test.dart`
+- [x] Test count: ≥ 3 tests pass
 
 **Tests**: unit (widget)
 **Gate**: quick
