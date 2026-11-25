@@ -168,9 +168,9 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 | BGA-08 | P2-AC4: arrastar posição pela notificação | - | Pending |
 | BGA-09 | P2-AC5: só Tocar/Pausar e barra | - | Pending |
 | BGA-10 | P2-AC6/AC7: sair da tela ou fechar o app para e tira a notificação | - | Pending |
-| BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | - | Pending |
+| BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | Execute | Implementing |
 | BGA-12 | P3-AC3: som curto abaixa o volume sem pausar | Execute | Implementing |
-| BGA-13 | P3-AC4: fone desconectado pausa | - | Pending |
+| BGA-13 | P3-AC4: fone desconectado pausa | Execute | Implementing |
 | BGA-14 | P3-AC5/AC6: tela e toast após pausa externa | - | Pending |
 | BGA-15 | P4-AC1: roteiro de teste em aparelho | - | Pending |
 | BGA-16 | P4-AC2: teste de integração com log | - | Pending |
