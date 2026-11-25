@@ -395,6 +395,20 @@ void main() {
       expect(_tonal(tester, 'Marcar início do loop').onPressed, isNull);
     });
 
+    // Regression (sensor S9): "Marcar fim do loop" while paused was never
+    // checked (spec P3-AC7).
+    testWidgets('"Marcar fim do loop" is disabled while paused',
+        (tester) async {
+      final setup = await _open(tester);
+      await _tapText(tester, 'Tocar');
+      await _emit(tester, setup.engine, 41000);
+      await _tapText(tester, 'Marcar início do loop');
+
+      await _tapText(tester, 'Pausar');
+
+      expect(_tonal(tester, 'Marcar fim do loop').onPressed, isNull);
+    });
+
     testWidgets('início → fim → "Repetindo trecho 0:41–1:12" → desligar',
         (tester) async {
       final setup = await _open(tester);

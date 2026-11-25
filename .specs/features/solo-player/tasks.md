@@ -352,6 +352,25 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ---
 
+## Fix Tasks (from validation.md, iteration 1)
+
+### F1: "Marcar fim do loop" disabled while paused
+
+**What**: Regression tests for sensor mutant S9: marking the loop end while paused does nothing (notifier), and the "Marcar fim do loop" button is disabled while paused (screen), per spec P3-AC7.
+**Where**: `test/presentation/providers/solo_player_notifier_test.dart` (plus the screen test)
+**Requirement**: SOLO-14, SOLO-15
+
+**Done when**:
+- [x] Notifier test fails with S9 (`if (!state.playing || startMs == null)` → `if (startMs == null)`) and passes without it
+- [x] Screen test fails with the button always enabled and passes without it
+- [x] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart test/presentation/screens/solo_player/solo_player_screen_test.dart` (43 tests)
+
+**Tests**: unit + widget
+**Gate**: quick
+**Commit**: `test(solo-player): cover loop end marking while paused`
+
+---
+
 ## Phase Execution Map
 
 ```

@@ -452,6 +452,24 @@ void main() {
       expect(_state(s.container).loopStartMs, isNull);
     });
 
+    // Regression (sensor S9): only the start was checked while paused, so
+    // marking the end while paused went unnoticed (spec P3-AC7).
+    test('marking the end does nothing while paused', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 41000);
+      _notifier(s.container).markLoopStart();
+      s.engine.emitPosition(72000);
+      await _flush();
+      await _notifier(s.container).togglePlay(); // pause
+
+      _notifier(s.container).markLoopEnd();
+
+      expect(_state(s.container).loop, isNull);
+      expect(_state(s.container).loopStartMs, 41000);
+    });
+
     test('markLoopEnd after the start turns the loop on', () async {
       final s = _setUp();
       addTearDown(s.container.dispose);
