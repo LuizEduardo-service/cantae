@@ -260,6 +260,23 @@ void main() {
       await subscription.cancel();
     });
 
+    // Regression (solo-metronome spec, bug 2): the position came from
+    // playbackEventStream, which only emits on events (load, pause,
+    // buffering). During steady playback on a device the clock froze.
+    test('advances while playing, with no new playback event', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final events = <int>[];
+      final subscription = engine.positionMs.listen(events.add);
+
+      await engine.playAt(DateTime.now());
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+
+      expect(events.where((ms) => ms >= 100), isNotEmpty,
+          reason: 'the clock must move on its own while playing');
+      await engine.pause();
+      await subscription.cancel();
+    });
+
     // Regression (solo-player design, Risks row 1): the position followed
     // tracks.first. When that track ends before the others, its player stops
     // emitting, the clock freezes and the end of the song is never reached.

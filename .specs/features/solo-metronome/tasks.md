@@ -111,10 +111,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: NONE
 
 **Done when**:
-- [ ] Regression test written first and failing on the current code: after `playAt`, with no new playback event, `positionMs` emits a value ≥ 100 ms within 400 ms
-- [ ] Existing position tests updated only where they emitted events to fake the clock (behavior kept: timeline conversion, longest-track reference)
-- [ ] Gate check passes: `flutter test` (full)
-- [ ] Test count: all existing + ≥ 1 new
+- [x] Regression test written first and failing on the current code: after `playAt`, with no new playback event, `positionMs` emits a value ≥ 100 ms within 400 ms
+- [x] Existing position tests updated only where they emitted events to fake the clock (behavior kept: timeline conversion, longest-track reference)
+- [x] Gate check passes: `flutter test` (full)
+- [x] Test count: all existing + ≥ 1 new
 
 **Tests**: unit
 **Gate**: full

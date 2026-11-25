@@ -42,7 +42,7 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   final StreamController<int> _positionMsController =
       StreamController<int>.broadcast();
   String? _soloTrackId;
-  StreamSubscription<PlaybackEvent>? _referencePlaybackEventSubscription;
+  StreamSubscription<Duration>? _referencePositionSubscription;
 
   MultiTrackAudioEngine({AudioPlayer Function()? playerFactory})
       : _playerFactory = playerFactory ?? AudioPlayer.new;
@@ -73,10 +73,13 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
       final referenceTrack = _longestTrack(tracks);
       final referencePlayer = _playersByTrackId[referenceTrack.id]!;
       final referenceStartDelayMs = referenceTrack.startDelayMs;
-      _referencePlaybackEventSubscription =
-          referencePlayer.playbackEventStream.listen((event) {
+      // positionStream ticks every 16–200 ms while playing (and on seeks);
+      // playbackEventStream only fires on events, which froze the clock
+      // during steady playback.
+      _referencePositionSubscription =
+          referencePlayer.positionStream.listen((position) {
         _positionMsController.add(TimelineConverter.toTimeline(
-          trackLocalMs: event.updatePosition.inMilliseconds,
+          trackLocalMs: position.inMilliseconds,
           startDelayMs: referenceStartDelayMs,
         ));
       });
@@ -205,8 +208,8 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
   }
 
   Future<void> _disposeAllPlayers() async {
-    await _referencePlaybackEventSubscription?.cancel();
-    _referencePlaybackEventSubscription = null;
+    await _referencePositionSubscription?.cancel();
+    _referencePositionSubscription = null;
     for (final player in _playersByTrackId.values) {
       await player.dispose();
     }
