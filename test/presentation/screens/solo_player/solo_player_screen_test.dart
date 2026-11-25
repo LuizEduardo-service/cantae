@@ -71,6 +71,9 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
       calls.add('add:${track.id}');
 
   @override
+  Future<void> setDucked(bool ducked) async => calls.add('ducked:$ducked');
+
+  @override
   Future<void> removeTrack(String trackId) async =>
       calls.add('remove:$trackId');
 

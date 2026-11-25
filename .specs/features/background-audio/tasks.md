@@ -86,9 +86,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed in the test file header, then tests written first: ducked halves each track's volume; un-duck restores it; a volume change while ducked stays halved; a track added while ducked starts halved; mute stays 0
-- [ ] Gate check passes: `flutter test` (full: interface change touches every fake)
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Failure modes listed in the test file header, then tests written first: ducked halves each track's volume; un-duck restores it; a volume change while ducked stays halved; a track added while ducked starts halved; mute stays 0
+- [x] Gate check passes: `flutter test` (full: interface change touches every fake)
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: unit
 **Gate**: full
