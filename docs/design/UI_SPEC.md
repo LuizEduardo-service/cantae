@@ -53,7 +53,7 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Naipes:** grupo com 4 linhas; faltante com selo tracejado e "Enviar faixa".
 - **Preparar:** Cortar áudio no Studio › · Alinhar entradas › · Sincronizar letra (3 de 5) › · Ensaios anteriores (7) ›.
 - **Rodapé:** [S] Ensaiar só · [P] Ensaiar em grupo.
-- **Papéis:** Cantor que recebeu a música vê versão somente leitura: sem "Preparar" nem "Enviar faixa"; mantém "Ensaiar só".
+- **Papéis:** Cantor que recebeu a música vê versão somente leitura: sem "Preparar" nem "Enviar faixa"; mantém "Ensaiar só" e uma seção "Ensaios" só com "Ensaios anteriores (N)" (o histórico vale para todos os papéis, PRD UX §6.16).
 - **Estados:** completa, incompleta (aviso de naipe faltando), rascunho pendente.
 
 ## 6.5 Alinhamento de faixas
@@ -193,11 +193,18 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Outros estados:** exportando (progresso), pacote inválido (error, bloqueia importação: "Este pacote está corrompido ou foi alterado").
 
 ## 6.16 Histórico de ensaios
+- **Entrada:** linha "Ensaios anteriores (N)" do Detalhe da música (sem número quando não há ensaios).
 - **Topo:** ‹ nome da música. Título "Ensaios" + "Registrados só neste aparelho."
 - **Resumo:** 3 `StatTile` (ensaios, tempo, loops).
-- **Lista:** data · modo, papel, duração (mono), loops.
-- **Rodapé:** [D tonal] Apagar desta música · [S] Apagar tudo (ambos com confirmação).
-- **Vazio:** "Nenhum ensaio registrado ainda" + "Ensaiar agora".
+- **Lista:** do mais recente para o mais antigo. Cada linha: data "25 nov 2026 · 19:40"; "Modo solo · 12:30 · 8 loops" (duração em mono; "sem loops", "1 loop"). O papel aparece nos ensaios de sala, quando as salas existirem.
+- **Rodapé:** [D tonal] Apagar desta música · [S] Apagar tudo, um embaixo do outro (ambos com `ConfirmSheet`; "Apagar tudo" avisa que apaga os ensaios de todas as músicas do aparelho). Sucesso: toast "Ensaios apagados".
+- **Registro:** ensaio do Modo solo com pelo menos 1 minuto de música tocando, gravado ao sair do Modo solo. O tempo pausado não conta; cada volta do loop ao início do trecho conta 1.
+- **Estados:**
+  - vazio: "Nenhum ensaio registrado ainda" + "Ensaiar agora" (abre o Modo solo); sem rodapé;
+  - carregando;
+  - erro de leitura: "Não foi possível carregar os ensaios" + "Tentar de novo";
+  - música não encontrada: "Voltar à Biblioteca";
+  - falha ao apagar: banner "Ensaios não apagados" / "Não foi possível apagar os ensaios." e a lista continua.
 
 ## 6.17 Privacidade e exclusão
 - **Topo:** ‹ Perfil. Título "Seus dados".

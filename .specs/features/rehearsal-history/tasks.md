@@ -249,9 +249,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests first: ready (title, line, 3 tiles with values, rows in order with date / "Modo solo" / duration / loops); empty with "Ensaiar agora" → solo-player route; loading; error + retry; notFound + "Voltar à Biblioteca"; back → song detail; "Apagar desta música" confirm → empty + toast, cancel → unchanged; "Apagar tudo" confirm; delete failure banner; detail row shows "(2)" and opens the screen with the id; dark theme; 360 dp at 130 %; buttons ≥ 44 dp
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test integration_test && flutter test`
-- [ ] Test count: all existing + ≥ 13 new
+- [x] Tests first: ready (title, line, 3 tiles with values, rows in order with date / "Modo solo" / duration / loops); empty with "Ensaiar agora" → solo-player route; loading; error + retry; notFound + "Voltar à Biblioteca"; back → song detail; "Apagar desta música" confirm → empty + toast, cancel → unchanged; "Apagar tudo" confirm; delete failure banner; detail row shows "(2)" and opens the screen with the id; dark theme; 360 dp at 130 %; buttons ≥ 44 dp
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test integration_test && flutter test`
+- [x] Test count: all existing + ≥ 13 new
 
 **Tests**: widget
 **Gate**: build

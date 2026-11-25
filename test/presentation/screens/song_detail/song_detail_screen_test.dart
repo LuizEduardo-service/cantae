@@ -4,10 +4,13 @@ import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/entities/naipe.dart';
+import 'package:cantae/domain/entities/rehearsal_log.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
+import 'package:cantae/domain/repositories/rehearsal_repository.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
+import 'package:cantae/presentation/providers/rehearsal_providers.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
@@ -50,6 +53,42 @@ class _FakeSongRepository implements SongRepository {
       throw UnimplementedError();
 }
 
+class _FakeRehearsals implements RehearsalRepository {
+  _FakeRehearsals(this.count);
+
+  final int count;
+
+  @override
+  Future<Result<List<RehearsalLog>, StorageFailure>> getBySong(
+    String songId,
+  ) async =>
+      Result.success([
+        for (var i = 0; i < count; i++)
+          RehearsalLog(
+            id: 'log-$i',
+            songId: songId,
+            startedAt: DateTime(2026, 11, 25, 19, i),
+            endedAt: DateTime(2026, 11, 25, 19, i + 1),
+            durationMs: 60000,
+            mode: RehearsalMode.solo,
+            maxParticipants: 1,
+            loopCount: 0,
+          ),
+      ]);
+
+  @override
+  Future<Result<Unit, StorageFailure>> add(RehearsalLog log) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Result<Unit, StorageFailure>> deleteBySong(String songId) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Result<Unit, StorageFailure>> deleteAll() =>
+      throw UnimplementedError();
+}
+
 GoRouter _buildRouter() {
   return GoRouter(
     initialLocation: '/songs/s1',
@@ -83,9 +122,14 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             Text('route:solo-player:${state.pathParameters['id']}'),
       ),
+      GoRoute(
+        path: '/song-history/:id',
+        name: 'song-history',
+        builder: (context, state) =>
+            Text('route:song-history:${state.pathParameters['id']}'),
+      ),
       for (final name in [
         'studio',
-        'song-history',
         'room-create',
         'package-import',
         'track-upload',
@@ -99,9 +143,17 @@ GoRouter _buildRouter() {
   );
 }
 
-Widget _wrap(SongRepository repository, {ThemeData? theme}) {
+Widget _wrap(
+  SongRepository repository, {
+  ThemeData? theme,
+  int rehearsals = 0,
+}) {
   return ProviderScope(
-    overrides: [songRepositoryProvider.overrideWithValue(repository)],
+    overrides: [
+      songRepositoryProvider.overrideWithValue(repository),
+      rehearsalRepositoryProvider
+          .overrideWithValue(_FakeRehearsals(rehearsals)),
+    ],
     child: MaterialApp.router(
       theme: theme ?? AppTheme.light,
       routerConfig: _buildRouter(),
@@ -311,7 +363,28 @@ void main() {
       expect(find.text('route:lyrics-editor:s1'), findsOneWidget);
     });
 
-    testWidgets('"Ensaios anteriores" navigates to the song-history route', (
+    // rehearsal-history HIST-08: the row shows the count and opens this
+    // song's history (the route now carries the song id).
+    testWidgets('"Ensaios anteriores (2)" opens the history of this song', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_completeSong()),
+      );
+      await tester.pumpWidget(_wrap(repo, rehearsals: 2));
+      await tester.pumpAndSettle();
+
+      await tester.scrollUntilVisible(
+        find.text('Ensaios anteriores (2)'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.text('Ensaios anteriores (2)'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:song-history:s1'), findsOneWidget);
+    });
+
+    testWidgets('without rehearsals the row reads "Ensaios anteriores"', (
       tester,
     ) async {
       final repo = _FakeSongRepository(
@@ -321,13 +394,33 @@ void main() {
       await tester.pumpAndSettle();
 
       await tester.scrollUntilVisible(
-        find.textContaining('Ensaios anteriores'),
+        find.text('Ensaios anteriores'),
         200,
         scrollable: find.byType(Scrollable).first,
       );
-      await tester.tap(find.textContaining('Ensaios anteriores'));
+      expect(find.text('Ensaios anteriores'), findsOneWidget);
+    });
+
+    // PRD UX §6.16: history is for every role, so a received (read-only)
+    // song still shows it, without the rest of "Preparar".
+    testWidgets('a received song shows its history but not "Preparar"', (
+      tester,
+    ) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async =>
+            Result.success(_completeSong(origin: SongOrigin.received)),
+      );
+      await tester.pumpWidget(_wrap(repo, rehearsals: 1));
       await tester.pumpAndSettle();
-      expect(find.text('route:song-history'), findsOneWidget);
+
+      await tester.scrollUntilVisible(
+        find.text('Ensaios anteriores (1)'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('Ensaios anteriores (1)'), findsOneWidget);
+      expect(find.text('Alinhar entradas'), findsNothing);
+      expect(find.text('Preparar'), findsNothing);
     });
 
     testWidgets('"Exportar" navigates to the package-import route', (
