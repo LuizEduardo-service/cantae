@@ -319,7 +319,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-ui-ux`, `flutter-widget-performance`
 
 **Done when**:
-- [ ] Screen tests:
+- [x] Screen tests:
   - "Metrônomo ♩ 72" toggles on/off (positive when on); the "Metrônomo" mix row appears only when on, with M and no S, and its volume reaches the engine;
   - created song without config → "Metrônomo" opens the sheet; saving shows "Metrônomo ♩ 96", the toast "Andamento salvo", and the repository has the config;
   - received song without config → button disabled + the explanatory sentence; received song with config → toggles, but no "Ajustar andamento";
@@ -327,9 +327,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
   - build failure → "Não foi possível preparar o metrônomo.";
   - "ligar ao abrir" → on when the screen opens;
   - still one primary action; dark theme; 360 dp at 130% with all footer targets ≥ 44 dp.
-- [ ] UI_SPEC §6.12 updated in the same commit
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
-- [ ] Test count: existing + ≥ 10 new
+- [x] UI_SPEC §6.12 updated in the same commit
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
+- [x] Test count: existing + ≥ 10 new
 
 **Tests**: widget
 **Gate**: build

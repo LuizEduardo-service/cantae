@@ -136,10 +136,17 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Conteúdo:**
   - título (nome da música) e autor;
   - letra compacta (`LyricView`: passada, atual, "Próxima"), ou "Esta música ainda não tem letra sincronizada";
-  - "Mix por naipe": um `MixTrackRow` por faixa, incluindo o Playback, com volume, M e S.
-- **Rodapé:** `PlaybackProgress` (arrastar busca ao soltar) · loop (tonal) · [P] Tocar/Pausar.
+  - "Mix por naipe": um `MixTrackRow` por faixa, incluindo o Playback, com volume, M e S. Com o metrônomo ligado, também uma linha "Metrônomo" com volume e M, sem S.
+  - Em música criada por você e com andamento: "72 BPM · 4 tempos" + `TonalButton` "Ajustar andamento" (abre a `TempoSheet`).
+- **Rodapé:** `PlaybackProgress` (arrastar busca ao soltar); linha 1: loop (tonal) · metrônomo (tonal); linha 2: [P] Tocar/Pausar. São duas linhas para as três ações caberem em 360 dp com a fonte a 130 %.
   - **Loop:** "Marcar início do loop" → "Marcar fim do loop" → "Desligar loop" (positivo), com a legenda "Repetindo trecho 0:41–1:12". Marcar só funciona tocando. Um fim antes do início mostra o banner "Trecho recusado".
-  - **Metrônomo:** fica para uma feature própria e não aparece por enquanto.
+  - **Metrônomo:**
+    - **com andamento:** "Metrônomo ♩ 72" liga e desliga (positivo quando ligado). O clique segue tocar, pausar, arrastar e o loop, e continua soando quando uma voz é isolada.
+    - **sem andamento, música criada:** "Metrônomo" abre a `TempoSheet` "Andamento". Salvar grava na música, liga o metrônomo e mostra o toast "Andamento salvo".
+    - **música recebida sem andamento:** botão desabilitado, com a frase "Música recebida: só quem criou pode definir o andamento."
+    - **música recebida com andamento:** liga e desliga, mas não ajusta.
+    - **falha ao preparar o clique:** banner "Metrônomo desligado", com "Não foi possível preparar o metrônomo."
+    - **"ligar ao abrir":** com essa opção salva no andamento, a tela abre com o metrônomo ligado.
 - **Estados:**
   - tocando, pausado, em loop e fim da música (o próximo "Tocar" recomeça do zero);
   - carregando;
