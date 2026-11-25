@@ -133,10 +133,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: publish sets title, "Modo solo", duration; playing → controls `[pause]`, paused → `[play]`; `systemActions == {seek}` and nothing else; `updatePosition` matches; `clear` → `mediaItem` null + idle + not playing; `play`/`pause`/`seek`/`stop`/`onTaskRemoved` each emit the right command
-- [ ] `scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/infrastructure/audio/cantae_audio_handler_test.dart`
-- [ ] Test count: all existing + ≥ 8 new
+- [x] Failure modes listed first, then tests: publish sets title, "Modo solo", duration; playing → controls `[pause]`, paused → `[play]`; `systemActions == {seek}` and nothing else; `updatePosition` matches; `clear` → `mediaItem` null + idle + not playing; `play`/`pause`/`seek`/`stop`/`onTaskRemoved` each emit the right command
+- [x] `scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/infrastructure/audio/cantae_audio_handler_test.dart`
+- [x] Test count: all existing + ≥ 8 new
 
 **Tests**: unit
 **Gate**: quick

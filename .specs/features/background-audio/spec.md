@@ -162,12 +162,12 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 | BGA-02 | P1-AC2: sessão de áudio `.playback` / foco de mídia | - | Pending |
 | BGA-03 | P1-AC3: `UIBackgroundModes: audio` + serviço `mediaPlayback` | - | Pending |
 | BGA-04 | P1-AC4/AC5: segue tocando com mix, loop e metrônomo; fim igual ao app | - | Pending |
-| BGA-05 | P2-AC1: título, subtítulo e duração publicados | - | Pending |
-| BGA-06 | P2-AC2: estado e posição publicados | - | Pending |
-| BGA-07 | P2-AC3: Tocar/Pausar pela notificação | - | Pending |
-| BGA-08 | P2-AC4: arrastar posição pela notificação | - | Pending |
-| BGA-09 | P2-AC5: só Tocar/Pausar e barra | - | Pending |
-| BGA-10 | P2-AC6/AC7: sair da tela ou fechar o app para e tira a notificação | - | Pending |
+| BGA-05 | P2-AC1: título, subtítulo e duração publicados | Execute | Implementing |
+| BGA-06 | P2-AC2: estado e posição publicados | Execute | Implementing |
+| BGA-07 | P2-AC3: Tocar/Pausar pela notificação | Execute | Implementing |
+| BGA-08 | P2-AC4: arrastar posição pela notificação | Execute | Implementing |
+| BGA-09 | P2-AC5: só Tocar/Pausar e barra | Execute | Implementing |
+| BGA-10 | P2-AC6/AC7: sair da tela ou fechar o app para e tira a notificação | Execute | Implementing |
 | BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | Execute | Implementing |
 | BGA-12 | P3-AC3: som curto abaixa o volume sem pausar | Execute | Implementing |
 | BGA-13 | P3-AC4: fone desconectado pausa | Execute | Implementing |
