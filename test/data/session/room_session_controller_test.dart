@@ -628,6 +628,62 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 300));
     expect(bReceivedTargeted, isEmpty);
   });
+
+  // Regression (flaky-tests): dispose() closed the output streams but kept
+  // the socket subscriptions, so a frame arriving after dispose was added
+  // to a closed controller: "Bad state: Cannot add new events after calling
+  // close", an uncaught error that failed whichever test was running.
+  group('after dispose, frames still arriving are dropped', () {
+    ({
+      RoomSessionController master,
+      RoomSessionController visitor,
+      StreamController<DiscoveredRoom> bus,
+    }) newPair() {
+      final bus = StreamController<DiscoveredRoom>.broadcast();
+      final master = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('master-device'),
+      );
+      final visitor = RoomSessionController(
+        transport: TcpSessionTransport(),
+        discovery: _FakeRoomDiscovery(bus),
+        handshakeService: HandshakeService(),
+        selfDeviceId: const DeviceId('visitor-device'),
+      );
+      addTearDown(() {
+        master.dispose();
+        visitor.dispose();
+        bus.close();
+      });
+      return (master: master, visitor: visitor, bus: bus);
+    }
+
+    test('a disposed visitor ignores an envelope from the master', () async {
+      final pair = newPair();
+      final pending =
+          await _connectAndApprove(pair.master, pair.visitor, pair.bus);
+
+      pair.visitor.dispose();
+      final sent = await pair.master
+          .sendEnvelopeTo(pending.id, Uint8List.fromList([1, 2, 3]));
+      expect(sent.isSuccess, isTrue);
+      // Long enough for the loopback frame to arrive and be handled.
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+    });
+
+    test('a disposed master ignores an envelope from the visitor', () async {
+      final pair = newPair();
+      await _connectAndApprove(pair.master, pair.visitor, pair.bus);
+
+      pair.master.dispose();
+      final sent =
+          await pair.visitor.sendEnvelope(Uint8List.fromList([4, 5, 6]));
+      expect(sent.isSuccess, isTrue);
+      await Future<void>.delayed(const Duration(milliseconds: 300));
+    });
+  });
 }
 
 /// Shared setup for the T8 applicationMessages tests: creates a room on
