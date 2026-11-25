@@ -15,25 +15,25 @@ abstract final class MetronomePulseGenerator {
   }) {
     if (durationMs <= 0) return const [];
 
-    final intervalMs = 60000 ~/ config.bpm;
+    // Each pulse sits at its own rounded absolute position. Adding an
+    // integer interval (60000 ~/ bpm) accumulated the rounding error: at
+    // 72 BPM the click fell ~70 ms behind after 3 minutes.
     final endMs = startMs + durationMs;
+    int positionOf(int n) => (n * 60000 / config.bpm).round();
 
-    // First beat at or after startMs, aligned to the global beat grid
-    final firstBeat = startMs == 0
-        ? 0
-        : ((startMs + intervalMs - 1) ~/ intervalMs) * intervalMs;
+    // First pulse at or after startMs, on the global beat grid.
+    var n = (startMs * config.bpm / 60000).floor();
+    while (positionOf(n) < startMs) {
+      n++;
+    }
 
     final pulses = <MetronomePulse>[];
-    var beatIndex = firstBeat ~/ intervalMs;
-    var positionMs = firstBeat;
-
-    while (positionMs < endMs) {
+    while (positionOf(n) < endMs) {
       pulses.add(MetronomePulse(
-        positionMs: positionMs,
-        isDownbeat: beatIndex % config.beatsPerMeasure == 0,
+        positionMs: positionOf(n),
+        isDownbeat: n % config.beatsPerMeasure == 0,
       ));
-      beatIndex++;
-      positionMs += intervalMs;
+      n++;
     }
 
     return pulses;

@@ -135,11 +135,11 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Regression test written first and failing on the current code: at 72 BPM, pulse 216 is at 180000 ms; no pulse is more than 1 ms from `n * 60000 / 72`
-- [ ] Mid-beat start still aligns to the global grid (existing test passes)
-- [ ] `scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/domain/audio/metronome_test.dart`
-- [ ] Test count: existing + ≥ 2 new
+- [x] Regression test written first and failing on the current code: at 72 BPM, pulse 216 is at 180000 ms; no pulse is more than 1 ms from `n * 60000 / 72`
+- [x] Mid-beat start still aligns to the global grid (existing test passes)
+- [x] `scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/domain/audio/metronome_test.dart`
+- [x] Test count: existing + ≥ 2 new
 
 **Tests**: unit
 **Gate**: quick

@@ -59,6 +59,36 @@ void main() {
       }
     });
 
+    // Regression (solo-metronome spec, bug 3): the interval was the integer
+    // 60000 ~/ bpm (833 ms at 72 BPM instead of 833.33), so the click fell
+    // ~70 ms behind the music after 3 minutes.
+    test('pulse n sits at round(n * 60000 / bpm): no cumulative drift', () {
+      final pulses = MetronomePulseGenerator.generate(
+        startMs: 0,
+        durationMs: 180001,
+        config: const MetronomeConfig(bpm: 72, beatsPerMeasure: 4),
+      );
+
+      expect(pulses[216].positionMs, 180000);
+      for (var n = 0; n < pulses.length; n++) {
+        expect(
+            (pulses[n].positionMs - n * 60000 / 72).abs(), lessThanOrEqualTo(1),
+            reason: 'pulse $n');
+      }
+    });
+
+    test('a mid-song start keeps the same drift-free grid', () {
+      final pulses = MetronomePulseGenerator.generate(
+        startMs: 179500,
+        durationMs: 1000,
+        config: const MetronomeConfig(bpm: 72, beatsPerMeasure: 4),
+      );
+
+      expect(pulses.first.positionMs, 180000);
+      expect(pulses.first.isDownbeat, isTrue,
+          reason: 'pulse 216 is the first beat of measure 55');
+    });
+
     test('empty list when durationMs is 0', () {
       const config = MetronomeConfig(bpm: 60, beatsPerMeasure: 4);
       final pulses = MetronomePulseGenerator.generate(
