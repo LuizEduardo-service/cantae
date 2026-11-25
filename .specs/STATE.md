@@ -80,35 +80,39 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen** and **lyrics-editor** are merged to `develop`, which is pushed to `origin` up to `0b4cad4`. **solo-player** (Modo solo) is complete and verified on branch `feature/phase-5-solo-player` (not yet merged). Project follows **Gitflow**.
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor** and **solo-player** are merged to `develop`, which is pushed to `origin` up to `d157434`. Only `develop` and `master` exist, locally and on the remote. **solo-metronome** (Metrônomo solo) is complete and verified on branch `feature/phase-5-solo-metronome` (not yet merged). Project follows **Gitflow**.
 
-- **solo-player scope:** 12 tasks (T1–T12) plus fix F1, executed inline in sequence (user: "seguir com as tarefas em sequência realizando os commits").
-  - **Domain:** new `LyricCursor`.
-  - **Audio engine:**
-    - `setTrackVolume` added; the 5 test fakes are updated.
-    - Fix: the timeline position now follows the track that ends last, not `tracks.first`. This affects room playback too.
-  - **New shared widgets** (all in `COMPONENTS.md`):
-    - `MuteSoloToggle` (extracted from `TrackAlignRow`, now with toggled semantics);
-    - `TonalButton`;
-    - `StatusPill` (neutral variant only);
-    - `PlaybackProgress`;
-    - `LyricView`;
-    - `MixTrackRow`;
-    - helper `naipe_labels.dart`.
-  - **Screen and route:** `SoloPlayerNotifier` and `SoloPlayerScreen` (UI_SPEC §6.12 rewritten); route `/solo-player/:id` from "Ensaiar só".
+- **solo-metronome scope:** 10 tasks, executed inline in sequence.
+  - **Audio fixes, red-first, affecting every playback path:**
+    - T1 `playAt` no longer awaits each `play()`. In just_audio that future completes only on pause, so on a device only the first track played.
+    - T2 the position comes from `positionStream`. `playbackEventStream` is event-only, so the clock froze.
+    - T3 metronome pulses at rounded absolute positions (it had ~70 ms of drift at 3 min / 72 BPM).
+  - **Engine:** `addTrack` / `removeTrack` (with `exemptFromSolo`).
+  - **Click track:**
+    - `ClickTrackWav`: a PCM 16-bit mono WAV, 22050 Hz, 30 ms beeps (1500 Hz downbeat, 1000 Hz otherwise);
+    - `ClickTrackBuilder` (domain interface, returns `Result`) + `FileClickTrackBuilder` (`Isolate.run`, temp dir).
+  - **Modo solo:**
+    - metronome on/off; the tempo sheet saves `MetronomeConfig` to the song (RF50);
+    - a received song is read-only;
+    - the click volume + M row in the mix;
+    - "ligar ao abrir" is honored;
+    - the footer now has two rows.
+  - **New shared widget:** `TempoSheet`. `MixTrackRow` gains `showSolo`.
 - **User decisions:**
-  - metronome and background/lock-screen playback are separate features;
-  - the loop is marked with start and end during playback;
-  - the mix has volume + M + S per track and lasts the session only.
-- **Verifier:** standalone fallback by the author (sub-agent blocked by auto mode, `context-mode` plugin).
-  - Iteration 1: 24/25 mutants killed; S9 (loop end while paused) survived.
-  - Iteration 2 after F1: 25/25, 644 tests, gate clean.
-  - Lesson L-018 recorded as a candidate.
-  - Report: `.specs/features/solo-player/validation.md`.
+  - the tempo is defined in Modo solo and saved;
+  - the click volume is a mix row;
+  - the audio bugs are the first tasks.
+  - Decided in T4 (recorded in the spec): soloing a voice does not silence the click.
+- **Verifier:** standalone fallback by the author (sub-agent blocked by the `context-mode` plugin). 30/30 mutants killed in iteration 1, 701 tests, gate clean. Lesson L-019 recorded as a candidate. Report: `.specs/features/solo-metronome/validation.md`.
 - **Known debt:**
-  - no l10n (inline pt-BR strings);
-  - naipe name/selo mapping still duplicated privately in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
-  - wall-clock flaky tests (`chunked_file_receiver_test`, `song_sync_coordinator_test`, `playback_command_handler_test`).
-- **Not verified on a device:** the last position may stop a few ms short of `durationMs` on real hardware (design Risks row 2). Check it in the background-playback feature.
+  - no l10n;
+  - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
+  - wall-clock flaky tests: `song_sync_coordinator_test` failed in 2 of 4 full runs this feature, plus `chunked_file_receiver_test` and `playback_command_handler_test`.
+- **Not verified on a device:** the T1/T2 fixes, the click-track sync and end-of-song detection. This needs a real-device pass, best done in the background-playback feature.
 
-**Next:** merging `feature/phase-5-solo-player` into `develop` needs the user's go-ahead. Candidate next features: **Metrônomo solo (RF54)**, **background playback for Modo solo (RF24)**, **Ensaios anteriores**, **Enviar faixa**, **Studio**.
+**Next:** merging `feature/phase-5-solo-metronome` into `develop` needs the user's go-ahead. Candidates:
+- background playback for Modo solo (RF24), which includes the device checks;
+- fixing the flaky wall-clock tests;
+- **Ensaios anteriores**;
+- **Enviar faixa**;
+- **Studio**.

@@ -141,7 +141,7 @@ Modo solo, "Mix por naipe": uma faixa por linha.
 - Selo do naipe + nome (`listTitle`); a faixa de Playback mostra "Playback", sem selo.
 - `MuteSoloToggle` M e S à direita; abaixo, slider de volume `accent` (0–100 %).
 - Leitor de tela: "Volume do Tenor", valor "30 %"; M e S anunciam ligado/desligado.
-- Props: `naipe` (nulo = Playback), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`.
+- Props: `naipe` (nulo = Playback ou Metrônomo), `label`, `volume`, `muted`, `solo`, `onVolumeChanged`, `onMuteToggled`, `onSoloToggled`, `showSolo` (padrão verdadeiro; falso esconde o S, como na linha "Metrônomo").
 
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".
@@ -168,6 +168,14 @@ Fundo `toastBg`, texto `onToast`, raio 14, check à esquerda. Posição: abaixo 
 Folha inferior com scrim.
 - Props: `title`, `message`, `safeLabel`, `destructiveLabel`, `steps` (1 ou 2), `typedConfirmation` (ex.: `"APAGAR"`).
 - Na etapa 2, botão final desabilitado até a confirmação digitada coincidir (sem diferenciar maiúsculas).
+
+### `TempoSheet`
+Folha inferior "Andamento" do metrônomo (RF50), com o mesmo scrim e raio da `ConfirmSheet`.
+- Campos numéricos em mono: "BPM" (30–300) e "Tempos por compasso" (2–16), com o limite em `dangerSolid` abaixo do campo quando inválido ("Entre 30 e 300", "Entre 2 e 16").
+- `SegmentedControl` "Com acento" / "Sem acento".
+- [P] "Salvar andamento", desabilitado enquanto algum campo é inválido; com carregamento enquanto salva.
+- Erro ao salvar: banner de erro na folha, que continua aberta com os valores digitados.
+- API: `TempoSheet.show(context, initial:, onSave:)`; `onSave` devolve nulo (fecha) ou a mensagem de erro.
 
 ### `EmptyState`
 Ícone 72×72 em `accentSoft`, título 28/700, frase, ação primária + secundária opcional.

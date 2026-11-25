@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_track.dart';
@@ -183,6 +185,100 @@ void main() {
     });
   });
 
+  group('addTrack / removeTrack', () {
+    const click = SongTrack(
+      id: 'metronome',
+      filePath: '/tmp/metronome.wav',
+      naipe: Naipe.custom,
+    );
+
+    test('adds one more player at full volume without reloading the others',
+        () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+
+      await engine.addTrack(click);
+
+      expect(fakePlatform.created, hasLength(3));
+      expect(fakePlatform.created[0].loadCalls, hasLength(1));
+      expect(fakePlatform.created[1].loadCalls, hasLength(1));
+      expect(fakePlatform.created[2].setVolumeCalls.last.volume, 1.0);
+    });
+
+    test('the added track follows seekAllTo, volume and mute', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click);
+      final clickPlatform = fakePlatform.created[2];
+
+      await engine.seekAllTo(41000);
+      expect(clickPlatform.seekCalls.last.position,
+          const Duration(milliseconds: 41000));
+
+      await engine.setTrackVolume('metronome', 0.4);
+      expect(clickPlatform.setVolumeCalls.last.volume, closeTo(0.4, 1e-9));
+
+      await engine.setTrackMuted('metronome', true);
+      expect(clickPlatform.setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('a solo-exempt track keeps sounding while a voice is soloed',
+        () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click, exemptFromSolo: true);
+      final clickPlatform = fakePlatform.created[2];
+
+      await engine.setTrackSolo('s', true);
+
+      expect(clickPlatform.setVolumeCalls.last.volume, 1.0);
+      expect(fakePlatform.created[1].setVolumeCalls.last.volume, 0.0);
+    });
+
+    test('removeTrack disposes only that player', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      await engine.addTrack(click);
+
+      await engine.removeTrack('metronome');
+
+      expect(fakePlatform.created[2].disposed, isTrue);
+      expect(fakePlatform.created[0].disposed, isFalse);
+      expect(fakePlatform.created[1].disposed, isFalse);
+      await engine.seekAllTo(1000);
+      expect(fakePlatform.created[2].seekCalls, isEmpty,
+          reason: 'a removed track no longer follows the timeline');
+    });
+
+    test('removeTrack with an unknown id does nothing', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+
+      await engine.removeTrack('nope');
+
+      expect(fakePlatform.created.every((p) => !p.disposed), isTrue);
+    });
+
+    test('adding a track does not change the position reference', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final events = <int>[];
+      final subscription = engine.positionMs.listen(events.add);
+      await engine.addTrack(click);
+      await Future<void>.delayed(Duration.zero);
+      events.clear();
+
+      fakePlatform.created[2].emitPlaybackEvent(PlaybackEventMessage(
+        processingState: ProcessingStateMessage.ready,
+        updateTime: DateTime.now(),
+        updatePosition: const Duration(seconds: 7),
+        bufferedPosition: const Duration(seconds: 7),
+        duration: null,
+        icyMetadata: null,
+        currentIndex: 0,
+        androidAudioSessionId: null,
+      ));
+      await Future<void>.delayed(Duration.zero);
+
+      expect(events, isNot(contains(7000)));
+      await subscription.cancel();
+    });
+  });
+
   group('setTrackStartDelayMs', () {
     test('changes only the internal map, without reloading the file', () async {
       await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
@@ -258,6 +354,23 @@ void main() {
       await subscription.cancel();
     });
 
+    // Regression (solo-metronome spec, bug 2): the position came from
+    // playbackEventStream, which only emits on events (load, pause,
+    // buffering). During steady playback on a device the clock froze.
+    test('advances while playing, with no new playback event', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      final events = <int>[];
+      final subscription = engine.positionMs.listen(events.add);
+
+      await engine.playAt(DateTime.now());
+      await Future<void>.delayed(const Duration(milliseconds: 400));
+
+      expect(events.where((ms) => ms >= 100), isNotEmpty,
+          reason: 'the clock must move on its own while playing');
+      await engine.pause();
+      await subscription.cancel();
+    });
+
     // Regression (solo-player design, Risks row 1): the position followed
     // tracks.first. When that track ends before the others, its player stops
     // emitting, the clock freezes and the end of the song is never reached.
@@ -295,6 +408,41 @@ void main() {
       expect(events.last, 4000,
           reason: 'the contralto (longest) drives it: 2000 delay + 2000 local');
       await subscription.cancel();
+    });
+  });
+
+  // Regression (solo-metronome spec, bug 1): playAt awaited each
+  // player.play(), whose future completes only when playback pauses. On a
+  // device only the first track ever started.
+  group('playAt', () {
+    test('starts every track even when play() answers only on pause', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      for (final player in fakePlatform.created) {
+        player.holdPlayUntilPause = true;
+      }
+
+      unawaited(engine.playAt(DateTime.now()));
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+
+      expect(fakePlatform.created[0].playCalls, hasLength(1));
+      expect(fakePlatform.created[1].playCalls, hasLength(1),
+          reason: 'the second track must not wait for the first to pause');
+      await engine.pause();
+    });
+
+    test('completes without waiting for playback to pause', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      for (final player in fakePlatform.created) {
+        player.holdPlayUntilPause = true;
+      }
+
+      await expectLater(
+        engine.playAt(DateTime.now()).timeout(const Duration(seconds: 1)),
+        completes,
+      );
+      await engine.pause();
     });
   });
 

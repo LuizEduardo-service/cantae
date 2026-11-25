@@ -23,6 +23,7 @@ class MixTrackRow extends StatelessWidget {
     required this.onVolumeChanged,
     required this.onMuteToggled,
     required this.onSoloToggled,
+    this.showSolo = true,
   });
 
   final Naipe? naipe;
@@ -35,6 +36,10 @@ class MixTrackRow extends StatelessWidget {
   final ValueChanged<double> onVolumeChanged;
   final VoidCallback onMuteToggled;
   final VoidCallback onSoloToggled;
+
+  /// False hides S, e.g. for the metronome row, where soloing the click
+  /// makes no sense.
+  final bool showSolo;
 
   @override
   Widget build(BuildContext context) {
@@ -66,13 +71,15 @@ class MixTrackRow extends StatelessWidget {
               active: muted,
               onTap: onMuteToggled,
             ),
-            const SizedBox(width: CantaeSpacing.space1),
-            MuteSoloToggle(
-              label: 'S',
-              semanticLabel: 'Solo',
-              active: solo,
-              onTap: onSoloToggled,
-            ),
+            if (showSolo) ...[
+              const SizedBox(width: CantaeSpacing.space1),
+              MuteSoloToggle(
+                label: 'S',
+                semanticLabel: 'Solo',
+                active: solo,
+                onTap: onSoloToggled,
+              ),
+            ],
           ],
         ),
         SliderTheme(

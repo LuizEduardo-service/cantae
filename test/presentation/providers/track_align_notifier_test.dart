@@ -67,6 +67,12 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
   Future<void> setTrackVolume(String trackId, double volume) async {}
 
   @override
+  Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async {}
+
+  @override
+  Future<void> removeTrack(String trackId) async {}
+
+  @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {
     startDelayCalls[trackId] = startDelayMs;
   }

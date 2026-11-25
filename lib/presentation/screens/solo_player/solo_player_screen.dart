@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../domain/audio/lyric_cursor.dart';
 import '../../../domain/audio/loop_controller.dart';
 import '../../../domain/entities/lyric_line.dart';
+import '../../../domain/entities/metronome_config.dart';
 import '../../../domain/entities/song.dart';
 import '../../../domain/entities/song_track.dart';
 import '../../providers/solo_player_notifier.dart';
@@ -21,6 +22,8 @@ import '../../widgets/naipe_labels.dart';
 import '../../widgets/nav_pill.dart';
 import '../../widgets/playback_progress.dart';
 import '../../widgets/status_pill.dart';
+import '../../widgets/tempo_sheet.dart';
+import '../../widgets/toast.dart';
 
 /// Everything the screen renders except the playback position. Watching
 /// this (instead of the whole state) keeps position ticks from rebuilding
@@ -36,6 +39,12 @@ typedef _View = ({
   int? loopStartMs,
   LoopController? loop,
   String? loopError,
+  bool metronomeOn,
+  double metronomeVolume,
+  bool metronomeMuted,
+  bool metronomeBusy,
+  String? metronomeError,
+  bool canEditTempo,
 });
 
 _View _viewOf(SoloPlayerState s) => (
@@ -48,7 +57,31 @@ _View _viewOf(SoloPlayerState s) => (
       loopStartMs: s.loopStartMs,
       loop: s.loop,
       loopError: s.loopError,
+      metronomeOn: s.metronomeOn,
+      metronomeVolume: s.metronomeVolume,
+      metronomeMuted: s.metronomeMuted,
+      metronomeBusy: s.metronomeBusy,
+      metronomeError: s.metronomeError,
+      canEditTempo: s.canEditTempo,
     );
+
+/// Opens the "Andamento" sheet; a successful save shows "Andamento salvo".
+Future<void> _openTempoSheet(
+  BuildContext context,
+  SoloPlayerNotifier notifier,
+  MetronomeConfig? current,
+) {
+  return TempoSheet.show(
+    context,
+    initial: current ?? const MetronomeConfig(bpm: 72, beatsPerMeasure: 4),
+    onSave: (config) async {
+      final saved = await notifier.saveTempo(config);
+      if (!saved) return tempoSaveFailedMessage;
+      if (context.mounted) Toast.show(context, 'Andamento salvo');
+      return null;
+    },
+  );
+}
 
 /// `m:ss`, for the loop caption ("Repetindo trecho 0:41–1:12").
 String _minutesSeconds(int ms) {
@@ -271,6 +304,35 @@ class _ReadyScaffold extends StatelessWidget {
             _mixRow(track),
             const SizedBox(height: CantaeSpacing.space3),
           ],
+          if (view.metronomeOn) ...[
+            MixTrackRow(
+              key: const ValueKey('mix-metronome'),
+              naipe: null,
+              label: 'Metrônomo',
+              volume: view.metronomeVolume,
+              muted: view.metronomeMuted,
+              solo: false,
+              showSolo: false,
+              onVolumeChanged: notifier.setMetronomeVolume,
+              onMuteToggled: notifier.toggleMetronomeMute,
+              onSoloToggled: () {},
+            ),
+            const SizedBox(height: CantaeSpacing.space3),
+          ],
+          if (view.canEditTempo && song.metronomeConfig != null) ...[
+            Text(
+              '${song.metronomeConfig!.bpm} BPM · '
+              '${song.metronomeConfig!.beatsPerMeasure} tempos',
+              style: CantaeTypography.caption.copyWith(color: colors.text2),
+            ),
+            const SizedBox(height: CantaeSpacing.space2),
+            TonalButton(
+              label: 'Ajustar andamento',
+              onPressed: () =>
+                  _openTempoSheet(context, notifier, song.metronomeConfig),
+            ),
+            const SizedBox(height: CantaeSpacing.space4),
+          ],
         ],
       ),
       footer: _Footer(songId: songId, view: view, notifier: notifier),
@@ -328,7 +390,10 @@ class _Footer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<CantaeColors>()!;
     final loop = view.loop;
+    final config = view.song?.metronomeConfig;
+    final receivedWithoutTempo = config == null && !view.canEditTempo;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -363,20 +428,55 @@ class _Footer extends StatelessWidget {
             ),
           ),
         ],
+        if (view.metronomeError != null) ...[
+          const SizedBox(height: CantaeSpacing.space2),
+          Semantics(
+            liveRegion: true,
+            child: InlineBanner(
+              variant: InlineBannerVariant.error,
+              title: 'Metrônomo desligado',
+              message: view.metronomeError!,
+            ),
+          ),
+        ],
         const SizedBox(height: CantaeSpacing.space3),
+        // Two rows so the three actions fit 360 dp at 130 % font.
         Row(
           children: [
             Expanded(child: _loopButton()),
             const SizedBox(width: CantaeSpacing.space3),
-            Expanded(
-              child: PrimaryButton(
-                label: view.playing ? 'Pausar' : 'Tocar',
-                onPressed: notifier.togglePlay,
-              ),
-            ),
+            Expanded(child: _metronomeButton(context, config)),
           ],
         ),
+        if (receivedWithoutTempo) ...[
+          const SizedBox(height: CantaeSpacing.space2),
+          Text(
+            'Música recebida: só quem criou pode definir o andamento.',
+            style: CantaeTypography.caption.copyWith(color: colors.text2),
+          ),
+        ],
+        const SizedBox(height: CantaeSpacing.space3),
+        PrimaryButton(
+          label: view.playing ? 'Pausar' : 'Tocar',
+          onPressed: notifier.togglePlay,
+        ),
       ],
+    );
+  }
+
+  Widget _metronomeButton(BuildContext context, MetronomeConfig? config) {
+    if (config != null) {
+      return TonalButton(
+        label: 'Metrônomo ♩ ${config.bpm}',
+        positive: view.metronomeOn,
+        onPressed: view.metronomeBusy ? null : notifier.toggleMetronome,
+      );
+    }
+    return TonalButton(
+      label: 'Metrônomo',
+      onPressed: view.canEditTempo
+          ? () => _openTempoSheet(context, notifier, null)
+          : null,
     );
   }
 

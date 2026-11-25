@@ -110,6 +110,12 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: validation.md S9 (lib/presentation/providers/solo_player_notifier.dart:293) (presentation)
 - last seen: 2026-11-25T00:37:50Z
 
+### L-019 - When adding a new kind of track to a shared mix, specify how it interacts with existing mute and solo rules
+- signal: `spec_precision_gap` · recurrence: 1 feature(s) · scope: `audio` · harmful: 0
+- features: solo-metronome
+- evidence: spec.md Assumptions: 'Isolar (S) uma faixa com o metrônomo ligado' (found in T4) (audio)
+- last seen: 2026-11-25T01:46:36Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.

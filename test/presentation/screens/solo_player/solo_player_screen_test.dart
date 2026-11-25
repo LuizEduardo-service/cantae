@@ -1,15 +1,19 @@
 import 'dart:async';
 
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
+import 'package:cantae/domain/audio/click_track_builder.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/entities/lyric_line.dart';
+import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/audio_playback_engine_provider.dart';
+import 'package:cantae/presentation/providers/click_track_builder_provider.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/screens/solo_player/solo_player_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
@@ -63,6 +67,14 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
       volumes[trackId] = volume;
 
   @override
+  Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async =>
+      calls.add('add:${track.id}');
+
+  @override
+  Future<void> removeTrack(String trackId) async =>
+      calls.add('remove:$trackId');
+
+  @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {}
 
   @override
@@ -89,9 +101,14 @@ class _FakeSongRepository implements SongRepository {
     return Result.success(song);
   }
 
+  Song? savedSong;
+
   @override
-  Future<Result<Unit, StorageFailure>> save(Song song) =>
-      throw UnimplementedError();
+  Future<Result<Unit, StorageFailure>> save(Song song) async {
+    savedSong = song;
+    this.song = song;
+    return const Result.success(Unit());
+  }
 
   @override
   Future<Result<List<Song>, StorageFailure>> getAll() async =>
@@ -107,6 +124,22 @@ class _FakeSongRepository implements SongRepository {
   @override
   Future<Result<Unit, Failure>> markRehearsed(String id, DateTime at) =>
       throw UnimplementedError();
+}
+
+class _FakeClickTrackBuilder implements ClickTrackBuilder {
+  bool fail = false;
+
+  @override
+  Future<Result<String, Failure>> build({
+    required String songId,
+    required MetronomeConfig config,
+    required int durationMs,
+  }) async {
+    if (fail) {
+      return Result.failure(PlaybackFailure(code: 'click_track_build_failed'));
+    }
+    return Result.success('/tmp/metronome_$songId.wav');
+  }
 }
 
 const _tracks = [
@@ -130,6 +163,8 @@ const _lyrics = [
 Song _song({
   List<SongTrack> tracks = _tracks,
   List<LyricLine> lyrics = _lyrics,
+  MetronomeConfig? metronomeConfig,
+  SongOrigin origin = SongOrigin.created,
 }) =>
     Song(
       id: 'ave',
@@ -137,6 +172,8 @@ Song _song({
       author: 'Mozart',
       tracks: tracks,
       lyrics: lyrics,
+      metronomeConfig: metronomeConfig,
+      origin: origin,
     );
 
 GoRouter _router() => GoRouter(
@@ -167,15 +204,22 @@ GoRouter _router() => GoRouter(
       ],
     );
 
-Future<({_FakeAudioPlaybackEngine engine, _FakeSongRepository repo})> _open(
+Future<
+    ({
+      _FakeAudioPlaybackEngine engine,
+      _FakeSongRepository repo,
+      _FakeClickTrackBuilder builder,
+    })> _open(
   WidgetTester tester, {
   Song? song,
   bool notFound = false,
   Failure? failure,
   bool throwOnLoad = false,
+  bool clickFails = false,
   ThemeData? theme,
 }) async {
   final engine = _FakeAudioPlaybackEngine()..throwOnLoad = throwOnLoad;
+  final builder = _FakeClickTrackBuilder()..fail = clickFails;
   final repo = _FakeSongRepository(
     song: notFound ? null : (song ?? _song()),
     failure: failure,
@@ -184,6 +228,7 @@ Future<({_FakeAudioPlaybackEngine engine, _FakeSongRepository repo})> _open(
     overrides: [
       audioPlaybackEngineProvider.overrideWithValue(engine),
       songRepositoryProvider.overrideWithValue(repo),
+      clickTrackBuilderProvider.overrideWithValue(builder),
     ],
     child: MaterialApp.router(
       theme: theme ?? AppTheme.light,
@@ -191,7 +236,7 @@ Future<({_FakeAudioPlaybackEngine engine, _FakeSongRepository repo})> _open(
     ),
   ));
   await tester.pumpAndSettle();
-  return (engine: engine, repo: repo);
+  return (engine: engine, repo: repo, builder: builder);
 }
 
 /// The stream delivers in a microtask: one pump applies it to the state,
@@ -476,6 +521,179 @@ void main() {
 
       expect(tester.takeException(), isNull);
       for (final label in ['Tocar', 'Marcar início do loop']) {
+        final button = find.ancestor(
+          of: find.text(label),
+          matching: find.byWidgetPredicate(
+            (w) => w is PrimaryButton || w is TonalButton,
+          ),
+        );
+        expect(tester.getSize(button).height, greaterThanOrEqualTo(44),
+            reason: label);
+      }
+    });
+  });
+
+  group('metronome (MET-04 to MET-17)', () {
+    const tempo72 = MetronomeConfig(bpm: 72, beatsPerMeasure: 4);
+
+    Finder field(String label) => find.byWidgetPredicate(
+          (w) => w is TextField && w.decoration?.labelText == label,
+        );
+
+    testWidgets('"Metrônomo ♩ 72" turns the click on and off', (tester) async {
+      final setup = await _open(tester, song: _song(metronomeConfig: tempo72));
+      expect(_tonal(tester, 'Metrônomo ♩ 72').positive, isFalse);
+      expect(find.byKey(const ValueKey('mix-metronome')), findsNothing);
+
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+      expect(_tonal(tester, 'Metrônomo ♩ 72').positive, isTrue);
+      expect(setup.engine.calls, contains('add:metronome'));
+
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+      expect(_tonal(tester, 'Metrônomo ♩ 72').positive, isFalse);
+      expect(setup.engine.calls.last, 'remove:metronome');
+    });
+
+    testWidgets('the "Metrônomo" mix row: M without S, volume reaches it',
+        (tester) async {
+      final setup = await _open(tester, song: _song(metronomeConfig: tempo72));
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+
+      final row = await _scrollTo(tester, 'metronome');
+      expect(
+          find.descendant(
+              of: row, matching: find.widgetWithText(MuteSoloToggle, 'M')),
+          findsOneWidget);
+      expect(
+          find.descendant(
+              of: row, matching: find.widgetWithText(MuteSoloToggle, 'S')),
+          findsNothing);
+
+      await tester.drag(
+        find.descendant(of: row, matching: find.byType(Slider)),
+        const Offset(-2000, 0),
+      );
+      await tester.pump();
+      expect(setup.engine.volumes['metronome'], 0.0);
+    });
+
+    testWidgets('no tempo: "Metrônomo" opens the sheet; saving turns it on',
+        (tester) async {
+      final setup = await _open(tester);
+
+      await _tapText(tester, 'Metrônomo');
+      await tester.pumpAndSettle();
+      expect(find.text('Andamento'), findsOneWidget);
+      expect(tester.widget<TextField>(field('BPM')).controller!.text, '72');
+
+      await tester.enterText(field('BPM'), '96');
+      await tester.tap(find.text('Salvar andamento'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Andamento salvo'), findsOneWidget);
+      expect(_tonal(tester, 'Metrônomo ♩ 96').positive, isTrue);
+      expect(setup.repo.savedSong!.metronomeConfig!.bpm, 96);
+      await tester.pump(const Duration(seconds: 3)); // toast goes away
+    });
+
+    testWidgets('"Ajustar andamento" opens the sheet with the saved tempo',
+        (tester) async {
+      await _open(tester,
+          song: _song(
+              metronomeConfig:
+                  const MetronomeConfig(bpm: 88, beatsPerMeasure: 3)));
+
+      await tester.scrollUntilVisible(
+        find.text('Ajustar andamento'),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      expect(find.text('88 BPM · 3 tempos'), findsOneWidget);
+      await tester.tap(find.text('Ajustar andamento'));
+      await tester.pumpAndSettle();
+
+      expect(tester.widget<TextField>(field('BPM')).controller!.text, '88');
+      expect(
+        tester.widget<TextField>(field('Tempos por compasso')).controller!.text,
+        '3',
+      );
+    });
+
+    testWidgets('received song without tempo: disabled, with the reason',
+        (tester) async {
+      await _open(tester, song: _song(origin: SongOrigin.received));
+
+      expect(_tonal(tester, 'Metrônomo').onPressed, isNull);
+      expect(
+        find.text('Música recebida: só quem criou pode definir o andamento.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('received song with tempo: toggles, no "Ajustar andamento"',
+        (tester) async {
+      final setup = await _open(tester,
+          song: _song(origin: SongOrigin.received, metronomeConfig: tempo72));
+
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+
+      expect(setup.engine.calls, contains('add:metronome'));
+      await tester.drag(find.byType(Scrollable).first, const Offset(0, -3000));
+      await tester.pumpAndSettle();
+      expect(find.text('Ajustar andamento'), findsNothing);
+    });
+
+    testWidgets('a click that cannot be prepared shows the reason',
+        (tester) async {
+      await _open(tester,
+          song: _song(metronomeConfig: tempo72), clickFails: true);
+
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+
+      expect(
+          find.text('Não foi possível preparar o metrônomo.'), findsOneWidget);
+      expect(_tonal(tester, 'Metrônomo ♩ 72').positive, isFalse);
+    });
+
+    testWidgets('"ligar ao abrir" opens with the metronome on', (tester) async {
+      await _open(tester,
+          song: _song(
+              metronomeConfig: const MetronomeConfig(
+            bpm: 72,
+            beatsPerMeasure: 4,
+            enabledByDefault: true,
+          )));
+
+      expect(_tonal(tester, 'Metrônomo ♩ 72').positive, isTrue);
+    });
+
+    testWidgets('dark theme with the metronome on', (tester) async {
+      await _open(tester,
+          song: _song(metronomeConfig: tempo72), theme: AppTheme.dark);
+      await _tapText(tester, 'Metrônomo ♩ 72');
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.byType(PrimaryButton), findsOneWidget);
+    });
+
+    testWidgets('360 dp at 130%: the two-row footer fits, targets >= 44 dp',
+        (tester) async {
+      tester.view.physicalSize = const Size(360, 720);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      tester.platformDispatcher.textScaleFactorTestValue = 1.3;
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+
+      await _open(tester, song: _song(origin: SongOrigin.received));
+
+      expect(tester.takeException(), isNull);
+      for (final label in ['Tocar', 'Marcar início do loop', 'Metrônomo']) {
         final button = find.ancestor(
           of: find.text(label),
           matching: find.byWidgetPredicate(

@@ -3,18 +3,30 @@ import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/audio/audio_playback_engine.dart';
+import '../../domain/audio/click_track_builder.dart';
 import '../../domain/audio/loop_controller.dart';
 import '../../domain/core/failures.dart';
 import '../../domain/core/result.dart';
+import '../../domain/entities/metronome_config.dart';
+import '../../domain/entities/naipe.dart';
 import '../../domain/entities/song.dart';
+import '../../domain/entities/song_origin.dart';
 import '../../domain/entities/song_track.dart';
 import 'audio_playback_engine_provider.dart';
+import 'click_track_builder_provider.dart';
+import 'library_providers.dart';
 import 'song_detail_providers.dart';
+import 'song_repository_provider.dart';
 
 enum SoloPlayerStatus { loading, notFound, error, noTracks, audioError, ready }
 
 const String loopEndBeforeStartMessage =
     'O fim do trecho precisa vir depois do início.';
+const String metronomeFailedMessage = 'Não foi possível preparar o metrônomo.';
+const String tempoSaveFailedMessage = 'Não foi possível salvar o andamento.';
+
+/// Engine track id of the metronome's click track.
+const String metronomeTrackId = 'metronome';
 
 /// One track's session-only mix (spec P2-AC7: never persisted).
 class TrackMix {
@@ -44,6 +56,12 @@ class SoloPlayerState {
     this.loopStartMs,
     this.loop,
     this.loopError,
+    this.metronomeOn = false,
+    this.metronomeVolume = 1.0,
+    this.metronomeMuted = false,
+    this.metronomeBusy = false,
+    this.metronomeError,
+    this.tempoSaveError,
   });
 
   const SoloPlayerState.loading() : this(status: SoloPlayerStatus.loading);
@@ -67,6 +85,23 @@ class SoloPlayerState {
   /// The active loop, or null when there is none.
   final LoopController? loop;
   final String? loopError;
+
+  /// The click track is loaded in the engine.
+  final bool metronomeOn;
+
+  /// Session-only click mix (spec P4-AC4).
+  final double metronomeVolume;
+  final bool metronomeMuted;
+
+  /// Preparing the click track.
+  final bool metronomeBusy;
+  final String? metronomeError;
+  final String? tempoSaveError;
+
+  MetronomeConfig? get metronomeConfig => song?.metronomeConfig;
+
+  /// A song received from a room is read-only (spec P3-AC6/AC7).
+  bool get canEditTempo => song?.origin == SongOrigin.created;
 
   /// Every track the engine loads, in its load order: the naipe tracks,
   /// then the Playback track.
@@ -97,6 +132,14 @@ class SoloPlayerState {
     bool clearLoop = false,
     String? loopError,
     bool clearLoopError = false,
+    bool? metronomeOn,
+    double? metronomeVolume,
+    bool? metronomeMuted,
+    bool? metronomeBusy,
+    String? metronomeError,
+    bool clearMetronomeError = false,
+    String? tempoSaveError,
+    bool clearTempoSaveError = false,
   }) {
     return SoloPlayerState(
       status: status ?? this.status,
@@ -110,6 +153,14 @@ class SoloPlayerState {
       loopStartMs: clearLoopStart ? null : (loopStartMs ?? this.loopStartMs),
       loop: clearLoop ? null : (loop ?? this.loop),
       loopError: clearLoopError ? null : (loopError ?? this.loopError),
+      metronomeOn: metronomeOn ?? this.metronomeOn,
+      metronomeVolume: metronomeVolume ?? this.metronomeVolume,
+      metronomeMuted: metronomeMuted ?? this.metronomeMuted,
+      metronomeBusy: metronomeBusy ?? this.metronomeBusy,
+      metronomeError:
+          clearMetronomeError ? null : (metronomeError ?? this.metronomeError),
+      tempoSaveError:
+          clearTempoSaveError ? null : (tempoSaveError ?? this.tempoSaveError),
     );
   }
 }
@@ -124,6 +175,7 @@ final soloPlayerProvider = StateNotifierProvider.autoDispose
 class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   SoloPlayerNotifier(this._ref, this._songId)
       : _engine = _ref.read(audioPlaybackEngineProvider),
+        _clickTrackBuilder = _ref.read(clickTrackBuilderProvider),
         super(const SoloPlayerState.loading()) {
     _ref.listen<AsyncValue<Result<Song, Failure>>>(
       songByIdProvider(_songId),
@@ -135,6 +187,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   final Ref _ref;
   final String _songId;
   final AudioPlaybackEngine _engine;
+  final ClickTrackBuilder _clickTrackBuilder;
   StreamSubscription<int>? _positionSubscription;
 
   void _onSongResult(AsyncValue<Result<Song, Failure>> async) {
@@ -196,7 +249,13 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       clearLoopStart: true,
       clearLoop: true,
       clearLoopError: true,
+      metronomeOn: false,
+      metronomeBusy: false,
+      clearMetronomeError: true,
     );
+    if (state.metronomeConfig?.enabledByDefault ?? false) {
+      await _turnMetronomeOn();
+    }
   }
 
   void _onPosition(int positionMs) {
@@ -315,6 +374,128 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       clearLoopStart: true,
       clearLoopError: true,
     );
+  }
+
+  /// Turns the metronome on (with a tempo) or off. Off removes only the
+  /// click track: the voices keep playing (spec P2-AC3).
+  Future<void> toggleMetronome() async {
+    if (state.status != SoloPlayerStatus.ready || state.metronomeBusy) return;
+    if (state.metronomeOn) {
+      state = state.copyWith(metronomeOn: false);
+      await _engine.removeTrack(metronomeTrackId);
+      return;
+    }
+    await _turnMetronomeOn();
+  }
+
+  Future<void> _turnMetronomeOn() async {
+    final config = state.metronomeConfig;
+    if (config == null) return;
+    state = state.copyWith(metronomeBusy: true, clearMetronomeError: true);
+
+    final result = await _clickTrackBuilder.build(
+      songId: _songId,
+      config: config,
+      durationMs: state.durationMs,
+    );
+    if (!mounted) return;
+    final path = result.when(success: (path) => path, failure: (_) => null);
+    if (path == null) {
+      _metronomeFailed();
+      return;
+    }
+
+    // The click must start aligned to the voices (spec Edge Cases): stop,
+    // add it, move everything to the current position, then resume.
+    final wasPlaying = state.playing;
+    try {
+      if (wasPlaying) await _engine.pause();
+      await _engine.addTrack(
+        SongTrack(id: metronomeTrackId, filePath: path, naipe: Naipe.custom),
+        exemptFromSolo: true,
+      );
+      await _engine.setTrackVolume(metronomeTrackId, state.metronomeVolume);
+      if (state.metronomeMuted) {
+        await _engine.setTrackMuted(metronomeTrackId, true);
+      }
+      await _engine.seekAllTo(state.positionMs);
+    } catch (_) {
+      // Unreadable click file: an infrastructure exception, mapped to the
+      // same message; the music resumes (spec P2-AC7).
+      if (wasPlaying) await _engine.playAt(DateTime.now());
+      if (mounted) _metronomeFailed();
+      return;
+    }
+    if (wasPlaying) await _engine.playAt(DateTime.now());
+    if (!mounted) return;
+    state = state.copyWith(metronomeOn: true, metronomeBusy: false);
+  }
+
+  void _metronomeFailed() {
+    state = state.copyWith(
+      metronomeOn: false,
+      metronomeBusy: false,
+      metronomeError: metronomeFailedMessage,
+    );
+  }
+
+  /// Saves the tempo to the song (RF50) and turns the metronome on with it.
+  /// Returns false on failure or for a received song.
+  Future<bool> saveTempo(MetronomeConfig config) async {
+    final song = state.song;
+    if (song == null || !state.canEditTempo) return false;
+
+    final updated = Song(
+      id: song.id,
+      name: song.name,
+      author: song.author,
+      version: song.version,
+      tracks: song.tracks,
+      lyrics: song.lyrics,
+      metronomeConfig: MetronomeConfig(
+        bpm: config.bpm,
+        beatsPerMeasure: config.beatsPerMeasure,
+        downbeatAccent: config.downbeatAccent,
+        enabledByDefault: song.metronomeConfig?.enabledByDefault ?? false,
+      ),
+      playbackTrack: song.playbackTrack,
+      origin: song.origin,
+      lastRehearsedAt: song.lastRehearsedAt,
+    );
+    state = state.copyWith(clearTempoSaveError: true);
+
+    final result = await _ref.read(songRepositoryProvider).save(updated);
+    if (!mounted) return false;
+    if (!result.isSuccess) {
+      state = state.copyWith(tempoSaveError: tempoSaveFailedMessage);
+      return false;
+    }
+
+    state = state.copyWith(song: updated);
+    _ref.invalidate(songsProvider);
+    _ref.invalidate(songByIdProvider(_songId));
+    if (state.metronomeOn) {
+      state = state.copyWith(metronomeOn: false);
+      await _engine.removeTrack(metronomeTrackId);
+    }
+    await _turnMetronomeOn();
+    return true;
+  }
+
+  Future<void> setMetronomeVolume(double volume) async {
+    final clamped = volume.clamp(0.0, 1.0);
+    state = state.copyWith(metronomeVolume: clamped);
+    if (state.metronomeOn) {
+      await _engine.setTrackVolume(metronomeTrackId, clamped);
+    }
+  }
+
+  Future<void> toggleMetronomeMute() async {
+    final muted = !state.metronomeMuted;
+    state = state.copyWith(metronomeMuted: muted);
+    if (state.metronomeOn) {
+      await _engine.setTrackMuted(metronomeTrackId, muted);
+    }
   }
 
   @override

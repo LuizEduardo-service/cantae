@@ -7,6 +7,7 @@ import 'package:cantae/data/session/room_application_message.dart';
 import 'package:cantae/data/session/room_session_controller.dart';
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/playback/room_playback_snapshot.dart';
 import 'package:cantae/domain/session/handshake_service.dart';
 import 'package:cantae/domain/session/ids.dart';
@@ -58,6 +59,12 @@ class FakeAudioPlaybackEngine implements AudioPlaybackEngine {
 
   @override
   Future<void> setTrackVolume(String trackId, double volume) async {}
+
+  @override
+  Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async {}
+
+  @override
+  Future<void> removeTrack(String trackId) async {}
 
   @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {}

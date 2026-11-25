@@ -1,14 +1,18 @@
 import 'dart:async';
 
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
+import 'package:cantae/domain/audio/click_track_builder.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/audio_playback_engine_provider.dart';
+import 'package:cantae/presentation/providers/click_track_builder_provider.dart';
 import 'package:cantae/presentation/providers/solo_player_notifier.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -57,6 +61,20 @@ class _FakeAudioPlaybackEngine implements AudioPlaybackEngine {
   Future<void> setTrackVolume(String trackId, double volume) async =>
       volumes[trackId] = volume;
 
+  bool throwOnAddTrack = false;
+  bool? lastAddExemptFromSolo;
+
+  @override
+  Future<void> addTrack(SongTrack track, {bool exemptFromSolo = false}) async {
+    if (throwOnAddTrack) throw Exception('click unreadable');
+    lastAddExemptFromSolo = exemptFromSolo;
+    calls.add('add:${track.id}:${track.filePath}');
+  }
+
+  @override
+  Future<void> removeTrack(String trackId) async =>
+      calls.add('remove:$trackId');
+
   @override
   Future<void> setTrackStartDelayMs(String trackId, int startDelayMs) async {}
 
@@ -86,9 +104,17 @@ class _FakeSongRepository implements SongRepository {
     return Result.success(song);
   }
 
+  Song? savedSong;
+  StorageFailure? saveFailure;
+
   @override
-  Future<Result<Unit, StorageFailure>> save(Song song) =>
-      throw UnimplementedError();
+  Future<Result<Unit, StorageFailure>> save(Song song) async {
+    final failure = saveFailure;
+    if (failure != null) return Result.failure(failure);
+    savedSong = song;
+    this.song = song;
+    return const Result.success(Unit());
+  }
 
   @override
   Future<Result<List<Song>, StorageFailure>> getAll() async =>
@@ -104,6 +130,24 @@ class _FakeSongRepository implements SongRepository {
   @override
   Future<Result<Unit, Failure>> markRehearsed(String id, DateTime at) =>
       throw UnimplementedError();
+}
+
+class _FakeClickTrackBuilder implements ClickTrackBuilder {
+  bool fail = false;
+  final List<({MetronomeConfig config, int durationMs})> builds = [];
+
+  @override
+  Future<Result<String, Failure>> build({
+    required String songId,
+    required MetronomeConfig config,
+    required int durationMs,
+  }) async {
+    builds.add((config: config, durationMs: durationMs));
+    if (fail) {
+      return Result.failure(PlaybackFailure(code: 'click_track_build_failed'));
+    }
+    return Result.success('/tmp/metronome_${songId}_${config.bpm}.wav');
+  }
 }
 
 const _soprano = SongTrack(
@@ -126,6 +170,8 @@ const _playback = SongTrack(
 Song _song({
   List<SongTrack> tracks = const [_soprano, _tenor],
   SongTrack? playbackTrack,
+  MetronomeConfig? metronomeConfig,
+  SongOrigin origin = SongOrigin.created,
 }) =>
     Song(
       id: 'ave',
@@ -133,14 +179,18 @@ Song _song({
       author: 'Mozart',
       tracks: tracks,
       playbackTrack: playbackTrack,
+      metronomeConfig: metronomeConfig,
+      origin: origin,
     );
 
 ({
   ProviderContainer container,
   _FakeAudioPlaybackEngine engine,
   _FakeSongRepository repo,
+  _FakeClickTrackBuilder builder,
 }) _setUp({Song? song, bool notFound = false, Failure? failure}) {
   final engine = _FakeAudioPlaybackEngine();
+  final builder = _FakeClickTrackBuilder();
   final repo = _FakeSongRepository(
     song: notFound ? null : (song ?? _song()),
     failure: failure,
@@ -149,9 +199,10 @@ Song _song({
     overrides: [
       audioPlaybackEngineProvider.overrideWithValue(engine),
       songRepositoryProvider.overrideWithValue(repo),
+      clickTrackBuilderProvider.overrideWithValue(builder),
     ],
   );
-  return (container: container, engine: engine, repo: repo);
+  return (container: container, engine: engine, repo: repo, builder: builder);
 }
 
 /// `soloPlayerProvider` is `autoDispose`; `container.listen` keeps it alive
@@ -540,6 +591,242 @@ void main() {
       expect(_state(s.container).loop, isNull);
       expect(_state(s.container).positionMs, 50000);
       expect(s.engine.calls.length, callsBefore);
+    });
+  });
+
+  group('metronome (MET-04 to MET-18)', () {
+    const tempo72 = MetronomeConfig(bpm: 72, beatsPerMeasure: 4);
+
+    test('turning it on builds the click and adds it, aligned to now',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).seekTo(41000);
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(s.builder.builds.single.config.bpm, 72);
+      expect(s.builder.builds.single.durationMs, 180000);
+      expect(
+          s.engine.calls, contains('add:metronome:/tmp/metronome_ave_72.wav'));
+      expect(s.engine.lastAddExemptFromSolo, isTrue,
+          reason: 'soloing a voice must not silence the click');
+      expect(s.engine.calls.last, 'seek:41000');
+      expect(_state(s.container).metronomeOn, isTrue);
+    });
+
+    test('turning it on while playing: pause, add, seek, play', () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 5000);
+      s.engine.calls.clear();
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(s.engine.calls.first, 'pause');
+      expect(s.engine.calls.sublist(s.engine.calls.length - 2),
+          ['seek:5000', 'play']);
+      expect(_state(s.container).playing, isTrue);
+    });
+
+    test('turning it off removes only the click; the voices keep playing',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 5000);
+      await _notifier(s.container).toggleMetronome();
+      s.engine.calls.clear();
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(s.engine.calls, ['remove:metronome']);
+      expect(_state(s.container).metronomeOn, isFalse);
+      expect(_state(s.container).playing, isTrue);
+    });
+
+    test('a build failure keeps it off, shows the error, music untouched',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 5000);
+      s.builder.fail = true;
+      s.engine.calls.clear();
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(_state(s.container).metronomeOn, isFalse);
+      expect(_state(s.container).metronomeError,
+          'Não foi possível preparar o metrônomo.');
+      expect(s.engine.calls, isEmpty);
+      expect(_state(s.container).playing, isTrue);
+    });
+
+    test('an unreadable click file keeps it off and resumes the music',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 5000);
+      s.engine.throwOnAddTrack = true;
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(_state(s.container).metronomeOn, isFalse);
+      expect(_state(s.container).metronomeError,
+          'Não foi possível preparar o metrônomo.');
+      expect(s.engine.calls.last, 'play');
+    });
+
+    test('without a tempo, toggling does nothing', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(s.builder.builds, isEmpty);
+      expect(_state(s.container).metronomeOn, isFalse);
+    });
+
+    test('"ligar ao abrir" turns it on once the song is ready', () async {
+      final s = _setUp(
+        song: _song(
+          metronomeConfig: const MetronomeConfig(
+            bpm: 72,
+            beatsPerMeasure: 4,
+            enabledByDefault: true,
+          ),
+        ),
+      );
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      expect(_state(s.container).metronomeOn, isTrue);
+      expect(s.builder.builds, hasLength(1));
+    });
+
+    test('saveTempo saves the tempo, keeps enabledByDefault, turns it on',
+        () async {
+      final s = _setUp(
+        song: _song(
+          metronomeConfig: const MetronomeConfig(
+            bpm: 60,
+            beatsPerMeasure: 4,
+            enabledByDefault: true,
+          ),
+        ),
+      );
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).toggleMetronome(); // off after auto-on
+
+      final saved = await _notifier(s.container).saveTempo(
+        const MetronomeConfig(
+          bpm: 96,
+          beatsPerMeasure: 3,
+          downbeatAccent: false,
+        ),
+      );
+      await _flush();
+
+      expect(saved, isTrue);
+      final config = s.repo.savedSong!.metronomeConfig!;
+      expect(config.bpm, 96);
+      expect(config.beatsPerMeasure, 3);
+      expect(config.downbeatAccent, isFalse);
+      expect(config.enabledByDefault, isTrue);
+      expect(_state(s.container).metronomeConfig!.bpm, 96);
+      expect(_state(s.container).metronomeOn, isTrue);
+      expect(s.builder.builds.last.config.bpm, 96);
+    });
+
+    test('saveTempo with the metronome on swaps the click for the new one',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).toggleMetronome();
+      s.engine.calls.clear();
+
+      await _notifier(s.container).saveTempo(
+        const MetronomeConfig(bpm: 96, beatsPerMeasure: 4),
+      );
+
+      expect(s.engine.calls.first, 'remove:metronome');
+      expect(
+          s.engine.calls, contains('add:metronome:/tmp/metronome_ave_96.wav'));
+      expect(_state(s.container).metronomeOn, isTrue);
+    });
+
+    test('a failed save keeps the metronome as it was and reports it',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      s.repo.saveFailure = StorageFailure(code: 'db_write');
+
+      final saved = await _notifier(s.container).saveTempo(tempo72);
+
+      expect(saved, isFalse);
+      expect(_state(s.container).tempoSaveError,
+          'Não foi possível salvar o andamento.');
+      expect(_state(s.container).metronomeOn, isFalse);
+      expect(s.builder.builds, isEmpty);
+    });
+
+    test('a received song cannot have its tempo saved', () async {
+      final s = _setUp(song: _song(origin: SongOrigin.received));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      final saved = await _notifier(s.container).saveTempo(tempo72);
+
+      expect(saved, isFalse);
+      expect(s.repo.savedSong, isNull);
+      expect(_state(s.container).canEditTempo, isFalse);
+    });
+
+    test('volume and mute reach only the click track', () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).toggleMetronome();
+
+      await _notifier(s.container).setMetronomeVolume(0.4);
+      await _notifier(s.container).toggleMetronomeMute();
+
+      expect(s.engine.volumes, {'metronome': 0.4});
+      expect(s.engine.mutes, {'metronome': true});
+      expect(_state(s.container).metronomeVolume, 0.4);
+      expect(_state(s.container).metronomeMuted, isTrue);
+    });
+
+    test('a volume chosen before turning it on is applied when it starts',
+        () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).setMetronomeVolume(1.7);
+      expect(_state(s.container).metronomeVolume, 1.0, reason: 'clamped');
+      await _notifier(s.container).setMetronomeVolume(0.25);
+
+      await _notifier(s.container).toggleMetronome();
+
+      expect(s.engine.volumes['metronome'], 0.25);
+    });
+
+    test('a fresh screen starts with the click at 100 %, unmuted', () async {
+      final s = _setUp(song: _song(metronomeConfig: tempo72));
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      expect(_state(s.container).metronomeVolume, 1.0);
+      expect(_state(s.container).metronomeMuted, isFalse);
+      expect(_state(s.container).metronomeOn, isFalse);
     });
   });
 }
