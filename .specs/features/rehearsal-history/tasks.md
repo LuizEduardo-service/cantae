@@ -226,9 +226,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests first: ready with logs newest first and totals; notFound; read error → error, retry reloads; deleteForSong success → empty + `rehearsalLogsProvider` re-read; deleteAll success; delete failure → logs kept + `deleteError`; formatting: 59 000 → "0:59", 750 000 → "12:30", 3 723 000 → "1:02:03", date → "25 nov 2026 · 19:40"
-- [ ] Gate check passes: `flutter test test/presentation/providers/rehearsal_history_notifier_test.dart test/presentation/formatting`
-- [ ] Test count: all existing + ≥ 10 new
+- [x] Tests first: ready with logs newest first and totals; notFound; read error → error, retry reloads; deleteForSong success → empty + `rehearsalLogsProvider` re-read; deleteAll success; delete failure → logs kept + `deleteError`; formatting: 59 000 → "0:59", 750 000 → "12:30", 3 723 000 → "1:02:03", date → "25 nov 2026 · 19:40"
+- [x] Gate check passes: `flutter test test/presentation/providers/rehearsal_history_notifier_test.dart test/presentation/formatting`
+- [x] Test count: all existing + ≥ 10 new
 
 **Tests**: unit
 **Gate**: quick
