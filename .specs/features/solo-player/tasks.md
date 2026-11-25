@@ -318,10 +318,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`, `flutter-widget-performance`
 
 **Done when**:
-- [ ] `test/presentation/screens/solo_player/solo_player_screen_test.dart`: loading / notFound (back to Biblioteca) / error + retry / noTracks + "Enviar faixa" / audioError + retry; ready shows title, author, "Funciona offline", lyric view, one mix row per track, `0:00.0` and total; "Tocar" ↔ "Pausar"; loop flow "Marcar início do loop" → "Marcar fim do loop" → "Desligar loop" with caption "Repetindo trecho 0:41–1:12"; loop error banner; loop buttons disabled while paused; song without timed lyrics shows the message; leaving stops audio; single primary action; dark theme; 360 dp at 130% with targets ≥ 44 dp; position ticks do not rebuild mix rows
-- [ ] UI_SPEC §6.12 updated in the same commit
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
-- [ ] Test count: ≥ 15 tests pass
+- [x] `test/presentation/screens/solo_player/solo_player_screen_test.dart`: loading / notFound (back to Biblioteca) / error + retry / noTracks + "Enviar faixa" / audioError + retry; ready shows title, author, "Funciona offline", lyric view, one mix row per track, `0:00.0` and total; "Tocar" ↔ "Pausar"; loop flow "Marcar início do loop" → "Marcar fim do loop" → "Desligar loop" with caption "Repetindo trecho 0:41–1:12"; loop error banner; loop buttons disabled while paused; song without timed lyrics shows the message; leaving stops audio; single primary action; dark theme; 360 dp at 130% with targets ≥ 44 dp; position ticks do not rebuild mix rows
+- [x] UI_SPEC §6.12 updated in the same commit
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
+- [x] Test count: ≥ 15 tests pass
 
 **Tests**: widget
 **Gate**: build
