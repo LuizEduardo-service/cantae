@@ -250,9 +250,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] `flutter analyze` passes with the file (compiles); not run (no device, per spec)
-- [ ] The test writes `background_audio.log` (per-player `playing`, position delta) to the app documents dir and prints it with a fixed `BACKGROUND_AUDIO_LOG` prefix for `flutter test` output capture
-- [ ] Gate check passes: `flutter analyze && flutter test` (desktop suite unchanged)
+- [x] `flutter analyze` passes with the file (compiles); not run (no device, per spec)
+- [x] The test writes `background_audio.log` (per-player `playing`, position delta) to the app documents dir and prints it with a fixed `BACKGROUND_AUDIO_LOG` prefix for `flutter test` output capture
+- [x] Gate check passes: `flutter analyze && flutter test` (desktop suite unchanged)
 
 **Tests**: integration
 **Gate**: build
