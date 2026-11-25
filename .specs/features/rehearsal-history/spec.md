@@ -146,9 +146,9 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 | HIST-02 | P1-AC2: loops = voltas ao início do trecho | Execute | Implementing |
 | HIST-03 | P1-AC3: grava ao sair com ≥ 60 s, com todos os campos | Execute | Implementing |
 | HIST-04 | P1-AC4: não grava abaixo de 60 s | Execute | Implementing |
-| HIST-05 | P1-AC5: atualiza o último ensaio da música | - | Pending |
+| HIST-05 | P1-AC5: atualiza o último ensaio da música | Execute | Implementing |
 | HIST-06 | P1-AC6: sem áudio, letra ou dados de terceiros | Execute | Implementing |
-| HIST-07 | P1-AC7: falha ao gravar não trava a saída | - | Pending |
+| HIST-07 | P1-AC7: falha ao gravar não trava a saída | Execute | Implementing |
 | HIST-08 | P2-AC1/AC2: linha "Ensaios anteriores (N)" abre a tela | - | Pending |
 | HIST-09 | P2-AC3: topo, título e frase | - | Pending |
 | HIST-10 | P2-AC4: 3 resumos | - | Pending |

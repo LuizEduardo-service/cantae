@@ -157,9 +157,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests first with fake repositories: record saves the log and marks the song with `endedAt`; after record, a listened `rehearsalLogsProvider(id)` and `songsProvider` re-read; add fails → no mark, no throw; mark fails → no throw
-- [ ] Gate check passes: `flutter test test/presentation/providers/rehearsal_providers_test.dart`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Tests first with fake repositories: record saves the log and marks the song with `endedAt`; after record, a listened `rehearsalLogsProvider(id)` and `songsProvider` re-read; add fails → no mark, no throw; mark fails → no throw
+- [x] Gate check passes: `flutter test test/presentation/providers/rehearsal_providers_test.dart`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: unit
 **Gate**: quick
