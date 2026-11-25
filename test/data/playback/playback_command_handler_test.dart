@@ -153,18 +153,17 @@ class _GatedEngine extends FakeAudioPlaybackEngine {
   }
 }
 
-/// Waits until the handler reports [phase]. The engine call is made before
-/// the phase changes, so waiting on `playAtCalls` alone reads the phase too
-/// early (flaky-tests).
-Future<void> _waitForPhase(
+/// Completes when the handler *publishes* [phase] on its snapshot stream.
+/// Call it before the message that leads there. Waiting on `playAtCalls`
+/// read the phase before it changed, and polling `current` resumed before
+/// the asynchronous stream delivered it to other listeners (flaky-tests).
+Future<void> _phasePublished(
   PlaybackCommandHandler handler,
   PlaybackPhase phase,
-) async {
-  final deadline = DateTime.now().add(const Duration(seconds: 2));
-  while (handler.current.phase != phase && DateTime.now().isBefore(deadline)) {
-    await Future<void>.delayed(const Duration(milliseconds: 10));
-  }
-}
+) =>
+    handler.snapshots
+        .firstWhere((s) => s.phase == phase)
+        .timeout(const Duration(seconds: 2));
 
 void main() {
   group('PlaybackCommandHandler (SYNC-01, SYNC-03, SYNC-05, SYNC-06, SYNC-08)',
@@ -223,6 +222,7 @@ void main() {
       final targetEpoch = DateTime.now()
           .add(const Duration(milliseconds: 50))
           .millisecondsSinceEpoch;
+      final playing = _phasePublished(handler, PlaybackPhase.playing);
       handler.handleApplicationMessage(
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
@@ -230,7 +230,7 @@ void main() {
       expect(handler.current.phase, equals(PlaybackPhase.scheduled));
       expect(engine.playAtCalls, isEmpty);
 
-      await _waitForPhase(handler, PlaybackPhase.playing);
+      await playing;
 
       expect(engine.playAtCalls, hasLength(1));
       expect(
@@ -262,11 +262,12 @@ void main() {
           reason: 'waiting must not call the engine on its own');
 
       final targetEpoch = DateTime.now().millisecondsSinceEpoch;
+      final playing = _phasePublished(handler, PlaybackPhase.playing);
       handler.handleApplicationMessage(
         PlayCommandMessage(songId: 'song-1', masterSendEpochMs: targetEpoch),
       );
 
-      await _waitForPhase(handler, PlaybackPhase.playing);
+      await playing;
       expect(engine.playAtCalls, hasLength(1));
       expect(handler.current.phase, equals(PlaybackPhase.playing));
     });
