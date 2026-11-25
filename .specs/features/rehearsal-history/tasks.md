@@ -87,10 +87,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed in the test header, then tests: only playing spans count (pauses excluded, several spans summed, end + replay continue the same session); an open span is closed by `finish`; repeated `setPlaying` values do not double count; loops only while playing; `startedAt` = first play; 59 999 ms → null, 60 000 ms → log; never played → null; log has mode solo, role null, 1 participant
-- [ ] `scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/domain/rehearsal`
-- [ ] Test count: all existing + ≥ 9 new
+- [x] Failure modes listed in the test header, then tests: only playing spans count (pauses excluded, several spans summed, end + replay continue the same session); an open span is closed by `finish`; repeated `setPlaying` values do not double count; loops only while playing; `startedAt` = first play; 59 999 ms → null, 60 000 ms → log; never played → null; log has mode solo, role null, 1 participant
+- [x] `scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/domain/rehearsal`
+- [x] Test count: all existing + ≥ 9 new
 
 **Tests**: unit
 **Gate**: quick

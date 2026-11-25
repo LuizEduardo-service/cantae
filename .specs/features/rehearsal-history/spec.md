@@ -142,12 +142,12 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| HIST-01 | P1-AC1: duração = tempo tocando | - | Pending |
-| HIST-02 | P1-AC2: loops = voltas ao início do trecho | - | Pending |
-| HIST-03 | P1-AC3: grava ao sair com ≥ 60 s, com todos os campos | - | Pending |
-| HIST-04 | P1-AC4: não grava abaixo de 60 s | - | Pending |
+| HIST-01 | P1-AC1: duração = tempo tocando | Execute | Implementing |
+| HIST-02 | P1-AC2: loops = voltas ao início do trecho | Execute | Implementing |
+| HIST-03 | P1-AC3: grava ao sair com ≥ 60 s, com todos os campos | Execute | Implementing |
+| HIST-04 | P1-AC4: não grava abaixo de 60 s | Execute | Implementing |
 | HIST-05 | P1-AC5: atualiza o último ensaio da música | - | Pending |
-| HIST-06 | P1-AC6: sem áudio, letra ou dados de terceiros | - | Pending |
+| HIST-06 | P1-AC6: sem áudio, letra ou dados de terceiros | Execute | Implementing |
 | HIST-07 | P1-AC7: falha ao gravar não trava a saída | - | Pending |
 | HIST-08 | P2-AC1/AC2: linha "Ensaios anteriores (N)" abre a tela | - | Pending |
 | HIST-09 | P2-AC3: topo, título e frase | - | Pending |
@@ -160,7 +160,7 @@ As telas de sala ainda não existem, então hoje só o Modo solo pode gerar ensa
 | HIST-16 | P3-AC5: falha ao apagar | - | Pending |
 | HIST-17 | P3-AC6: toast e contagem atualizada | - | Pending |
 | HIST-18 | P3-AC7: apagar a música apaga os ensaios | - | Pending |
-| HIST-19 | Edge: fim e tocar de novo, interrupções, segundo plano, nunca tocou | - | Pending |
+| HIST-19 | Edge: fim e tocar de novo, interrupções, segundo plano, nunca tocou | Execute | Implementing |
 
 **ID format:** `HIST-[NUMBER]`
 
