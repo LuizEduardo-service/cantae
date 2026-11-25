@@ -158,31 +158,31 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BGA-01 | P1-AC1: `AudioService.init` uma vez na abertura | Execute | Implementing |
-| BGA-02 | P1-AC2: sessão de áudio `.playback` / foco de mídia | Execute | Implementing |
-| BGA-03 | P1-AC3: `UIBackgroundModes: audio` + serviço `mediaPlayback` | Execute | Implementing |
-| BGA-04 | P1-AC4/AC5: segue tocando com mix, loop e metrônomo; fim igual ao app | Execute | Implementing |
-| BGA-05 | P2-AC1: título, subtítulo e duração publicados | Execute | Implementing |
-| BGA-06 | P2-AC2: estado e posição publicados | Execute | Implementing |
-| BGA-07 | P2-AC3: Tocar/Pausar pela notificação | Execute | Implementing |
-| BGA-08 | P2-AC4: arrastar posição pela notificação | Execute | Implementing |
-| BGA-09 | P2-AC5: só Tocar/Pausar e barra | Execute | Implementing |
-| BGA-10 | P2-AC6/AC7: sair da tela ou fechar o app para e tira a notificação | Execute | Implementing |
-| BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | Execute | Implementing |
-| BGA-12 | P3-AC3: som curto abaixa o volume sem pausar | Execute | Implementing |
-| BGA-13 | P3-AC4: fone desconectado pausa | Execute | Implementing |
-| BGA-14 | P3-AC5/AC6: tela e toast após pausa externa | Execute | Implementing |
-| BGA-15 | P4-AC1: roteiro de teste em aparelho | Execute | Implementing |
-| BGA-16 | P4-AC2: teste de integração com log | Execute | Implementing |
-| BGA-17 | P4-AC3: pendência registrada no STATE.md | Execute | Implementing |
-| BGA-18 | Edge: falha no `AudioService.init` não impede o app | Execute | Implementing |
-| BGA-19 | Edge: sem notificação antes de carregar; um dono por vez | Execute | Implementing |
+| BGA-01 | P1-AC1: `AudioService.init` uma vez na abertura | Execute | Verified |
+| BGA-02 | P1-AC2: sessão de áudio `.playback` / foco de mídia | Execute | Verified |
+| BGA-03 | P1-AC3: `UIBackgroundModes: audio` + serviço `mediaPlayback` | Execute | Verified |
+| BGA-04 | P1-AC4/AC5: segue tocando com mix, loop e metrônomo; fim igual ao app | Execute | Verified |
+| BGA-05 | P2-AC1: título, subtítulo e duração publicados | Execute | Verified |
+| BGA-06 | P2-AC2: estado e posição publicados | Execute | Verified |
+| BGA-07 | P2-AC3: Tocar/Pausar pela notificação | Execute | Verified |
+| BGA-08 | P2-AC4: arrastar posição pela notificação | Execute | Verified |
+| BGA-09 | P2-AC5: só Tocar/Pausar e barra | Execute | Verified |
+| BGA-10 | P2-AC6/AC7: sair da tela ou fechar o app para e tira a notificação | Execute | Verified |
+| BGA-11 | P3-AC1/AC2: interrupção pausa e não retoma sozinha | Execute | Verified |
+| BGA-12 | P3-AC3: som curto abaixa o volume sem pausar | Execute | Verified |
+| BGA-13 | P3-AC4: fone desconectado pausa | Execute | Verified |
+| BGA-14 | P3-AC5/AC6: tela e toast após pausa externa | Execute | Verified |
+| BGA-15 | P4-AC1: roteiro de teste em aparelho | Execute | Verified |
+| BGA-16 | P4-AC2: teste de integração com log | Execute | Verified |
+| BGA-17 | P4-AC3: pendência registrada no STATE.md | Execute | Verified |
+| BGA-18 | Edge: falha no `AudioService.init` não impede o app | Execute | Verified |
+| BGA-19 | Edge: sem notificação antes de carregar; um dono por vez | Execute | Verified |
 
 **ID format:** `BGA-[NUMBER]`
 
 **Status values:** Pending → In Design → In Tasks → Implementing → Verified
 
-**Coverage:** 19 total, 0 mapped to tasks, 19 unmapped
+**Coverage:** 19 total, 19 mapped to tasks, 0 unmapped
 
 ---
 

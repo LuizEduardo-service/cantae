@@ -80,7 +80,7 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is in progress on branch `feature/phase-5-background-audio`. Project follows **Gitflow**.
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (Áudio em segundo plano, RF24) is complete and verified on branch `feature/phase-5-background-audio` (not yet merged). Project follows **Gitflow**.
 
 - **background-audio scope:** 9 tasks, executed inline in sequence.
   - **Engine:** `setDucked` (×0.5 on every track, click included); players built with `handleInterruptions: false` (`MultiTrackAudioEngine.defaultPlayer`).
@@ -88,6 +88,7 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - **Infrastructure:** `AudioSessionInterruptions`, `CantaeAudioHandler` (the single `audio_service` handler: title, "Modo solo", Tocar/Pausar + seek), `bootstrapBackgroundAudio` (session `.music()`, `AudioService.init`, never throws). `main.dart` runs it before `runApp`. iOS declares `UIBackgroundModes: audio`.
   - **Modo solo:** publishes on ready/play/pause/seek/loop jump/end; lock-screen commands run the in-app paths; stop and leaving clear the notification; interruptions and headphones pause all without auto-resume; duck lowers the volume; toast on return.
 - **User decisions:** notification has Tocar/Pausar + the position bar; no device available now, so a device script and an integration test are delivered but not run.
+- **Verifier:** standalone fallback by the author (sub-agent blocked by `context-mode`). 19/19 requirements, 34/34 mutants killed in iteration 1, 758 tests. Report: `.specs/features/background-audio/validation.md`.
 - **Pending device run (BGA-17):** neither `docs/device-test-background-audio.md` nor `integration_test/background_audio_test.dart` has run on a device. They also cover the solo-metronome T1/T2 fixes, still unverified on a device. The Android 13+ notification permission exemption is an unconfirmed assumption (script step 2).
 - **Known debt:**
   - two `audio_service` handlers in the code: only `CantaeAudioHandler` is registered; the phase-4 room `BackgroundAudioHandler` (used by its integration test) must fold into `PlaybackRemote` when the room screens land;
@@ -96,7 +97,7 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
   - wall-clock flaky tests (`song_sync_coordinator_test`, `chunked_file_receiver_test`, `playback_command_handler_test`).
 
-**Next:** feature-level verification of background-audio, then merge to `develop` with the user's go-ahead. Candidates after that:
+**Next:** merging `feature/phase-5-background-audio` into `develop` needs the user's go-ahead. Candidates after that:
 - run the device script;
 - fixing the flaky wall-clock tests;
 - **Ensaios anteriores**;
