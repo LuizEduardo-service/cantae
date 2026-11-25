@@ -295,9 +295,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] `test/presentation/providers/solo_player_notifier_test.dart`, 1:1 to ACs: loaded → `ready`, position 0, duration from engine; `notFound`; repository error → `error`, `retry` re-reads; no tracks → `noTracks` and the engine is never loaded; `loadSong` throws → `audioError`, `retry` reloads; togglePlay play/pause and rapid double tap ends in the last state; seekTo clamps to 0..duration and keeps playing state; reaching duration pauses, sets `ended`, next play seeks to 0; setVolume clamps and calls the engine; toggleMute; toggleSolo exclusive and undo; mix starts at 100 % unmuted on a fresh provider; markLoopStart only while playing; markLoopEnd valid → loop on; end ≤ start → `loopError`, start kept; reaching loop end seeks to start; clearLoop keeps position (no seek); dispose stops the engine
-- [ ] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
-- [ ] Test count: ≥ 20 tests pass
+- [x] `test/presentation/providers/solo_player_notifier_test.dart`, 1:1 to ACs: loaded → `ready`, position 0, duration from engine; `notFound`; repository error → `error`, `retry` re-reads; no tracks → `noTracks` and the engine is never loaded; `loadSong` throws → `audioError`, `retry` reloads; togglePlay play/pause and rapid double tap ends in the last state; seekTo clamps to 0..duration and keeps playing state; reaching duration pauses, sets `ended`, next play seeks to 0; setVolume clamps and calls the engine; toggleMute; toggleSolo exclusive and undo; mix starts at 100 % unmuted on a fresh provider; markLoopStart only while playing; markLoopEnd valid → loop on; end ≤ start → `loopError`, start kept; reaching loop end seeks to start; clearLoop keeps position (no seek); dispose stops the engine
+- [x] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
+- [x] Test count: ≥ 20 tests pass
 
 **Tests**: unit
 **Gate**: quick
