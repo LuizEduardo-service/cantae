@@ -342,9 +342,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-routing`
 
 **Done when**:
-- [ ] Tests written first and failing: `app_router_test.dart` "solo-player renders SoloPlayerScreen with the route id" (replacing the ComingSoon entry); `song_detail_screen_test.dart` "Ensaiar só" expects `route:solo-player:s1`
-- [ ] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
-- [ ] Test count: full suite, 0 regressions
+- [x] Tests written first and failing: `app_router_test.dart` "solo-player renders SoloPlayerScreen with the route id" (replacing the ComingSoon entry); `song_detail_screen_test.dart` "Ensaiar só" expects `route:solo-player:s1`
+- [x] Gate check passes: `flutter analyze && dart format --set-exit-if-changed lib test && flutter test`
+- [x] Test count: full suite, 0 regressions
 
 **Tests**: widget
 **Gate**: build

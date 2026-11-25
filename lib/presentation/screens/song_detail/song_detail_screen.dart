@@ -299,7 +299,10 @@ class _HubScaffold extends StatelessWidget {
           Expanded(
             child: SecondaryButton(
               label: 'Ensaiar só',
-              onPressed: () => context.goNamed('solo-player'),
+              onPressed: () => context.goNamed(
+                'solo-player',
+                pathParameters: {'id': song.id},
+              ),
             ),
           ),
           const SizedBox(width: CantaeSpacing.space3),

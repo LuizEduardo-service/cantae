@@ -8,6 +8,7 @@ import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
 import 'package:cantae/presentation/screens/lyrics_editor/lyrics_editor_screen.dart';
+import 'package:cantae/presentation/screens/solo_player/solo_player_screen.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/screens/track_align/track_align_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
@@ -156,8 +157,22 @@ void main() {
       );
     });
 
+    testWidgets('solo-player renders SoloPlayerScreen with the route id', (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed('solo-player', pathParameters: {'id': 'abc'});
+      await tester.pumpAndSettle();
+
+      expect(find.byType(SoloPlayerScreen), findsOneWidget);
+      expect(
+        tester.widget<SoloPlayerScreen>(find.byType(SoloPlayerScreen)).songId,
+        equals('abc'),
+      );
+    });
+
     for (final entry in {
-      'solo-player': 'Modo solo',
       'studio': 'Studio — corte de áudio',
       'song-history': 'Ensaios anteriores',
       'track-upload': 'Enviar faixa',

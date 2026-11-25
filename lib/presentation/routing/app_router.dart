@@ -4,13 +4,14 @@ import 'package:go_router/go_router.dart';
 import '../screens/coming_soon/coming_soon_screen.dart';
 import '../screens/library/library_screen.dart';
 import '../screens/lyrics_editor/lyrics_editor_screen.dart';
+import '../screens/solo_player/solo_player_screen.dart';
 import '../screens/song_detail/song_detail_screen.dart';
 import '../screens/track_align/track_align_screen.dart';
 
 /// The app's single `GoRouter` instance (AD-012). Routes are always named
 /// (`context.goNamed(...)`), never raw path strings. `library`,
-/// `song-detail`, `track-align` and `lyrics-editor` are real screens; the
-/// rest render the shared [ComingSoonScreen] placeholder.
+/// `song-detail`, `track-align`, `lyrics-editor` and `solo-player` are real
+/// screens; the rest render the shared [ComingSoonScreen] placeholder.
 final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     initialLocation: '/',
@@ -50,9 +51,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             const ComingSoonScreen(title: 'Importar pacote'),
       ),
       GoRoute(
-        path: '/solo-player',
+        path: '/solo-player/:id',
         name: 'solo-player',
-        builder: (context, state) => const ComingSoonScreen(title: 'Modo solo'),
+        builder: (context, state) =>
+            SoloPlayerScreen(songId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/studio',

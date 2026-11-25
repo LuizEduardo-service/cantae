@@ -77,10 +77,15 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             Text('route:lyrics-editor:${state.pathParameters['id']}'),
       ),
+      GoRoute(
+        path: '/solo-player/:id',
+        name: 'solo-player',
+        builder: (context, state) =>
+            Text('route:solo-player:${state.pathParameters['id']}'),
+      ),
       for (final name in [
         'studio',
         'song-history',
-        'solo-player',
         'room-create',
         'package-import',
         'track-upload',
@@ -350,7 +355,7 @@ void main() {
 
       await tester.tap(find.text('Ensaiar só'));
       await tester.pumpAndSettle();
-      expect(find.text('route:solo-player'), findsOneWidget);
+      expect(find.text('route:solo-player:s1'), findsOneWidget);
     });
 
     testWidgets('rodapé: "Ensaiar em grupo" navigates to the room-create route',
