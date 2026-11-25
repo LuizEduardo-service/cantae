@@ -136,9 +136,63 @@ Future<ParticipantSession> _joinAndApprove(
   return connected;
 }
 
+/// playAt that signals when it is called and finishes only when released.
+class _GatedEngine extends FakeAudioPlaybackEngine {
+  final started = Completer<void>();
+  final release = Completer<void>();
+
+  @override
+  Future<void> playAt(DateTime scheduledStart) async {
+    playAtCalls.add(scheduledStart);
+    started.complete();
+    await release.future;
+  }
+}
+
 void main() {
   group('PlaybackCommandHandler (SYNC-01, SYNC-03, SYNC-05, SYNC-06, SYNC-08)',
       () {
+    // Regression (flaky-tests): dispose() closed the snapshot stream but
+    // left the scheduled Timer running. A disposed handler still called
+    // engine.playAt at the scheduled time, and a playAt still starting at
+    // dispose emitted into the closed stream ("Cannot add new events after
+    // calling close").
+    test('disposing before the scheduled time never calls the engine',
+        () async {
+      final engine = FakeAudioPlaybackEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      handler.handleApplicationMessage(PlayCommandMessage(
+        songId: 'song-1',
+        masterSendEpochMs: DateTime.now()
+            .add(const Duration(milliseconds: 50))
+            .millisecondsSinceEpoch,
+      ));
+
+      handler.dispose();
+      await Future<void>.delayed(const Duration(milliseconds: 150));
+
+      expect(engine.playAtCalls, isEmpty);
+    });
+
+    test('disposing while the engine is starting emits nothing afterwards',
+        () async {
+      final engine = _GatedEngine();
+      final handler = PlaybackCommandHandler(engine: engine);
+      final phases = <PlaybackPhase>[];
+      handler.snapshots.listen((s) => phases.add(s.phase));
+      handler.handleApplicationMessage(PlayCommandMessage(
+        songId: 'song-1',
+        masterSendEpochMs: DateTime.now().millisecondsSinceEpoch,
+      ));
+      await engine.started.future.timeout(const Duration(seconds: 2));
+
+      handler.dispose();
+      engine.release.complete();
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      expect(phases, isNot(contains(PlaybackPhase.playing)));
+    });
+
     test(
         'snapshots transition idle -> scheduled -> playing on a PlayCommandMessage, calling the fake engine playAt at the scheduled epoch',
         () async {

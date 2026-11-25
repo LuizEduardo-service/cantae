@@ -114,8 +114,18 @@ class PlaybackCommandHandler {
       activeSongId: activeSongId,
       scheduledStartAt: targetTime,
     );
-    Timer(delay.isNegative ? Duration.zero : delay, onFire);
+    late final Timer timer;
+    timer = Timer(delay.isNegative ? Duration.zero : delay, () {
+      _pendingTimers.remove(timer);
+      onFire();
+    });
+    _pendingTimers.add(timer);
   }
+
+  /// Commands scheduled but not fired yet; [dispose] cancels them so a
+  /// handler that left the room never starts the engine.
+  final Set<Timer> _pendingTimers = {};
+  bool _disposed = false;
 
   static const _unset = Object();
 
@@ -124,6 +134,9 @@ class PlaybackCommandHandler {
     Object? activeSongId = _unset,
     DateTime? scheduledStartAt,
   }) {
+    // An engine call still finishing at dispose must not reach the closed
+    // stream.
+    if (_disposed) return;
     _current = RoomPlaybackSnapshot(
       activeSongId: activeSongId == _unset
           ? _current.activeSongId
@@ -135,6 +148,11 @@ class PlaybackCommandHandler {
   }
 
   void dispose() {
+    _disposed = true;
+    for (final timer in _pendingTimers) {
+      timer.cancel();
+    }
+    _pendingTimers.clear();
     _subscription?.cancel();
     unawaited(_snapshotsController.close());
   }
