@@ -136,6 +136,9 @@ Editor de letra: uma linha da letra, com edição inline.
 
 ### `PlaybackProgress`
 Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`, região de loop `accentTrack`. Abaixo, texto opcional "Repetindo trecho 0:41–1:12 · Mestre: Marina".
+- Arrastar a barra mostra o tempo do dedo e só busca (`onSeek`) ao soltar, uma vez.
+- Leitor de tela: "Posição da música", valor em `m:ss.s`.
+- Props: `positionMs`, `durationMs`, `onSeek`, `loopStartMs`, `loopEndMs` (região só com os dois), `caption`.
 
 ### `RoomCodeDisplay`
 Card `surface` raio 24: rótulo "Código da sala", código em `monoLarge`, botão "Copiar" (toast "Código copiado"), frase de instrução.
