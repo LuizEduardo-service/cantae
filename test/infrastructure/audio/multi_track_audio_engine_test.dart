@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_track.dart';
@@ -295,6 +297,41 @@ void main() {
       expect(events.last, 4000,
           reason: 'the contralto (longest) drives it: 2000 delay + 2000 local');
       await subscription.cancel();
+    });
+  });
+
+  // Regression (solo-metronome spec, bug 1): playAt awaited each
+  // player.play(), whose future completes only when playback pauses. On a
+  // device only the first track ever started.
+  group('playAt', () {
+    test('starts every track even when play() answers only on pause', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      for (final player in fakePlatform.created) {
+        player.holdPlayUntilPause = true;
+      }
+
+      unawaited(engine.playAt(DateTime.now()));
+      for (var i = 0; i < 10; i++) {
+        await Future<void>.delayed(Duration.zero);
+      }
+
+      expect(fakePlatform.created[0].playCalls, hasLength(1));
+      expect(fakePlatform.created[1].playCalls, hasLength(1),
+          reason: 'the second track must not wait for the first to pause');
+      await engine.pause();
+    });
+
+    test('completes without waiting for playback to pause', () async {
+      await engine.loadSong(songWith(sopranoId: 's', contraltoId: 'c'));
+      for (final player in fakePlatform.created) {
+        player.holdPlayUntilPause = true;
+      }
+
+      await expectLater(
+        engine.playAt(DateTime.now()).timeout(const Duration(seconds: 1)),
+        completes,
+      );
+      await engine.pause();
     });
   });
 

@@ -169,8 +169,12 @@ class MultiTrackAudioEngine implements AudioPlaybackEngine {
     if (!delay.isNegative) {
       await Future<void>.delayed(delay);
     }
+    // `AudioPlayer.play()` completes only when playback pauses, stops or
+    // ends (just_audio docs; Android holds the reply until pause). Awaiting
+    // it would start one track and block the rest, so every player is
+    // started without waiting; a failure in one must not stop the others.
     for (final player in _playersByTrackId.values) {
-      await player.play();
+      unawaited(player.play().catchError((Object _) {}));
     }
   }
 

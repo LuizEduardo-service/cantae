@@ -57,6 +57,13 @@ class FakeAudioPlayerPlatform extends AudioPlayerPlatform {
   /// real decoder would report.
   Duration? loadDuration;
 
+  /// When true, `play` answers only once playback pauses (or the player is
+  /// disposed), like the Android implementation (`AudioPlayer.java` keeps
+  /// `playResult` until pause). `just_audio`'s `play()` documents the same
+  /// contract: its future completes when playback pauses, stops or ends.
+  bool holdPlayUntilPause = false;
+  Completer<void>? _heldPlay;
+
   final StreamController<PlaybackEventMessage> _playbackEvents =
       StreamController<PlaybackEventMessage>.broadcast();
 
@@ -98,12 +105,18 @@ class FakeAudioPlayerPlatform extends AudioPlayerPlatform {
   @override
   Future<PlayResponse> play(PlayRequest request) async {
     playCalls.add(request);
+    if (holdPlayUntilPause) {
+      final held = Completer<void>();
+      _heldPlay = held;
+      await held.future;
+    }
     return PlayResponse();
   }
 
   @override
   Future<PauseResponse> pause(PauseRequest request) async {
     pauseCalls.add(request);
+    _releaseHeldPlay();
     return PauseResponse();
   }
 
@@ -140,6 +153,13 @@ class FakeAudioPlayerPlatform extends AudioPlayerPlatform {
   Future<DisposeResponse> dispose(DisposeRequest request) async {
     disposeCalls.add(request);
     _disposed = true;
+    _releaseHeldPlay();
     return DisposeResponse();
+  }
+
+  void _releaseHeldPlay() {
+    final held = _heldPlay;
+    _heldPlay = null;
+    if (held != null && !held.isCompleted) held.complete();
   }
 }

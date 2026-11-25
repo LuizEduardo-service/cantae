@@ -88,9 +88,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: NONE
 
 **Done when**:
-- [ ] Regression test written first and failing on the current code: with `holdPlayUntilPause`, `playAt` on a 2-track song sends `play` to both players, and the `playAt` future completes without a pause
-- [ ] Gate check passes: `flutter test` (full: every screen and the room use `playAt`)
-- [ ] Test count: all existing + ≥ 2 new
+- [x] Regression test written first and failing on the current code: with `holdPlayUntilPause`, `playAt` on a 2-track song sends `play` to both players, and the `playAt` future completes without a pause
+- [x] Gate check passes: `flutter test` (full: every screen and the room use `playAt`)
+- [x] Test count: all existing + ≥ 2 new
 
 **Tests**: unit
 **Gate**: full
