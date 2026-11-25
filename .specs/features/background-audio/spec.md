@@ -158,9 +158,9 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| BGA-01 | P1-AC1: `AudioService.init` uma vez na abertura | - | Pending |
-| BGA-02 | P1-AC2: sessão de áudio `.playback` / foco de mídia | - | Pending |
-| BGA-03 | P1-AC3: `UIBackgroundModes: audio` + serviço `mediaPlayback` | - | Pending |
+| BGA-01 | P1-AC1: `AudioService.init` uma vez na abertura | Execute | Implementing |
+| BGA-02 | P1-AC2: sessão de áudio `.playback` / foco de mídia | Execute | Implementing |
+| BGA-03 | P1-AC3: `UIBackgroundModes: audio` + serviço `mediaPlayback` | Execute | Implementing |
 | BGA-04 | P1-AC4/AC5: segue tocando com mix, loop e metrônomo; fim igual ao app | - | Pending |
 | BGA-05 | P2-AC1: título, subtítulo e duração publicados | Execute | Implementing |
 | BGA-06 | P2-AC2: estado e posição publicados | Execute | Implementing |
@@ -175,7 +175,7 @@ As correções de áudio da feature anterior (todas as faixas tocam juntas; o re
 | BGA-15 | P4-AC1: roteiro de teste em aparelho | - | Pending |
 | BGA-16 | P4-AC2: teste de integração com log | - | Pending |
 | BGA-17 | P4-AC3: pendência registrada no STATE.md | - | Pending |
-| BGA-18 | Edge: falha no `AudioService.init` não impede o app | - | Pending |
+| BGA-18 | Edge: falha no `AudioService.init` não impede o app | Execute | Implementing |
 | BGA-19 | Edge: sem notificação antes de carregar; um dono por vez | - | Pending |
 
 **ID format:** `BGA-[NUMBER]`

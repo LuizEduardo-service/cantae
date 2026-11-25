@@ -157,10 +157,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: successful init → overrides resolve to the given handler and interruptions; init throws → `playbackRemoteProvider` is `NoPlaybackRemote`, and the call completes; session configure throws → init still attempted; interruptions throw → `NoAudioInterruptions`
-- [ ] Platform config test: `Info.plist` has `UIBackgroundModes` containing `audio`; manifest keeps the `AudioService` with `mediaPlayback`
-- [ ] Gate check passes: `flutter test` (full: `main` changes)
-- [ ] Test count: all existing + ≥ 6 new
+- [x] Failure modes listed first, then tests: successful init → overrides resolve to the given handler and interruptions; init throws → `playbackRemoteProvider` is `NoPlaybackRemote`, and the call completes; session configure throws → init still attempted; interruptions throw → `NoAudioInterruptions`
+- [x] Platform config test: `Info.plist` has `UIBackgroundModes` containing `audio`; manifest keeps the `AudioService` with `mediaPlayback`
+- [x] Gate check passes: `flutter test` (full: `main` changes)
+- [x] Test count: all existing + ≥ 6 new
 
 **Tests**: unit
 **Gate**: full
