@@ -7,6 +7,8 @@ import '../../domain/audio/audio_playback_engine.dart';
 import '../../domain/audio/click_track_builder.dart';
 import '../../domain/audio/loop_controller.dart';
 import '../../domain/audio/playback_remote.dart';
+import '../../domain/rehearsal/rehearsal_session_tracker.dart';
+import '../../data/ids/uuid_v4.dart';
 import '../../domain/core/failures.dart';
 import '../../domain/core/result.dart';
 import '../../domain/entities/metronome_config.dart';
@@ -18,6 +20,7 @@ import 'audio_playback_engine_provider.dart';
 import 'background_audio_providers.dart';
 import 'click_track_builder_provider.dart';
 import 'library_providers.dart';
+import 'rehearsal_providers.dart';
 import 'song_detail_providers.dart';
 import 'song_repository_provider.dart';
 
@@ -195,6 +198,10 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
       : _engine = _ref.read(audioPlaybackEngineProvider),
         _clickTrackBuilder = _ref.read(clickTrackBuilderProvider),
         _remote = _ref.read(playbackRemoteProvider),
+        // Read now: the notifier's ref cannot be used in dispose, where the
+        // session is recorded (rehearsal-history design).
+        _recorder = _ref.read(rehearsalRecorderProvider),
+        _now = _ref.read(clockProvider),
         super(const SoloPlayerState.loading()) {
     _commandSubscription = _remote.commands.listen(_onRemoteCommand);
     _interruptionSubscription =
@@ -211,6 +218,23 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
   final AudioPlaybackEngine _engine;
   final ClickTrackBuilder _clickTrackBuilder;
   final PlaybackRemote _remote;
+  final RehearsalRecorder _recorder;
+  final DateTime Function() _now;
+  final RehearsalSessionTracker _tracker = RehearsalSessionTracker();
+
+  @override
+  SoloPlayerState get state => super.state;
+
+  /// Every path that starts or stops the music (button, lock screen, end of
+  /// the song, interruptions) goes through here, so the rehearsal time
+  /// counts them all the same (HIST-01). The metronome's internal pause and
+  /// resume never change `playing`, so they do not split the time.
+  @override
+  set state(SoloPlayerState value) {
+    super.state = value;
+    _tracker.setPlaying(value.playing, _now());
+  }
+
   StreamSubscription<int>? _positionSubscription;
   late final StreamSubscription<RemoteCommand> _commandSubscription;
   late final StreamSubscription<AudioInterruption> _interruptionSubscription;
@@ -352,6 +376,7 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     if (loop != null && loop.shouldReposition(positionMs)) {
       state = state.copyWith(positionMs: loop.repositionTarget);
       _engine.seekAllTo(loop.repositionTarget);
+      _tracker.loopJumped();
       _publish();
       return;
     }
@@ -602,6 +627,8 @@ class SoloPlayerNotifier extends StateNotifier<SoloPlayerState> {
     _interruptionSubscription.cancel();
     _remote.clear();
     _engine.stop();
+    final log = _tracker.finish(id: uuidV4(), songId: _songId, now: _now());
+    if (log != null) unawaited(_recorder.record(log));
     super.dispose();
   }
 }

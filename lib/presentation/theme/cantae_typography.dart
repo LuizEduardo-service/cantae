@@ -119,6 +119,15 @@ abstract final class CantaeTypography {
     letterSpacing: 8,
   );
 
+  /// Large number in a `StatTile` (History summary).
+  static const TextStyle monoStat = TextStyle(
+    fontFamily: _geistMono,
+    fontSize: 26,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.5,
+    height: 1.1,
+  );
+
   static const TextStyle mono = TextStyle(
     fontFamily: _geistMono,
     fontSize: 14,

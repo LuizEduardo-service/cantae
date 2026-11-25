@@ -135,6 +135,7 @@ Fontes empacotadas no app (não depender de rede). Toda medida escala com a font
 | `caption` | 13 / 400–600 | Metadados, rótulos de seção (`text2`, 600) |
 | `monoLarge` | 64 / 500 / +8 | Código da sala |
 | `monoInput` | 28 / 500 / +8 | Campo de código |
+| `monoStat` | 26 / 600 / −0.5 / 1.1 | Número do `StatTile` (Histórico) |
 | `mono` | 13–15 / 400–500 | Tempos, latência, MB |
 
 Rótulos de seção usam **frase normal** ("Naipes", "Seus dados"), não CAIXA ALTA.

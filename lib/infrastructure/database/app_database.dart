@@ -2,15 +2,18 @@ import 'package:drift/drift.dart';
 import 'package:cantae/infrastructure/database/tables/songs_table.dart';
 import 'package:cantae/infrastructure/database/tables/song_tracks_table.dart';
 import 'package:cantae/infrastructure/database/tables/lyric_lines_table.dart';
+import 'package:cantae/infrastructure/database/tables/rehearsal_logs_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [SongsTable, SongTracksTable, LyricLinesTable])
+@DriftDatabase(
+  tables: [SongsTable, SongTracksTable, LyricLinesTable, RehearsalLogsTable],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   // SPEC_DEVIATION: AD-009/design.md's original sketch named drift's
   // `stepByStep(from1To2: ...)` helper. That helper now only exists as
@@ -33,6 +36,11 @@ class AppDatabase extends _$AppDatabase {
             // from onset_ms. alterTable rebuilds lyric_lines from the current
             // (nullable) schema and copies every existing row unchanged.
             await m.alterTable(TableMigration(lyricLinesTable));
+          }
+          if (from < 4) {
+            // rehearsal-history: a new table (and its index) only.
+            await m.createTable(rehearsalLogsTable);
+            await m.createIndex(rehearsalLogsSongId);
           }
         },
         beforeOpen: (details) async {

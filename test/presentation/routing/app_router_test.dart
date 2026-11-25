@@ -6,6 +6,7 @@ import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
+import 'package:cantae/presentation/screens/history/rehearsal_history_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
 import 'package:cantae/presentation/screens/lyrics_editor/lyrics_editor_screen.dart';
 import 'package:cantae/presentation/screens/solo_player/solo_player_screen.dart';
@@ -172,9 +173,28 @@ void main() {
       );
     });
 
+    testWidgets('song-history renders RehearsalHistoryScreen with the route id',
+        (
+      tester,
+    ) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed('song-history', pathParameters: {'id': 'abc'});
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RehearsalHistoryScreen), findsOneWidget);
+      expect(
+        tester
+            .widget<RehearsalHistoryScreen>(
+              find.byType(RehearsalHistoryScreen),
+            )
+            .songId,
+        equals('abc'),
+      );
+    });
+
     for (final entry in {
       'studio': 'Studio — corte de áudio',
-      'song-history': 'Ensaios anteriores',
       'track-upload': 'Enviar faixa',
     }.entries) {
       testWidgets('${entry.key} renders ComingSoonScreen', (tester) async {

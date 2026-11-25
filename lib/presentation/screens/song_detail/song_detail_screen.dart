@@ -7,6 +7,7 @@ import '../../../domain/entities/naipe.dart';
 import '../../../domain/entities/song.dart';
 import '../../../domain/entities/song_origin.dart';
 import '../../providers/library_providers.dart';
+import '../../providers/rehearsal_providers.dart';
 import '../../providers/song_detail_providers.dart';
 import '../../providers/song_repository_provider.dart';
 import '../../theme/cantae_colors.dart';
@@ -276,10 +277,15 @@ class _HubScaffold extends StatelessWidget {
                 pathParameters: {'id': song.id},
               ),
             ),
-            _PreparaRow(
-              label: 'Ensaios anteriores',
-              onTap: () => context.goNamed('song-history'),
-            ),
+            _HistoryRow(songId: song.id),
+          ],
+          // PRD UX §6.16: history is for every role, so a received song
+          // keeps it even though "Preparar" is hidden.
+          if (isReadOnly) ...[
+            const SizedBox(height: CantaeSpacing.space6),
+            const _SectionLabel('Ensaios'),
+            const SizedBox(height: CantaeSpacing.space2),
+            _HistoryRow(songId: song.id),
           ],
           const SizedBox(height: CantaeSpacing.space6),
           if (deleteError != null) ...[
@@ -379,6 +385,30 @@ class _NaipeRow extends StatelessWidget {
               ),
             ),
         ],
+      ),
+    );
+  }
+}
+
+/// "Ensaios anteriores (N)" (rehearsal-history HIST-08).
+class _HistoryRow extends ConsumerWidget {
+  const _HistoryRow({required this.songId});
+
+  final String songId;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final count = ref.watch(rehearsalLogsProvider(songId)).valueOrNull?.when(
+          success: (logs) => logs.length,
+          failure: (_) => 0,
+        );
+    return _PreparaRow(
+      label: count == null || count == 0
+          ? 'Ensaios anteriores'
+          : 'Ensaios anteriores ($count)',
+      onTap: () => context.goNamed(
+        'song-history',
+        pathParameters: {'id': songId},
       ),
     );
   }

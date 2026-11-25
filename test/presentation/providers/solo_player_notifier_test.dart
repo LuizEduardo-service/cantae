@@ -9,6 +9,8 @@ import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/entities/metronome_config.dart';
 import 'package:cantae/domain/entities/naipe.dart';
+import 'package:cantae/domain/entities/rehearsal_log.dart';
+import 'package:cantae/domain/repositories/rehearsal_repository.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
@@ -16,6 +18,7 @@ import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/audio_playback_engine_provider.dart';
 import 'package:cantae/presentation/providers/background_audio_providers.dart';
 import 'package:cantae/presentation/providers/click_track_builder_provider.dart';
+import 'package:cantae/presentation/providers/rehearsal_providers.dart';
 import 'package:cantae/presentation/providers/solo_player_notifier.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:flutter/widgets.dart';
@@ -184,6 +187,41 @@ class _FakeRemote implements PlaybackRemote {
   Stream<RemoteCommand> get commands => _commands.stream;
 }
 
+class _FakeRehearsals implements RehearsalRepository {
+  final List<RehearsalLog> added = [];
+  bool failAdd = false;
+
+  @override
+  Future<Result<Unit, StorageFailure>> add(RehearsalLog log) async {
+    if (failAdd) {
+      return Result.failure(StorageFailure(code: 'rehearsal_save_failed'));
+    }
+    added.add(log);
+    return const Result.success(Unit());
+  }
+
+  @override
+  Future<Result<List<RehearsalLog>, StorageFailure>> getBySong(
+    String songId,
+  ) async =>
+      Result.success(added.where((l) => l.songId == songId).toList());
+
+  @override
+  Future<Result<Unit, StorageFailure>> deleteBySong(String songId) async =>
+      const Result.success(Unit());
+
+  @override
+  Future<Result<Unit, StorageFailure>> deleteAll() async =>
+      const Result.success(Unit());
+}
+
+/// A clock the test moves by hand.
+class _Clock {
+  DateTime now = DateTime(2026, 11, 25, 19, 40);
+
+  void advance(int seconds) => now = now.add(Duration(seconds: seconds));
+}
+
 class _FakeInterruptions implements AudioInterruptions {
   final _events = StreamController<AudioInterruption>.broadcast();
 
@@ -236,8 +274,12 @@ Song _song({
   _FakeClickTrackBuilder builder,
   _FakeRemote remote,
   _FakeInterruptions interruptions,
+  _FakeRehearsals rehearsals,
+  _Clock clock,
 }) _setUp({Song? song, bool notFound = false, Failure? failure}) {
   final engine = _FakeAudioPlaybackEngine();
+  final rehearsals = _FakeRehearsals();
+  final clock = _Clock();
   final remote = _FakeRemote();
   final interruptions = _FakeInterruptions();
   final builder = _FakeClickTrackBuilder();
@@ -252,6 +294,8 @@ Song _song({
       clickTrackBuilderProvider.overrideWithValue(builder),
       playbackRemoteProvider.overrideWithValue(remote),
       audioInterruptionsProvider.overrideWithValue(interruptions),
+      rehearsalRepositoryProvider.overrideWithValue(rehearsals),
+      clockProvider.overrideWithValue(() => clock.now),
     ],
   );
   return (
@@ -261,6 +305,8 @@ Song _song({
     builder: builder,
     remote: remote,
     interruptions: interruptions,
+    rehearsals: rehearsals,
+    clock: clock,
   );
 }
 
@@ -1206,6 +1252,168 @@ void main() {
 
       expect(_state(s.container).playing, isTrue);
       expect(_state(s.container).externalPause, isNull);
+    });
+  });
+
+  // Leaving the screen disposes only the autoDispose notifier; the container
+  // (and the app-scoped recorder) stays, as in the app.
+  group('rehearsal recording (HIST-01 to HIST-04, HIST-07, HIST-19)', () {
+    Future<ProviderSubscription<SoloPlayerState>> open(
+      ProviderContainer c,
+    ) async {
+      final sub = c.listen(soloPlayerProvider('ave'), (_, __) {});
+      await _flush();
+      return sub;
+    }
+
+    Future<void> leave(ProviderSubscription<SoloPlayerState> sub) async {
+      sub.close();
+      await _flush();
+    }
+
+    test('75 s playing with 3 loop jumps records one solo rehearsal', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      final startedAt = s.clock.now;
+      await _notifier(s.container).togglePlay();
+      s.engine.emitPosition(41000);
+      await _flush();
+      _notifier(s.container).markLoopStart();
+      s.engine.emitPosition(72000);
+      await _flush();
+      _notifier(s.container).markLoopEnd();
+      for (var i = 0; i < 3; i++) {
+        s.engine.emitPosition(72000);
+        await _flush();
+      }
+      s.clock.advance(75);
+
+      await leave(sub);
+
+      final log = s.rehearsals.added.single;
+      expect(log.songId, 'ave');
+      expect(log.durationMs, 75000);
+      expect(log.loopCount, 3);
+      expect(log.mode, RehearsalMode.solo);
+      expect(log.startedAt, startedAt);
+      expect(log.endedAt, s.clock.now);
+    });
+
+    test('59 s playing records nothing', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(59);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added, isEmpty);
+    });
+
+    test('never playing records nothing', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      s.clock.advance(600);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added, isEmpty);
+    });
+
+    test('paused time is not counted', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(40);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(300);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(30);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added.single.durationMs, 70000);
+    });
+
+    test('the end of the song and playing again add to the same rehearsal',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(50);
+      s.engine.emitPosition(180000);
+      await _flush();
+      s.clock.advance(20);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(30);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added.single.durationMs, 80000);
+    });
+
+    test('a pause by a call is not counted', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(65);
+      await s.interruptions.emit(AudioInterruption.pauseBegan);
+      s.clock.advance(120);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added.single.durationMs, 65000);
+    });
+
+    test('Tocar from the lock screen counts', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await s.remote.send(const RemotePlay());
+      s.clock.advance(61);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added.single.durationMs, 61000);
+    });
+
+    test("the metronome's internal pause and resume do not split the time",
+        () async {
+      final s = _setUp(
+        song: _song(
+          metronomeConfig: const MetronomeConfig(bpm: 72, beatsPerMeasure: 4),
+        ),
+      );
+      addTearDown(s.container.dispose);
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(30);
+      await _notifier(s.container).toggleMetronome();
+      s.clock.advance(40);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added.single.durationMs, 70000);
+    });
+
+    test('a failed save does not break leaving the screen', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      s.rehearsals.failAdd = true;
+      final sub = await open(s.container);
+      await _notifier(s.container).togglePlay();
+      s.clock.advance(90);
+
+      await leave(sub);
+
+      expect(s.rehearsals.added, isEmpty);
+      expect(s.engine.calls.last, 'stop');
     });
   });
 }

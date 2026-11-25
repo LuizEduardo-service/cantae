@@ -148,6 +148,58 @@ void main() {
       expect(row.onsetMs, isNull);
     });
   });
+  // Failure modes (HIST-18, schema v4): upgrading a v3 library loses songs;
+  // the rehearsal_logs table is missing after an upgrade or a fresh
+  // install; deleting a song leaves its rehearsals behind.
+  group('AppDatabase migration v3 -> v4 (rehearsal_logs)', () {
+    test('a v3 library upgrades with its song intact and the new table',
+        () async {
+      final db = AppDatabase(NativeDatabase(File(_seedV3Database())));
+      addTearDown(db.close);
+
+      final song = await db.select(db.songsTable).getSingle();
+      expect(song.id, 'ave-1');
+      expect(song.name, 'Ave Verum Corpus');
+      expect(await _columnsOf(db, 'rehearsal_logs'), _rehearsalColumns);
+    });
+
+    test('a fresh install creates rehearsal_logs', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      expect(await _columnsOf(db, 'rehearsal_logs'), _rehearsalColumns);
+    });
+
+    test('deleting a song deletes its rehearsals', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      for (final id in ['ave-1', 'aleluia']) {
+        await db.into(db.songsTable).insert(SongsTableCompanion.insert(
+              id: id,
+              name: id,
+              author: 'Mozart',
+              version: '',
+            ));
+        await db.into(db.rehearsalLogsTable).insert(
+              RehearsalLogsTableCompanion.insert(
+                id: 'log-$id',
+                songId: id,
+                startedAt: DateTime(2026, 11, 25, 19),
+                endedAt: DateTime(2026, 11, 25, 19, 15),
+                durationMs: 750000,
+                mode: 'solo',
+                maxParticipants: 1,
+                loopCount: 8,
+              ),
+            );
+      }
+
+      await (db.delete(db.songsTable)..where((s) => s.id.equals('ave-1'))).go();
+
+      final left = await db.select(db.rehearsalLogsTable).get();
+      expect(left.map((r) => r.songId), ['aleluia']);
+    });
+  });
 }
 
 /// A schema-v2 database file: `onset_ms` is still NOT NULL, with one song
@@ -190,6 +242,74 @@ String _seedV2Database() {
     "VALUES ('ave-1', 'Ave verum corpus', 12500, 'soprano', 'piano')",
   );
   raw.execute('PRAGMA user_version = 2;');
+  raw.close();
+  return dbPath;
+}
+
+const _rehearsalColumns = {
+  'id',
+  'song_id',
+  'started_at',
+  'ended_at',
+  'duration_ms',
+  'mode',
+  'local_role',
+  'max_participants',
+  'loop_count',
+};
+
+Future<Set<String>> _columnsOf(AppDatabase db, String table) async {
+  final rows = await db.customSelect("PRAGMA table_info('$table')").get();
+  return rows.map((r) => r.data['name'] as String).toSet();
+}
+
+/// A schema-v3 database file with one song (`ave-1`). Deleted after the
+/// test.
+String _seedV3Database() {
+  final dir = Directory.systemTemp.createTempSync('cantae_migration_v4_test');
+  addTearDown(() => dir.deleteSync(recursive: true));
+  final dbPath = p.join(dir.path, 'v3.db');
+
+  final raw = raw_sqlite3.sqlite3.open(dbPath);
+  raw.execute('''
+    CREATE TABLE songs (
+      id TEXT NOT NULL PRIMARY KEY,
+      name TEXT NOT NULL,
+      author TEXT NOT NULL,
+      version TEXT NOT NULL,
+      metronome_bpm INTEGER NULL,
+      metronome_beats_per_measure INTEGER NULL,
+      metronome_downbeat_accent INTEGER NULL,
+      metronome_enabled_by_default INTEGER NULL,
+      origin TEXT NOT NULL DEFAULT 'created',
+      last_rehearsed_at INTEGER NULL
+    );
+  ''');
+  raw.execute('''
+    CREATE TABLE song_tracks (
+      id TEXT NOT NULL PRIMARY KEY,
+      song_id TEXT NOT NULL REFERENCES songs (id) ON DELETE CASCADE,
+      file_path TEXT NOT NULL,
+      naipe TEXT NOT NULL,
+      start_delay_ms INTEGER NOT NULL,
+      is_playback INTEGER NOT NULL,
+      is_playback_slot INTEGER NOT NULL DEFAULT 0
+    );
+  ''');
+  raw.execute('''
+    CREATE TABLE lyric_lines (
+      row_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+      song_id TEXT NOT NULL REFERENCES songs (id) ON DELETE CASCADE,
+      text TEXT NOT NULL,
+      onset_ms INTEGER NULL,
+      naipe TEXT NULL,
+      dynamics TEXT NULL
+    );
+  ''');
+  raw.execute(
+    "INSERT INTO songs (id, name, author, version) VALUES ('ave-1', 'Ave Verum Corpus', 'Mozart', '')",
+  );
+  raw.execute('PRAGMA user_version = 3;');
   raw.close();
   return dbPath;
 }

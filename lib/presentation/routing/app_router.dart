@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/coming_soon/coming_soon_screen.dart';
+import '../screens/history/rehearsal_history_screen.dart';
 import '../screens/library/library_screen.dart';
 import '../screens/lyrics_editor/lyrics_editor_screen.dart';
 import '../screens/solo_player/solo_player_screen.dart';
@@ -75,10 +76,10 @@ final routerProvider = Provider<GoRouter>((ref) {
             LyricsEditorScreen(songId: state.pathParameters['id']!),
       ),
       GoRoute(
-        path: '/song-history',
+        path: '/song-history/:id',
         name: 'song-history',
         builder: (context, state) =>
-            const ComingSoonScreen(title: 'Ensaios anteriores'),
+            RehearsalHistoryScreen(songId: state.pathParameters['id']!),
       ),
       GoRoute(
         path: '/track-upload',
