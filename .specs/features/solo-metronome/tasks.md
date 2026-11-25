@@ -231,7 +231,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
 - Skill: `flutter-clean-architecture`
 
 **Done when**:
-- [ ] Tests (fake builder + fake engine), 1:1 to ACs:
+- [x] Tests (fake builder + fake engine), 1:1 to ACs:
   - **toggle on:** builds and adds the `metronome` track, then seeks to the current position;
   - **on while playing:** pause → add → seek → play;
   - **toggle off:** removes only the click track, with no pause or seek of the voices;
@@ -244,8 +244,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10
   - **received song:** `saveTempo` does nothing;
   - **volume and mute:** reach the `metronome` track only;
   - **fresh screen:** metronome volume 100 %, unmuted.
-- [ ] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
-- [ ] Test count: existing + ≥ 14 new
+- [x] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
+- [x] Test count: existing + ≥ 14 new
 
 **Tests**: unit
 **Gate**: quick
