@@ -181,9 +181,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests written first with a fake `PlaybackRemote`: nothing published while loading; ready publishes title/"Modo solo"/duration paused at 0; play/pause/seek/loop jump/end each publish; `RemotePause` while playing pauses the engine and state; `RemotePause` while paused does nothing; `RemotePlay` after the end restarts from 0; `RemoteSeek` beyond the end clamps; `RemoteStop` pauses + clears; dispose clears; loop and metronome keep running with no lifecycle-driven pause
-- [ ] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
-- [ ] Test count: all existing + ≥ 11 new
+- [x] Tests written first with a fake `PlaybackRemote`: nothing published while loading; ready publishes title/"Modo solo"/duration paused at 0; play/pause/seek/loop jump/end each publish; `RemotePause` while playing pauses the engine and state; `RemotePause` while paused does nothing; `RemotePlay` after the end restarts from 0; `RemoteSeek` beyond the end clamps; `RemoteStop` pauses + clears; dispose clears; loop and metronome keep running with no lifecycle-driven pause
+- [x] Gate check passes: `flutter test test/presentation/providers/solo_player_notifier_test.dart`
+- [x] Test count: all existing + ≥ 11 new
 
 **Tests**: unit
 **Gate**: quick

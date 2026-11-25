@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cantae/domain/audio/audio_playback_engine.dart';
 import 'package:cantae/domain/audio/click_track_builder.dart';
+import 'package:cantae/domain/audio/playback_remote.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
@@ -12,9 +13,11 @@ import 'package:cantae/domain/entities/song_origin.dart';
 import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/audio_playback_engine_provider.dart';
+import 'package:cantae/presentation/providers/background_audio_providers.dart';
 import 'package:cantae/presentation/providers/click_track_builder_provider.dart';
 import 'package:cantae/presentation/providers/solo_player_notifier.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -153,6 +156,28 @@ class _FakeClickTrackBuilder implements ClickTrackBuilder {
   }
 }
 
+class _FakeRemote implements PlaybackRemote {
+  final List<NowPlaying> published = [];
+  int clears = 0;
+  final _commands = StreamController<RemoteCommand>.broadcast();
+
+  NowPlaying get last => published.last;
+
+  Future<void> send(RemoteCommand command) async {
+    _commands.add(command);
+    await _flush();
+  }
+
+  @override
+  void publish(NowPlaying info) => published.add(info);
+
+  @override
+  void clear() => clears++;
+
+  @override
+  Stream<RemoteCommand> get commands => _commands.stream;
+}
+
 const _soprano = SongTrack(
   id: 'soprano',
   filePath: '/tmp/soprano.mp3',
@@ -191,8 +216,10 @@ Song _song({
   _FakeAudioPlaybackEngine engine,
   _FakeSongRepository repo,
   _FakeClickTrackBuilder builder,
+  _FakeRemote remote,
 }) _setUp({Song? song, bool notFound = false, Failure? failure}) {
   final engine = _FakeAudioPlaybackEngine();
+  final remote = _FakeRemote();
   final builder = _FakeClickTrackBuilder();
   final repo = _FakeSongRepository(
     song: notFound ? null : (song ?? _song()),
@@ -203,9 +230,16 @@ Song _song({
       audioPlaybackEngineProvider.overrideWithValue(engine),
       songRepositoryProvider.overrideWithValue(repo),
       clickTrackBuilderProvider.overrideWithValue(builder),
+      playbackRemoteProvider.overrideWithValue(remote),
     ],
   );
-  return (container: container, engine: engine, repo: repo, builder: builder);
+  return (
+    container: container,
+    engine: engine,
+    repo: repo,
+    builder: builder,
+    remote: remote,
+  );
 }
 
 /// `soloPlayerProvider` is `autoDispose`; `container.listen` keeps it alive
@@ -830,6 +864,211 @@ void main() {
       expect(_state(s.container).metronomeVolume, 1.0);
       expect(_state(s.container).metronomeMuted, isFalse);
       expect(_state(s.container).metronomeOn, isFalse);
+    });
+  });
+
+  group('lock screen and notification (BGA-04 to BGA-10, BGA-19)', () {
+    test('nothing is published before a song is ready', () async {
+      final s = _setUp(notFound: true);
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      expect(s.remote.published, isEmpty);
+    });
+
+    test('ready publishes the title, "Modo solo" and the duration, paused at 0',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      final info = s.remote.last;
+      expect(info.title, 'Ave Verum Corpus');
+      expect(info.subtitle, 'Modo solo');
+      expect(info.durationMs, 180000);
+      expect(info.playing, isFalse);
+      expect(info.positionMs, 0);
+    });
+
+    test('play and pause publish the new state at the current position',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await _playAt(s.container, s.engine, 12000);
+      expect(s.remote.last.playing, isTrue);
+
+      await _notifier(s.container).togglePlay();
+      expect(s.remote.last.playing, isFalse);
+      expect(s.remote.last.positionMs, 12000);
+    });
+
+    test('a plain position tick does not publish', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _notifier(s.container).togglePlay();
+      final before = s.remote.published.length;
+
+      s.engine.emitPosition(5000);
+      await _flush();
+
+      expect(s.remote.published, hasLength(before));
+    });
+
+    test('seekTo publishes the new position', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await _notifier(s.container).seekTo(41000);
+
+      expect(s.remote.last.positionMs, 41000);
+      expect(s.remote.last.playing, isFalse);
+    });
+
+    test('a loop jump publishes the loop start, still playing', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 41000);
+      _notifier(s.container).markLoopStart();
+      s.engine.emitPosition(72000);
+      await _flush();
+      _notifier(s.container).markLoopEnd();
+
+      s.engine.emitPosition(72000);
+      await _flush();
+
+      expect(s.remote.last.positionMs, 41000);
+      expect(s.remote.last.playing, isTrue);
+    });
+
+    test('the end of the song publishes paused at the end', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await _playAt(s.container, s.engine, 180000);
+
+      expect(s.remote.last.playing, isFalse);
+      expect(s.remote.last.positionMs, 180000);
+    });
+
+    test('Pausar from the lock screen pauses like the in-app button', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+
+      await s.remote.send(const RemotePause());
+
+      expect(_state(s.container).playing, isFalse);
+      expect(s.engine.calls.last, 'pause');
+      expect(s.remote.last.playing, isFalse);
+    });
+
+    test('Pausar while already paused changes nothing', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      final calls = List.of(s.engine.calls);
+
+      await s.remote.send(const RemotePause());
+
+      expect(s.engine.calls, calls);
+      expect(_state(s.container).playing, isFalse);
+    });
+
+    test('Tocar from the lock screen plays; again while playing does nothing',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await s.remote.send(const RemotePlay());
+      expect(_state(s.container).playing, isTrue);
+      expect(s.engine.calls.last, 'play');
+      final calls = List.of(s.engine.calls);
+
+      await s.remote.send(const RemotePlay());
+      expect(s.engine.calls, calls);
+      expect(_state(s.container).playing, isTrue);
+    });
+
+    test('Tocar after the end restarts from 0', () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 180000);
+
+      await s.remote.send(const RemotePlay());
+
+      expect(s.engine.calls.sublist(s.engine.calls.length - 2),
+          ['seek:0', 'play']);
+      expect(_state(s.container).positionMs, 0);
+    });
+
+    test('dragging the lock-screen bar seeks like the in-app bar, clamped',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+
+      await s.remote.send(const RemoteSeek(41000));
+      expect(s.engine.calls.last, 'seek:41000');
+      expect(_state(s.container).positionMs, 41000);
+
+      await s.remote.send(const RemoteSeek(999999));
+      expect(s.engine.calls.last, 'seek:180000');
+      expect(_state(s.container).positionMs, 180000);
+    });
+
+    test('stop (notification dismissed or app closed) pauses and clears',
+        () async {
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 12000);
+
+      await s.remote.send(const RemoteStop());
+
+      expect(_state(s.container).playing, isFalse);
+      expect(s.engine.calls.last, 'pause');
+      expect(s.remote.clears, 1);
+    });
+
+    test('leaving Modo solo clears the notification', () async {
+      final s = _setUp();
+      await _settle(s.container);
+
+      s.container.dispose();
+
+      expect(s.remote.clears, 1);
+    });
+
+    test('going to the background does not pause; the loop keeps jumping',
+        () async {
+      final binding = TestWidgetsFlutterBinding.ensureInitialized();
+      final s = _setUp();
+      addTearDown(s.container.dispose);
+      await _settle(s.container);
+      await _playAt(s.container, s.engine, 41000);
+      _notifier(s.container).markLoopStart();
+      s.engine.emitPosition(72000);
+      await _flush();
+      _notifier(s.container).markLoopEnd();
+
+      binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
+      addTearDown(() =>
+          binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed));
+      s.engine.emitPosition(72000);
+      await _flush();
+
+      expect(s.engine.calls, isNot(contains('pause')));
+      expect(s.engine.calls.last, 'seek:41000');
+      expect(_state(s.container).playing, isTrue);
     });
   });
 }
