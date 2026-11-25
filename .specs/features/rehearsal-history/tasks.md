@@ -180,9 +180,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests first with a fake clock and a fake recorder: play 75 s with 3 loop jumps, dispose → one log (75 000 ms, 3 loops, solo, song id, startedAt/endedAt); 59 s → nothing; never played → nothing; pause excluded; end + replay summed; interruption pause excluded; lock-screen play counts; the metronome's internal pause/resume does not split the time; recorder failure does not throw from dispose
-- [ ] Gate check passes: `flutter test` (full: the notifier is shared by the screen tests)
-- [ ] Test count: all existing + ≥ 8 new
+- [x] Tests first with a fake clock and a fake recorder: play 75 s with 3 loop jumps, dispose → one log (75 000 ms, 3 loops, solo, song id, startedAt/endedAt); 59 s → nothing; never played → nothing; pause excluded; end + replay summed; interruption pause excluded; lock-screen play counts; the metronome's internal pause/resume does not split the time; recorder failure does not throw from dispose
+- [x] Gate check passes: `flutter test` (full: the notifier is shared by the screen tests)
+- [x] Test count: all existing + ≥ 8 new
 
 **Tests**: unit
 **Gate**: build
