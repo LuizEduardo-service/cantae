@@ -301,9 +301,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests: new song starts ready with 4 empty naipes + Playback; existing song loads saved slots and its custom naipes; not found, error + retry, received → read-only; pick → checking → chosen; each rejection keeps the previous slot and sets the spec message; cancel changes nothing; picker failure → message; a second pick during checking wins; create/choose custom naipe, 5th blocked, invalid name → reason; remove saved → removed, remove chosen → previous; dirty only after a change; save disabled with an invalid name; save success returns the id and invalidates the library; save failure → spec message; double save ignored
-- [ ] Gate check passes: `flutter test test/presentation/providers`
-- [ ] Test count: all existing + ≥ 20 new
+- [x] Tests: new song starts ready with 4 empty naipes + Playback; existing song loads saved slots and its custom naipes; not found, error + retry, received → read-only; pick → checking → chosen; each rejection keeps the previous slot and sets the spec message; cancel changes nothing; picker failure → message; a second pick during checking wins; create/choose custom naipe, 5th blocked, invalid name → reason; remove saved → removed ("Remover" always leaves the slot without a track, also over a newly chosen file; decided at T10 because the button says "Remover", not "Desfazer"); dirty only after a change; save disabled with an invalid name; save success returns the id and invalidates the library; save failure → spec message; double save ignored
+- [x] Gate check passes: `flutter test test/presentation/providers`
+- [x] Test count: all existing + ≥ 20 new
 
 **Tests**: unit
 **Gate**: quick

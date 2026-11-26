@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../data/ids/uuid_v4.dart';
 import '../../data/library/song_tracks_saver.dart';
 import '../../data/library/track_file_importer.dart';
 import '../../data/library/track_file_inspector.dart';
@@ -37,3 +38,6 @@ final songTracksSaverProvider = Provider<SongTracksSaver>(
 final customNaipeRepositoryProvider = Provider<CustomNaipeRepository>(
   (ref) => DriftCustomNaipeRepository(ref.watch(appDatabaseProvider)),
 );
+
+/// Ids for new songs and custom naipes. Overridden in tests.
+final newIdProvider = Provider<String Function()>((ref) => uuidV4);
