@@ -90,10 +90,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed in the test header, then tests: name empty/blank, 1, 80, 81 chars; author 0, 80, 81; trimmed values returned; naipe name empty, 24, 25; reserved names in any case (Soprano, contralto, TENOR, Baixo, Playback); duplicate of an existing custom naipe ignoring case and spaces; valid name returned trimmed
-- [ ] `scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/domain/library`
-- [ ] Test count: all existing + ≥ 12 new
+- [x] Failure modes listed in the test header, then tests: name empty/blank, 1, 80, 81 chars; author 0, 80, 81; trimmed values returned; naipe name empty, 24, 25; reserved names in any case (Soprano, contralto, TENOR, Baixo, Playback); duplicate of an existing custom naipe ignoring case and spaces; valid name returned trimmed
+- [x] `scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/domain/library`
+- [x] Test count: all existing + ≥ 12 new
 
 **Tests**: unit
 **Gate**: quick

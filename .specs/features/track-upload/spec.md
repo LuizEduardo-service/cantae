@@ -174,7 +174,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-02 | P1-AC2: campos e seções da tela | Execute | In Tasks |
 | UPL-03 | P1-AC3/AC4: escolher arquivo e mostrar nome e tamanho | Execute | In Tasks |
 | UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | In Tasks |
-| UPL-05 | P1-AC6: limites do nome e do autor | Execute | In Tasks |
+| UPL-05 | P1-AC6: limites do nome e do autor | Execute | Implementing |
 | UPL-06 | P1-AC7: salvando sem toque duplo | Execute | In Tasks |
 | UPL-07 | P2-AC1: formato pelo conteúdo | Execute | In Tasks |
 | UPL-08 | P2-AC2/AC3: tamanho e arquivo ilegível | Execute | In Tasks |
@@ -183,7 +183,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-11 | P2-AC6 + Edge: cancelar o seletor e falha do seletor | Execute | In Tasks |
 | UPL-12 | P3-AC1: Playback opcional | Execute | In Tasks |
 | UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | In Tasks |
-| UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | In Tasks |
+| UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Implementing |
 | UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | In Tasks |
 | UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | In Tasks |
 | UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | In Tasks |
