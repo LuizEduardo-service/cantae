@@ -353,13 +353,27 @@ class _NaipeRow extends StatelessWidget {
           ),
           if (!hasTrack && showUploadAction)
             Semantics(
+              container: true,
               button: true,
               label: 'Enviar faixa de ${naipeDisplayName(naipe)}',
               child: InkWell(
                 onTap: onUpload,
-                child: Text(
-                  'Enviar faixa',
-                  style: CantaeTypography.label.copyWith(color: colors.accent),
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    minWidth: CantaeSpacing.minTouchTarget,
+                    minHeight: CantaeSpacing.minTouchTarget,
+                  ),
+                  child: Align(
+                    widthFactor: 1,
+                    heightFactor: 1,
+                    child: ExcludeSemantics(
+                      child: Text(
+                        'Enviar faixa',
+                        style: CantaeTypography.label
+                            .copyWith(color: colors.accent),
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),

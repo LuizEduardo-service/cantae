@@ -16,6 +16,7 @@ import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:cantae/presentation/widgets/buttons.dart';
+import 'package:cantae/presentation/theme/cantae_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -315,6 +316,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('route:track-upload:s1?naipe=tenor'), findsOneWidget);
+    });
+
+    testWidgets(
+        'regression: a missing naipe exposes one "Enviar faixa de <naipe>" '
+        'button of at least 44 dp, apart from the naipe name', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_incompleteSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      final button = find.bySemanticsLabel('Enviar faixa de Tenor');
+      expect(button, findsOneWidget);
+      expect(
+        tester.getSemantics(button),
+        matchesSemantics(
+          label: 'Enviar faixa de Tenor',
+          isButton: true,
+          hasTapAction: true,
+          isFocusable: true,
+          hasFocusAction: true,
+        ),
+      );
+      final size = tester.getSize(button);
+      expect(size.width, greaterThanOrEqualTo(CantaeSpacing.minTouchTarget));
+      expect(size.height, greaterThanOrEqualTo(CantaeSpacing.minTouchTarget));
+      final name = tester.getSemantics(find.text('Tenor'));
+      expect(name.label, isNot(contains('Enviar faixa')));
+      expect(name.getSemanticsData().flagsCollection.isButton, isFalse);
+      semantics.dispose();
     });
 
     testWidgets(

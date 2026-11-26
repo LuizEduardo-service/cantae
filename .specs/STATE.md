@@ -142,7 +142,6 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - no l10n;
   - room transfer hashes whole files in memory on the calling isolate (`chunked_file_sender.dart:68`, `chunked_file_receiver.dart:238`), up to 100 MB;
   - library files no track uses any more stay on disk (for the Privacidade screen);
-  - in the Detalhe, a missing-naipe row is read as one verbose button ("T, Tenor, Enviar faixa de Tenor, Enviar faixa");
   - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
 **Next:** merging `feature/phase-5-track-upload` into `develop` needs the user's go-ahead. Candidates after that:
