@@ -1,9 +1,13 @@
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/custom_naipe.dart';
+import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/repositories/custom_naipe_repository.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
+import 'package:cantae/presentation/providers/track_upload_providers.dart';
 import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/history/rehearsal_history_screen.dart';
@@ -11,6 +15,7 @@ import 'package:cantae/presentation/screens/library/library_screen.dart';
 import 'package:cantae/presentation/screens/lyrics_editor/lyrics_editor_screen.dart';
 import 'package:cantae/presentation/screens/solo_player/solo_player_screen.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
+import 'package:cantae/presentation/screens/song_editor/song_editor_screen.dart';
 import 'package:cantae/presentation/screens/track_align/track_align_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:flutter/material.dart';
@@ -43,10 +48,17 @@ class _EmptySongRepository implements SongRepository {
       throw UnimplementedError();
 }
 
+class _NoCustomNaipes implements CustomNaipeRepository {
+  @override
+  Future<Result<List<CustomNaipe>, StorageFailure>> getAll() async =>
+      const Result.success(<CustomNaipe>[]);
+}
+
 Future<GoRouter> _pumpRouter(WidgetTester tester) async {
   final container = ProviderContainer(
     overrides: [
       songRepositoryProvider.overrideWithValue(_EmptySongRepository()),
+      customNaipeRepositoryProvider.overrideWithValue(_NoCustomNaipes()),
     ],
   );
   addTearDown(container.dispose);
@@ -193,9 +205,56 @@ void main() {
       );
     });
 
+    testWidgets('song-create renders SongEditorScreen for a new song',
+        (tester) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed('song-create');
+      await tester.pumpAndSettle();
+
+      final screen =
+          tester.widget<SongEditorScreen>(find.byType(SongEditorScreen));
+      expect(screen.songId, isNull);
+      expect(screen.initialNaipe, isNull);
+    });
+
+    testWidgets('track-upload renders SongEditorScreen with id and naipe',
+        (tester) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed(
+        'track-upload',
+        pathParameters: {'id': 'abc'},
+        queryParameters: {'naipe': 'tenor'},
+      );
+      await tester.pumpAndSettle();
+
+      final screen =
+          tester.widget<SongEditorScreen>(find.byType(SongEditorScreen));
+      expect(screen.songId, 'abc');
+      expect(screen.initialNaipe, Naipe.tenor);
+    });
+
+    testWidgets('track-upload ignores an unknown naipe', (tester) async {
+      final router = await _pumpRouter(tester);
+
+      router.goNamed(
+        'track-upload',
+        pathParameters: {'id': 'abc'},
+        queryParameters: {'naipe': 'mezzo'},
+      );
+      await tester.pumpAndSettle();
+
+      expect(
+        tester
+            .widget<SongEditorScreen>(find.byType(SongEditorScreen))
+            .initialNaipe,
+        isNull,
+      );
+    });
+
     for (final entry in {
       'studio': 'Studio — corte de áudio',
-      'track-upload': 'Enviar faixa',
     }.entries) {
       testWidgets('${entry.key} renders ComingSoonScreen', (tester) async {
         final router = await _pumpRouter(tester);

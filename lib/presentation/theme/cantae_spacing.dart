@@ -6,6 +6,9 @@ abstract final class CantaeSpacing {
   static const double space4 = 16;
   static const double space5 = 20;
   static const double space6 = 24;
+
+  /// Smallest touch target (UI_GUIDELINES: 44 × 44 dp).
+  static const double minTouchTarget = 44;
   static const double safeTop = 52;
   static const double safeBottom = 28;
 }

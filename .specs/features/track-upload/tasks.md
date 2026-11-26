@@ -324,10 +324,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests: every state renders; choosing a file shows name and `MB`; rejection text; "Salvar música" disabled with the name limit shown, in progress while saving, opens the detail after save; sheet lists available custom naipes, creates one, shows the reason, "Até 4 naipes extras por música."; Trocar/Remover confirm and cancel; back with changes asks, cancel stays, confirm leaves; `?naipe=tenor` opens the picker once; read-only explanation; light and dark; 360 dp at 130 % without overflow; touch targets ≥ 44 dp; semantics on rows and buttons
-- [ ] UI_SPEC.md section added
-- [ ] Gate check passes: `flutter test test/presentation`
-- [ ] Test count: all existing + ≥ 18 new
+- [x] Tests: every state renders; choosing a file shows name and `MB`; rejection text; "Salvar música" disabled with the name limit shown, in progress while saving, opens the detail after save; sheet lists available custom naipes, creates one, shows the reason, "Até 4 naipes extras por música."; Trocar/Remover confirm and cancel; back with changes asks, cancel stays, confirm leaves; `?naipe=tenor` opens the picker once; read-only explanation; light and dark; 360 dp at 130 % without overflow; touch targets ≥ 44 dp; semantics on rows and buttons
+- [x] UI_SPEC.md section added
+- [x] Gate check passes: `flutter test test/presentation`
+- [x] Test count: all existing + ≥ 18 new
 
 **Tests**: widget
 **Gate**: full
@@ -348,7 +348,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests: library empty state → `route:song-create`; detail Tenor row → `route:track-upload:<id>?naipe=tenor`; solo empty → `track-upload:<id>`; align empty → `track-upload:<id>`; detail shows "Solista" with an "S" badge; solo mix row and align row show "Solista"; router test maps both new routes
+- [ ] Tests: library empty state → `route:song-create`; detail Tenor row → `route:track-upload:<id>?naipe=tenor`; solo empty → `track-upload:<id>`; align empty → `track-upload:<id>`; detail shows "Solista" with an "S" badge; solo mix row and align row show "Solista" (the router test for both new routes landed in T11, with the routes)
 - [ ] UI_SPEC §6.2b/§6.3 updated
 - [ ] Gate check passes: `flutter test`
 - [ ] Test count: all existing + ≥ 7 new
