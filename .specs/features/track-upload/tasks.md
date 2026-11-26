@@ -114,10 +114,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: ID3 → mp3; MPEG frame sync → mp3; ADTS → aac; `ftyp` at offset 4 → m4a; RIFF…WAVE → wav; RIFF without WAVE, plain text, a PNG header, a header shorter than the signature → null; size 0 → empty; 100 MB → accepted; 100 MB + 1 → too large; size checked before format
-- [ ] `scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/domain/library`
-- [ ] Test count: all existing + ≥ 12 new
+- [x] Failure modes listed first, then tests: ID3 → mp3; MPEG frame sync → mp3; ADTS → aac; `ftyp` at offset 4 → m4a; RIFF…WAVE → wav; RIFF without WAVE, plain text, a PNG header, a header shorter than the signature → null; size 0 → empty; 100 MB → accepted; 100 MB + 1 → too large; size checked before format
+- [x] `scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/domain/library`
+- [x] Test count: all existing + ≥ 12 new
 
 **Tests**: unit
 **Gate**: quick
