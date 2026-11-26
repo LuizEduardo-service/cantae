@@ -17,4 +17,8 @@ abstract class TrackFilePicker {
   /// The chosen file, `null` when the person cancels, or `picker_failed`
   /// when the system chooser could not open.
   Future<Result<PickedTrackFile?, StorageFailure>> pick();
+
+  /// Deletes copies the system chooser made for this app (Android copies a
+  /// picked file into the app cache). Never fails.
+  Future<void> releaseTemporaryFiles();
 }
