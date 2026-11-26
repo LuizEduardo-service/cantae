@@ -178,7 +178,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-06 | P1-AC7: salvando sem toque duplo | Execute | In Tasks |
 | UPL-07 | P2-AC1: formato pelo conteúdo | Execute | Implementing |
 | UPL-08 | P2-AC2/AC3: tamanho e arquivo ilegível | Execute | Implementing |
-| UPL-09 | P2-AC4: conferência fora da thread de interface, com estado | Execute | In Tasks |
+| UPL-09 | P2-AC4: conferência fora da thread de interface, com estado | Execute | Implementing |
 | UPL-10 | P2-AC5: hash da cópia diferente não grava nada | Execute | In Tasks |
 | UPL-11 | P2-AC6 + Edge: cancelar o seletor e falha do seletor | Execute | In Tasks |
 | UPL-12 | P3-AC1: Playback opcional | Execute | In Tasks |

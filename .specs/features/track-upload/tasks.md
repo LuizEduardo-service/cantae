@@ -185,9 +185,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests on a temp directory: a real WAV header file → wav with the right size and SHA-256; a `.mp3` that is text → unsupported; an empty file → empty; a sparse 100 MB + 1 file → too large without hashing; a missing path → unreadable
-- [ ] Gate check passes: `flutter test test/data/library`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Failure modes listed first, then tests on a temp directory: a real WAV header file → wav with the right size and SHA-256; a `.mp3` that is text → unsupported; an empty file → empty; a sparse 100 MB + 1 file → too large without hashing; a missing path → unreadable
+- [x] Gate check passes: `flutter test test/data/library`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick
