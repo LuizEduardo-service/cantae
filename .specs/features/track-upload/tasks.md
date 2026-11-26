@@ -231,9 +231,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: new song saved as `created` with Soprano + Playback + "Solista"; existing song keeps Soprano delay 400, replaced Tenor gets 0, lyrics and metronome intact; the second import fails → first copy discarded, nothing saved; repository save fails → copies discarded; the same file for two naipes → one file
-- [ ] Gate check passes: `flutter test test/data/library`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Failure modes listed first, then tests: new song saved as `created` with Soprano + Playback + "Solista"; existing song keeps Soprano delay 400, replaced Tenor gets 0, lyrics and metronome intact; the second import fails → first copy discarded, nothing saved; repository save fails → copies discarded; the same file for two naipes → one file
+- [x] Gate check passes: `flutter test test/data/library`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick
