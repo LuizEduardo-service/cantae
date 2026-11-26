@@ -170,29 +170,29 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| UPL-01 | P1-AC1: Biblioteca abre "Nova música" | Execute | Implementing |
-| UPL-02 | P1-AC2: campos e seções da tela | Execute | Implementing |
-| UPL-03 | P1-AC3/AC4: escolher arquivo e mostrar nome e tamanho | Execute | Implementing |
-| UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | Implementing |
-| UPL-05 | P1-AC6: limites do nome e do autor | Execute | Implementing |
-| UPL-06 | P1-AC7: salvando sem toque duplo | Execute | Implementing |
-| UPL-07 | P2-AC1: formato pelo conteúdo | Execute | Implementing |
-| UPL-08 | P2-AC2/AC3: tamanho e arquivo ilegível | Execute | Implementing |
-| UPL-09 | P2-AC4: conferência fora da thread de interface, com estado | Execute | Implementing |
-| UPL-10 | P2-AC5: hash da cópia diferente não grava nada | Execute | Implementing |
-| UPL-11 | P2-AC6 + Edge: cancelar o seletor e falha do seletor | Execute | Implementing |
-| UPL-12 | P3-AC1: Playback opcional | Execute | Implementing |
-| UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | Implementing |
-| UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Implementing |
-| UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | Implementing |
-| UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | Implementing |
-| UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | Implementing |
-| UPL-18 | P4-AC3/AC4: trocar e remover com confirmação | Execute | Implementing |
-| UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Implementing |
-| UPL-20 | P4-AC6: descartar alterações pede confirmação | Execute | Implementing |
-| UPL-21 | P4-AC7/AC8: não encontrada, erro, música recebida | Execute | Implementing |
-| UPL-22 | Edge: mesmo arquivo em dois naipes e arquivo já na biblioteca | Execute | Implementing |
-| UPL-23 | Edge: escolher de novo durante a conferência; 360 dp a 130 % | Execute | Implementing |
+| UPL-01 | P1-AC1: Biblioteca abre "Nova música" | Execute | Verified |
+| UPL-02 | P1-AC2: campos e seções da tela | Execute | Verified |
+| UPL-03 | P1-AC3/AC4: escolher arquivo e mostrar nome e tamanho | Execute | Verified |
+| UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | Verified |
+| UPL-05 | P1-AC6: limites do nome e do autor | Execute | Verified |
+| UPL-06 | P1-AC7: salvando sem toque duplo | Execute | Verified |
+| UPL-07 | P2-AC1: formato pelo conteúdo | Execute | Verified |
+| UPL-08 | P2-AC2/AC3: tamanho e arquivo ilegível | Execute | Verified |
+| UPL-09 | P2-AC4: conferência fora da thread de interface, com estado | Execute | Verified |
+| UPL-10 | P2-AC5: hash da cópia diferente não grava nada | Execute | Verified |
+| UPL-11 | P2-AC6 + Edge: cancelar o seletor e falha do seletor | Execute | Verified |
+| UPL-12 | P3-AC1: Playback opcional | Execute | Verified |
+| UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | Verified |
+| UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Verified |
+| UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | Verified |
+| UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | Verified |
+| UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | Verified |
+| UPL-18 | P4-AC3/AC4: trocar e remover com confirmação | Execute | Verified |
+| UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Verified |
+| UPL-20 | P4-AC6: descartar alterações pede confirmação | Execute | Verified |
+| UPL-21 | P4-AC7/AC8: não encontrada, erro, música recebida | Execute | Verified |
+| UPL-22 | Edge: mesmo arquivo em dois naipes e arquivo já na biblioteca | Execute | Verified |
+| UPL-23 | Edge: escolher de novo durante a conferência; 360 dp a 130 % | Execute | Verified |
 
 **ID format:** `UPL-[NUMBER]`
 

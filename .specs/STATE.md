@@ -86,7 +86,30 @@
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (RF24) and **stabilize-flaky-tests** are merged to `develop` (pushed up to `dda2959`). **rehearsal-history** (Ensaios anteriores, RF39/RF40) is complete and verified on branch `feature/phase-5-rehearsal-history` (not yet merged).
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (RF24) and **stabilize-flaky-tests** are merged to `develop` (pushed up to `dda2959`). **rehearsal-history** (RF39/RF40) is merged to `develop` and pushed (`99f69e7`). **track-upload** (Cadastrar música e enviar faixas, RF13/RF16/RF17) is complete and verified on branch `feature/phase-5-track-upload` (not yet merged).
+
+- **track-upload:** 13 tasks, executed inline in sequence.
+  - Domain:
+    - `CustomNaipe`;
+    - `SongTrack.customNaipe/fileName/fileSizeBytes`;
+    - song and naipe name rules;
+    - audio check by content signature (MP3/ADTS/M4A/WAV) and the 100 MB limit;
+    - ports `TrackFilePicker` and `CustomNaipeRepository`.
+  - Schema v5: `custom_naipes` table (unique `name_key`) and 3 nullable `song_tracks` columns. The repositories store custom naipes in the song transaction and load them in one batched query.
+  - Files:
+    - `TrackFileInspector` reads the size, header and streamed SHA-256 inside `Isolate.run`;
+    - `TrackFileImporter` copies to `.part`, verifies the hash, renames, and reuses an identical file;
+    - `SongTracksSaver` saves in one go and rolls back the copies it created.
+  - `file_picker` 13.4.1 behind the port (AD-013); `releaseTemporaryFiles()` clears the Android cache copies after a save.
+  - UI:
+    - `naipe_labels.dart` is the single naipe → name/badge mapping;
+    - `VoicePartBadge.custom` (neutral, initial) and `NaipeBadge`;
+    - `SongEditorNotifier`;
+    - "Nova música" / "Faixas" screen with the add-naipe sheet, UI_SPEC §6.4;
+    - routes `song-create` (`/song-editor`) and `track-upload` (`/song-editor/:id?naipe=`);
+    - Biblioteca, Detalhe, Modo solo and Alinhamento open it. Detalhe and Alinhamento list the custom naipes.
+  - Verifier: author fallback; 23/23 requirements, 57/57 non-equivalent mutants (U20 re-run, U21 equivalent), 955 tests. Report: `.specs/features/track-upload/validation.md`.
+  - Not run on a device: the real system file chooser.
 
 - **rehearsal-history:** 8 tasks + 1 fix, executed inline in sequence.
   - Domain `RehearsalLog` + pure `RehearsalSessionTracker` (playing time only, loop jumps, 60 s minimum).
@@ -117,10 +140,11 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - two `audio_service` handlers in the code: only `CantaeAudioHandler` is registered; the phase-4 room `BackgroundAudioHandler` (used by its integration test) must fold into `PlaybackRemote` when the room screens land;
   - `handleInterruptions: false` is not observable under `flutter test`; only the device script (steps 8–9) guards it;
   - no l10n;
-  - the naipe name/selo mapping is duplicated in `TrackAlignRow`, `LyricLineRow` and `SongRow`;
+  - room transfer hashes whole files in memory on the calling isolate (`chunked_file_sender.dart:68`, `chunked_file_receiver.dart:238`), up to 100 MB;
+  - library files no track uses any more stay on disk (for the Privacidade screen);
+  - in the Detalhe, a missing-naipe row is read as one verbose button ("T, Tenor, Enviar faixa de Tenor, Enviar faixa");
   - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
-**Next:** merging `feature/phase-5-rehearsal-history` into `develop` needs the user's go-ahead. Candidates after that:
-- run the device script;
-- **Enviar faixa**;
+**Next:** merging `feature/phase-5-track-upload` into `develop` needs the user's go-ahead. Candidates after that:
+- run the device script (now also the file chooser);
 - **Studio**.
