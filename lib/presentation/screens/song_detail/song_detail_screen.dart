@@ -11,6 +11,7 @@ import '../../providers/library_providers.dart';
 import '../../providers/rehearsal_providers.dart';
 import '../../providers/song_detail_providers.dart';
 import '../../providers/song_repository_provider.dart';
+import '../../providers/track_upload_providers.dart';
 import '../../theme/cantae_colors.dart';
 import '../../theme/cantae_spacing.dart';
 import '../../theme/cantae_typography.dart';
@@ -56,15 +57,16 @@ class _SongDetailScreenState extends ConsumerState<SongDetailScreen> {
 
     final repository = ref.read(songRepositoryProvider);
     final result = await repository.delete(song.id);
-    result.when(
-      success: (_) {
-        ref.invalidate(songsProvider);
-        if (context.mounted) context.goNamed('library');
-      },
-      failure: (_) {
-        setState(() => _deleteError = 'Não foi possível apagar a música.');
-      },
-    );
+    if (result.isFailure) {
+      setState(() => _deleteError = 'Não foi possível apagar a música.');
+      return;
+    }
+    await ref.read(libraryFileReleaserProvider).release([
+      for (final track in song.tracks) track.filePath,
+      if (song.playbackTrack case final playback?) playback.filePath,
+    ]);
+    ref.invalidate(songsProvider);
+    if (context.mounted) context.goNamed('library');
   }
 
   @override

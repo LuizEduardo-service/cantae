@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cantae/data/library/library_file_releaser.dart';
 import 'package:cantae/data/library/song_tracks_saver.dart';
 import 'package:cantae/data/library/track_file_importer.dart';
 import 'package:cantae/data/library/track_file_inspector.dart';
@@ -31,7 +32,9 @@ import 'package:path/path.dart' as p;
 // - the second import fails but the first copy stays in the library;
 // - the repository fails but the copies stay in the library;
 // - the same file for two naipes is copied twice;
-// - a new track has no file name or size.
+// - a new track has no file name or size;
+// - a replaced or removed track's library file stays on disk after the
+//   save, or goes away although the save failed.
 class _FailingSongRepository implements SongRepository {
   _FailingSongRepository(this._inner);
   final SongRepository _inner;
@@ -90,6 +93,10 @@ void main() {
         importer: TrackFileImporter(
           resolveRoot: () async => root,
           hashFile: hashFile ?? sha256OfFile,
+        ),
+        releaser: LibraryFileReleaser(
+          repository: repository,
+          resolveRoot: () async => root,
         ),
         newId: () => 'id-${ids++}',
       );
@@ -264,5 +271,79 @@ void main() {
     final song = (await repository.getById('ave'))
         .when(success: (s) => s, failure: (f) => fail(f.code));
     expect(song.tracks.map((t) => t.filePath).toSet(), hasLength(1));
+  });
+
+  group('library files no track uses any more', () {
+    String libraryFile(String name) =>
+        (File(p.join(root.path, name))..writeAsStringSync(name)).path;
+
+    Song base() => Song(
+          id: 'ave',
+          name: 'Ave Verum Corpus',
+          author: '',
+          tracks: [
+            SongTrack(
+              id: 'sop',
+              filePath: libraryFile('sop.mp3'),
+              naipe: Naipe.soprano,
+            ),
+            SongTrack(
+              id: 'ten',
+              filePath: libraryFile('ten.mp3'),
+              naipe: Naipe.tenor,
+            ),
+          ],
+          playbackTrack: SongTrack(
+            id: 'pb',
+            filePath: libraryFile('pb.mp3'),
+            naipe: Naipe.custom,
+            isPlayback: true,
+          ),
+        );
+
+    test('a replaced and a removed track lose their files once saved',
+        () async {
+      final old = base();
+      await repository.save(old);
+
+      saved(await saver().save(SongSaveRequest(
+        songId: 'ave',
+        name: 'Ave Verum Corpus',
+        author: '',
+        base: old,
+        tracks: [
+          TrackChoice.kept(old.tracks[0]),
+          TrackChoice.newFile(naipe: Naipe.tenor, file: file('ten2.mp3', 4)),
+        ],
+      )));
+
+      expect(File(old.tracks[0].filePath).existsSync(), isTrue);
+      expect(File(old.tracks[1].filePath).existsSync(), isFalse);
+      expect(File(old.playbackTrack!.filePath).existsSync(), isFalse);
+    });
+
+    test('a failed save keeps the old files', () async {
+      final old = base();
+      await repository.save(old);
+
+      final result = await saver(repo: _FailingSongRepository(repository))
+          .save(SongSaveRequest(
+        songId: 'ave',
+        name: 'Ave Verum Corpus',
+        author: '',
+        base: old,
+        tracks: [
+          TrackChoice.newFile(naipe: Naipe.tenor, file: file('ten2.mp3', 4)),
+        ],
+      ));
+
+      expect(result.isFailure, isTrue);
+      for (final path in [
+        ...old.tracks.map((t) => t.filePath),
+        old.playbackTrack!.filePath,
+      ]) {
+        expect(File(path).existsSync(), isTrue, reason: path);
+      }
+    });
   });
 }

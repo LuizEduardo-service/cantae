@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cantae/data/library/library_file_releaser.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
@@ -13,6 +14,7 @@ import 'package:cantae/domain/repositories/rehearsal_repository.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/rehearsal_providers.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
+import 'package:cantae/presentation/providers/track_upload_providers.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:cantae/presentation/widgets/buttons.dart';
@@ -152,14 +154,34 @@ GoRouter _buildRouter() {
   );
 }
 
+/// Records the paths handed over for deletion instead of touching disk.
+class _RecordingReleaser extends LibraryFileReleaser {
+  _RecordingReleaser(SongRepository repository)
+      : super(
+          repository: repository,
+          resolveRoot: () async => throw UnimplementedError(),
+        );
+
+  final released = <String>[];
+
+  @override
+  Future<int> release(Iterable<String> paths) async {
+    released.addAll(paths);
+    return 0;
+  }
+}
+
 Widget _wrap(
   SongRepository repository, {
   ThemeData? theme,
   int rehearsals = 0,
+  _RecordingReleaser? releaser,
 }) {
   return ProviderScope(
     overrides: [
       songRepositoryProvider.overrideWithValue(repository),
+      libraryFileReleaserProvider
+          .overrideWithValue(releaser ?? _RecordingReleaser(repository)),
       rehearsalRepositoryProvider
           .overrideWithValue(_FakeRehearsals(rehearsals)),
     ],
@@ -562,7 +584,8 @@ void main() {
             return const Result.success(Unit());
           },
         );
-        await tester.pumpWidget(_wrap(repo));
+        final releaser = _RecordingReleaser(repo);
+        await tester.pumpWidget(_wrap(repo, releaser: releaser));
         await tester.pumpAndSettle();
 
         await tester.scrollUntilVisible(
@@ -577,6 +600,8 @@ void main() {
 
         expect(deletedId, equals('s1'));
         expect(find.text('route:library'), findsOneWidget);
+        expect(releaser.released, ['a.wav', 'b.wav', 'c.wav', 'd.wav'],
+            reason: 'the files of the deleted song go for deletion');
       },
     );
 
@@ -617,7 +642,8 @@ void main() {
           getById: (_) async => Result.success(_completeSong()),
           delete: (_) async => Result.failure(StorageFailure(code: 'x')),
         );
-        await tester.pumpWidget(_wrap(repo));
+        final releaser = _RecordingReleaser(repo);
+        await tester.pumpWidget(_wrap(repo, releaser: releaser));
         await tester.pumpAndSettle();
 
         await tester.scrollUntilVisible(
@@ -632,6 +658,7 @@ void main() {
 
         expect(find.text('Não foi possível apagar'), findsOneWidget);
         expect(find.text('route:library'), findsNothing);
+        expect(releaser.released, isEmpty);
       },
     );
 

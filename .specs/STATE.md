@@ -140,8 +140,6 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - two `audio_service` handlers in the code: only `CantaeAudioHandler` is registered; the phase-4 room `BackgroundAudioHandler` (used by its integration test) must fold into `PlaybackRemote` when the room screens land;
   - `handleInterruptions: false` is not observable under `flutter test`; only the device script (steps 8–9) guards it;
   - no l10n;
-  - room transfer hashes whole files in memory on the calling isolate (`chunked_file_sender.dart:68`, `chunked_file_receiver.dart:238`), up to 100 MB;
-  - library files no track uses any more stay on disk (for the Privacidade screen);
   - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
 **Next:** merging `feature/phase-5-track-upload` into `develop` needs the user's go-ahead. Candidates after that:
