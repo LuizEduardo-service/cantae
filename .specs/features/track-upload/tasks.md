@@ -208,9 +208,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes listed first, then tests: copy lands at `<root>/<sha>.mp3` with equal bytes and `created`; same file twice → reused, not `created`; a corrupt file at the final path is replaced; injected hasher mismatch → `track_hash_mismatch` and no `.part` or final file left; missing source → `track_copy_failed`; `discard` removes created and keeps reused
-- [ ] Gate check passes: `flutter test test/data/library`
-- [ ] Test count: all existing + ≥ 6 new
+- [x] Failure modes listed first, then tests: copy lands at `<root>/<sha>.mp3` with equal bytes and `created`; same file twice → reused, not `created`; a corrupt file at the final path is replaced; injected hasher mismatch → `track_hash_mismatch` and no `.part` or final file left; missing source → `track_copy_failed`; `discard` removes created and keeps reused
+- [x] Gate check passes: `flutter test test/data/library`
+- [x] Test count: all existing + ≥ 6 new
 
 **Tests**: unit
 **Gate**: quick

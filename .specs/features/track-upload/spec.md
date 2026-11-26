@@ -173,13 +173,13 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-01 | P1-AC1: Biblioteca abre "Nova música" | Execute | In Tasks |
 | UPL-02 | P1-AC2: campos e seções da tela | Execute | In Tasks |
 | UPL-03 | P1-AC3/AC4: escolher arquivo e mostrar nome e tamanho | Execute | In Tasks |
-| UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | In Tasks |
+| UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | Implementing |
 | UPL-05 | P1-AC6: limites do nome e do autor | Execute | Implementing |
 | UPL-06 | P1-AC7: salvando sem toque duplo | Execute | In Tasks |
 | UPL-07 | P2-AC1: formato pelo conteúdo | Execute | Implementing |
 | UPL-08 | P2-AC2/AC3: tamanho e arquivo ilegível | Execute | Implementing |
 | UPL-09 | P2-AC4: conferência fora da thread de interface, com estado | Execute | Implementing |
-| UPL-10 | P2-AC5: hash da cópia diferente não grava nada | Execute | In Tasks |
+| UPL-10 | P2-AC5: hash da cópia diferente não grava nada | Execute | Implementing |
 | UPL-11 | P2-AC6 + Edge: cancelar o seletor e falha do seletor | Execute | In Tasks |
 | UPL-12 | P3-AC1: Playback opcional | Execute | In Tasks |
 | UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | In Tasks |
@@ -191,7 +191,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Implementing |
 | UPL-20 | P4-AC6: descartar alterações pede confirmação | Execute | In Tasks |
 | UPL-21 | P4-AC7/AC8: não encontrada, erro, música recebida | Execute | In Tasks |
-| UPL-22 | Edge: mesmo arquivo em dois naipes e arquivo já na biblioteca | Execute | In Tasks |
+| UPL-22 | Edge: mesmo arquivo em dois naipes e arquivo já na biblioteca | Execute | Implementing |
 | UPL-23 | Edge: escolher de novo durante a conferência; 360 dp a 130 % | Execute | In Tasks |
 
 **ID format:** `UPL-[NUMBER]`
