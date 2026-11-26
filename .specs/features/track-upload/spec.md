@@ -185,7 +185,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | In Tasks |
 | UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Implementing |
 | UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | Implementing |
-| UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | In Tasks |
+| UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | Implementing |
 | UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | In Tasks |
 | UPL-18 | P4-AC3/AC4: trocar e remover com confirmação | Execute | In Tasks |
 | UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Implementing |

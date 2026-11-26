@@ -162,9 +162,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests: a song with a "Solista" track round-trips name, file name and size; the same custom naipe in two songs is stored once; `getAll` lists custom naipes by name, including one whose songs were deleted; `getAll` songs resolve custom naipes for several songs; a failing database → `StorageFailure`
-- [ ] Gate check passes: `flutter test test/data/repositories`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests: a song with a "Solista" track round-trips name, file name and size; the same custom naipe in two songs is stored once; `getAll` lists custom naipes by name, including one whose songs were deleted; `getAll` songs resolve custom naipes for several songs; a failing database → `StorageFailure`
+- [x] Gate check passes: `flutter test test/data/repositories`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick

@@ -4,7 +4,9 @@ import 'package:cantae/data/mappers/song_track_mapper.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/custom_naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
+import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/infrastructure/database/app_database.dart';
 import 'package:drift/drift.dart';
@@ -28,6 +30,19 @@ class DriftSongRepository implements SongRepository {
         await (_db.delete(_db.lyricLinesTable)
               ..where((l) => l.songId.equals(song.id)))
             .go();
+
+        // New custom naipes join the device list (UPL-15); existing ones
+        // are left as they are.
+        final customNaipes = {
+          for (final track in song.tracks)
+            if (track.customNaipe != null) track.customNaipe!,
+        };
+        for (final naipe in customNaipes) {
+          await _db.into(_db.customNaipesTable).insert(
+                SongTrackMapper.customNaipeCompanion(naipe),
+                mode: InsertMode.insertOrIgnore,
+              );
+        }
 
         for (final track in song.tracks) {
           await _db.into(_db.songTracksTable).insert(
@@ -82,10 +97,12 @@ class DriftSongRepository implements SongRepository {
           ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
-    final tracks = trackRows
-        .where((row) => !row.isPlaybackSlot)
-        .map(SongTrackMapper.fromRow)
-        .toList();
+    final customNaipes = await _customNaipesFor(trackRows);
+    SongTrack toTrack(SongTracksTableData row) =>
+        SongTrackMapper.fromRow(row, customNaipes: customNaipes);
+
+    final tracks =
+        trackRows.where((row) => !row.isPlaybackSlot).map(toTrack).toList();
     final playbackRow =
         trackRows.where((row) => row.isPlaybackSlot).firstOrNull;
 
@@ -93,8 +110,7 @@ class DriftSongRepository implements SongRepository {
       songRow,
       tracks: tracks,
       lyrics: lyricRows.map(LyricLineMapper.fromRow).toList(),
-      playbackTrack:
-          playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+      playbackTrack: playbackRow == null ? null : toTrack(playbackRow),
     );
 
     return Result.success(song);
@@ -118,6 +134,10 @@ class DriftSongRepository implements SongRepository {
           ..orderBy([(l) => OrderingTerm.asc(l.rowId)]))
         .get();
 
+    final customNaipes = await _customNaipesFor(trackRows);
+    SongTrack toTrack(SongTracksTableData row) =>
+        SongTrackMapper.fromRow(row, customNaipes: customNaipes);
+
     final tracksBySong = <String, List<SongTracksTableData>>{};
     for (final row in trackRows) {
       tracksBySong.putIfAbsent(row.songId, () => []).add(row);
@@ -129,10 +149,8 @@ class DriftSongRepository implements SongRepository {
 
     final songs = songRows.map((songRow) {
       final allTracks = tracksBySong[songRow.id] ?? const [];
-      final tracks = allTracks
-          .where((row) => !row.isPlaybackSlot)
-          .map(SongTrackMapper.fromRow)
-          .toList();
+      final tracks =
+          allTracks.where((row) => !row.isPlaybackSlot).map(toTrack).toList();
       final playbackRow =
           allTracks.where((row) => row.isPlaybackSlot).firstOrNull;
 
@@ -142,12 +160,29 @@ class DriftSongRepository implements SongRepository {
         lyrics: (lyricsBySong[songRow.id] ?? const [])
             .map(LyricLineMapper.fromRow)
             .toList(),
-        playbackTrack:
-            playbackRow == null ? null : SongTrackMapper.fromRow(playbackRow),
+        playbackTrack: playbackRow == null ? null : toTrack(playbackRow),
       );
     }).toList();
 
     return Result.success(songs);
+  }
+
+  /// Every custom naipe [rows] reference, in one query (no N+1).
+  Future<Map<String, CustomNaipe>> _customNaipesFor(
+    List<SongTracksTableData> rows,
+  ) async {
+    final ids = {
+      for (final row in rows)
+        if (row.customNaipeId != null) row.customNaipeId!,
+    };
+    if (ids.isEmpty) return const {};
+    final naipeRows = await (_db.select(_db.customNaipesTable)
+          ..where((n) => n.id.isIn(ids)))
+        .get();
+    return {
+      for (final row in naipeRows)
+        row.id: CustomNaipe(id: row.id, name: row.name),
+    };
   }
 
   @override
