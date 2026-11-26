@@ -9,7 +9,9 @@
 ```
 Onboarding (1ª vez)
   → Biblioteca (hub)
+       → Nova música → Detalhe da música
        → Detalhe da música
+            → Faixas (Enviar faixa)
             → Studio · Alinhamento · Editor de letra · Histórico
             → Modo solo
             → Criar sala (a partir da música)
@@ -43,22 +45,48 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 
 ## 6.2b Biblioteca vazia
 - `EmptyState`: "Nenhuma música ainda" + frase.
-- [P] Cadastrar primeira música · [S] Abrir pacote .cantae.
+- [P] Cadastrar primeira música (abre "Nova música", §6.4) · [S] Abrir pacote .cantae.
 - Card inferior: "Tem ensaio rolando por perto?" + "Entrar em sala".
 
 ## 6.3 Detalhe da música
 - **Topo:** ‹ Biblioteca · Exportar.
 - **Cabeçalho:** título, "Autor · duração · origem".
 - **Banner warning (condicional):** rascunho do Studio pendente → "Retomar corte" / "Descartar" (Descartar pede confirmação).
-- **Naipes:** grupo com 4 linhas; faltante com selo tracejado e "Enviar faixa".
+- **Naipes:** grupo com 4 linhas; faltante com selo tracejado e "Enviar faixa" (abre "Faixas" já no seletor daquele naipe, §6.4). Naipes extras aparecem abaixo, com selo neutro e a inicial.
 - **Preparar:** Cortar áudio no Studio › · Alinhar entradas › · Sincronizar letra (3 de 5) › · Ensaios anteriores (7) ›.
 - **Rodapé:** [S] Ensaiar só · [P] Ensaiar em grupo.
 - **Papéis:** Cantor que recebeu a música vê versão somente leitura: sem "Preparar" nem "Enviar faixa"; mantém "Ensaiar só" e uma seção "Ensaios" só com "Ensaios anteriores (N)" (o histórico vale para todos os papéis, PRD UX §6.16).
 - **Estados:** completa, incompleta (aviso de naipe faltando), rascunho pendente.
 
+## 6.4 Nova música / Faixas
+- **Entradas:** "Cadastrar primeira música" (Biblioteca vazia) abre "Nova música". "Enviar faixa" no Detalhe, no Modo solo e no Alinhamento abre "Faixas" da música. No Detalhe, o seletor de arquivos já abre no naipe tocado.
+- **Topo:** ‹ Biblioteca (nova) ou ‹ nome da música. Título "Nova música" ou "Faixas".
+- **Campos:** Nome (obrigatório, até 80) e Autor (opcional, até 80). O limite aparece no campo.
+- **Naipes:** 4 linhas (Soprano, Contralto, Tenor, Baixo). Cada linha tem selo, nome e uma linha de estado:
+  - "Sem faixa";
+  - "Conferindo arquivo…";
+  - nome do arquivo · tamanho em mono ("12,4 MB");
+  - "Faixa salva", para faixas antigas sem nome de arquivo.
+- **Ações por linha:** "Escolher arquivo", ou "Trocar" e "Remover". Trocar ou remover uma faixa já salva pede `ConfirmSheet`. A faixa trocada entra com atraso zero.
+- **Playback:** linha "Playback (opcional)", sem selo, com as mesmas ações.
+- **Naipes extras:**
+  - Linhas com selo neutro e a inicial, mais "Tirar naipe".
+  - [S] "Adicionar naipe" abre uma folha com "Naipes já criados" e o campo "Novo naipe" + "Criar naipe". O nome tem até 24 caracteres e não repete um naipe padrão, "Playback" ou um naipe extra já existente.
+  - Com 4 extras, o botão fica desabilitado e aparece "Até 4 naipes extras por música.".
+- **Rodapé:** [P] Salvar música. Fica desabilitado com nome inválido ou arquivo em conferência, e mostra andamento enquanto salva. Ao salvar, abre o Detalhe.
+- **Estados:**
+  - *Carregando*.
+  - *Música não encontrada*: EmptyState + "Voltar à Biblioteca".
+  - *Erro de leitura*: banner + "Tentar de novo".
+  - *Música recebida*: só leitura, com banner explicando o motivo e sem ações nem "Salvar música".
+  - *Arquivo recusado*: mensagem na linha ("Este arquivo não é um áudio aceito (MP3, M4A ou WAV).", "Arquivo maior que 100 MB.", "Não foi possível ler este arquivo.").
+  - *Seletor indisponível*: banner "Não foi possível abrir os arquivos.".
+  - *Falha ao salvar*: banner "Não foi possível salvar a música. Tente de novo.". As escolhas continuam na tela.
+  - *Alterações não salvas*: sair pede confirmação.
+
 ## 6.5 Alinhamento de faixas
 - **Topo:** ‹ nome da música. Título "Alinhar entradas" + instrução.
-- **Conteúdo:** 4 `TrackAlignRow`.
+- **Conteúdo:** uma `TrackAlignRow` por faixa: os 4 naipes padrão na ordem e depois os naipes extras (selo neutro e nome).
 - **Rodapé:** [S] Ouvir em loop · [P] Salvar atrasos (toast "Atrasos salvos").
 - **Estados:**
   - *Sem faixas*: EmptyState que leva ao Studio ou ao upload.

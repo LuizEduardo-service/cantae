@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/custom_naipe.dart';
 import '../../domain/entities/naipe.dart';
 import '../theme/cantae_colors.dart';
 import '../theme/cantae_spacing.dart';
 import '../theme/cantae_typography.dart';
 import 'mute_solo_toggle.dart';
 import 'naipe_labels.dart';
-import 'voice_part_badge.dart';
 
 /// One track in Modo solo's "Mix por naipe" (COMPONENTS.md `MixTrackRow`):
 /// selo + name, M (mudo) and S (solo), and a volume slider below.
@@ -24,9 +24,13 @@ class MixTrackRow extends StatelessWidget {
     required this.onMuteToggled,
     required this.onSoloToggled,
     this.showSolo = true,
+    this.customNaipe,
   });
 
   final Naipe? naipe;
+
+  /// The named custom naipe, shown with the neutral badge.
+  final CustomNaipe? customNaipe;
   final String label;
 
   /// 0.0..1.0.
@@ -53,10 +57,7 @@ class MixTrackRow extends StatelessWidget {
         Row(
           children: [
             if (naipe != null) ...[
-              VoicePartBadge(
-                variant: VoicePartBadgeVariant.filled,
-                part: voicePartForNaipe(naipe),
-              ),
+              NaipeBadge(naipe: naipe, customNaipe: customNaipe),
               const SizedBox(width: CantaeSpacing.space2),
             ],
             Expanded(

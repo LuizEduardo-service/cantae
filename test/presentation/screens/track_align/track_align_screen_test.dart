@@ -4,6 +4,7 @@ import 'package:cantae/domain/audio/audio_playback_engine.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/custom_naipe.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_track.dart';
@@ -13,6 +14,7 @@ import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/screens/track_align/track_align_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:cantae/presentation/widgets/buttons.dart';
+import 'package:cantae/presentation/widgets/voice_part_badge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -147,7 +149,15 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             TrackAlignScreen(songId: state.pathParameters['id']!),
       ),
-      for (final name in ['studio', 'track-upload'])
+      GoRoute(
+        path: '/song-editor/:id',
+        name: 'track-upload',
+        builder: (_, state) => Text(
+          'route:track-upload:${state.pathParameters['id']}'
+          '${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}',
+        ),
+      ),
+      for (final name in ['studio'])
         GoRoute(
           path: '/$name',
           name: name,
@@ -202,6 +212,51 @@ void main() {
       await tester.tap(find.text('Cortar áudio no Studio'));
       await tester.pumpAndSettle();
       expect(find.text('route:studio'), findsOneWidget);
+    });
+
+    testWidgets('sem faixas: "Enviar faixa" abre as faixas da música (UPL-17)',
+        (tester) async {
+      final engine = _FakeAudioPlaybackEngine();
+      final repo =
+          _FakeSongRepository(initialSong: _songWith(tracks: const []));
+      await tester.pumpWidget(_wrap(engine: engine, repo: repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Enviar faixa'));
+      await tester.pumpAndSettle();
+      expect(find.text('route:track-upload:song-1'), findsOneWidget);
+    });
+
+    testWidgets('um naipe extra aparece com o nome e o selo (UPL-16)',
+        (tester) async {
+      final engine = _FakeAudioPlaybackEngine();
+      final repo = _FakeSongRepository(
+        initialSong: _songWith(tracks: const [
+          SongTrack(
+            id: 'soprano',
+            filePath: '/tmp/soprano.mp3',
+            naipe: Naipe.soprano,
+          ),
+          SongTrack(
+            id: 'solista',
+            filePath: '/tmp/solista.mp3',
+            naipe: Naipe.custom,
+            customNaipe: CustomNaipe(id: 'n1', name: 'Solista'),
+          ),
+        ]),
+      );
+      await tester.pumpWidget(_wrap(engine: engine, repo: repo));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Solista'), findsOneWidget);
+      // Soprano's "S" and Solista's initial (each row also has an S toggle).
+      expect(
+        find.descendant(
+          of: find.byType(VoicePartBadge),
+          matching: find.text('S'),
+        ),
+        findsNWidgets(2),
+      );
     });
 
     testWidgets(

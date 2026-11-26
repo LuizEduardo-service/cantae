@@ -23,6 +23,7 @@ dependencies:
   nsd: ^3.0.0
   cryptography: ^2.7.0
   go_router: ^18.1.4
+  file_picker: ^13.4.1
 
 dev_dependencies:
   flutter_test:

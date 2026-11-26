@@ -9,6 +9,7 @@ import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/entities/lyric_line.dart';
 import 'package:cantae/domain/entities/metronome_config.dart';
+import 'package:cantae/domain/entities/custom_naipe.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/song.dart';
 import 'package:cantae/domain/entities/song_origin.dart';
@@ -217,9 +218,12 @@ GoRouter _router() => GoRouter(
               Text('route:song-detail:${state.pathParameters['id']}'),
         ),
         GoRoute(
-          path: '/track-upload',
+          path: '/song-editor/:id',
           name: 'track-upload',
-          builder: (_, __) => const Text('route:track-upload'),
+          builder: (_, state) => Text(
+            'route:track-upload:${state.pathParameters['id']}'
+            '${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}',
+          ),
         ),
         GoRoute(
           path: '/solo-player/:id',
@@ -345,7 +349,7 @@ void main() {
       expect(find.text('Tocar'), findsNothing);
       await tester.tap(find.text('Enviar faixa'));
       await tester.pumpAndSettle();
-      expect(find.text('route:track-upload'), findsOneWidget);
+      expect(find.text('route:track-upload:ave'), findsOneWidget);
     });
 
     testWidgets('audio load failure: banner, retry loads again',
@@ -444,6 +448,27 @@ void main() {
       final row = tester.widget<MixTrackRow>(tenor);
       expect(row.muted, isTrue);
       expect(row.solo, isTrue);
+    });
+
+    testWidgets('a custom naipe mixes under its own name and initial (UPL-16)',
+        (tester) async {
+      await _open(tester,
+          song: _song(tracks: const [
+            ..._tracks,
+            SongTrack(
+              id: 'solista',
+              filePath: '/tmp/sol.mp3',
+              naipe: Naipe.custom,
+              customNaipe: CustomNaipe(id: 'n1', name: 'Solista'),
+            ),
+          ]));
+      final row = await _scrollTo(tester, 'solista');
+
+      expect(find.descendant(of: row, matching: find.text('Solista')),
+          findsOneWidget);
+      expect(
+          find.descendant(of: row, matching: find.text('S')), findsNWidgets(2),
+          reason: 'badge initial + the solo toggle');
     });
 
     testWidgets('leaving the screen stops the audio', (tester) async {

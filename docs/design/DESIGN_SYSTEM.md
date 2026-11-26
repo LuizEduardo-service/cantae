@@ -154,6 +154,7 @@ Base de **4 pt**.
 | `space4` | 16 | Padding interno de card/banner |
 | `space5` | 20 | **Margem lateral da tela** |
 | `space6` | 24 | Separação entre seções |
+| `minTouchTarget` | 44 | Menor área de toque (ações de texto dentro de linhas) |
 | `safeTop` | 52–56 | Topo (inclui área segura) |
 | `safeBottom` | 28–32 | Rodapé (inclui área segura) |
 

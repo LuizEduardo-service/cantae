@@ -20,6 +20,10 @@ enum VoicePartBadgeVariant {
 
   /// The "every naipe" badge ("Todos").
   all,
+
+  /// A custom naipe ("Solista"): neutral colors with its initial
+  /// ([VoicePartBadge.glyph]).
+  custom,
 }
 
 /// Naipe badge. Color is never the only signal — a letter (or "Todos"/"V")
@@ -30,11 +34,16 @@ class VoicePartBadge extends StatelessWidget {
     required this.variant,
     this.part,
     this.size = 22,
-  }) : assert(
+    this.glyph,
+  })  : assert(
           variant != VoicePartBadgeVariant.filled &&
                   variant != VoicePartBadgeVariant.missing ||
               part != null,
           'filled/missing badges need a part to pick the right letter',
+        ),
+        assert(
+          variant != VoicePartBadgeVariant.custom || glyph != null,
+          'a custom badge needs the custom naipe initial',
         );
 
   final VoicePartBadgeVariant variant;
@@ -47,8 +56,13 @@ class VoicePartBadge extends StatelessWidget {
 
   final double size;
 
+  /// The letter of a [VoicePartBadgeVariant.custom] badge.
+  final String? glyph;
+
   String get _glyph {
     switch (variant) {
+      case VoicePartBadgeVariant.custom:
+        return glyph!;
       case VoicePartBadgeVariant.visitor:
         return 'V';
       case VoicePartBadgeVariant.all:
@@ -77,6 +91,7 @@ class VoicePartBadge extends StatelessWidget {
       case VoicePartBadgeVariant.visitor:
         return VoicePart.visitante;
       case VoicePartBadgeVariant.all:
+      case VoicePartBadgeVariant.custom:
         return VoicePart.todos;
       case VoicePartBadgeVariant.missing:
         return VoicePart.semFaixa;
