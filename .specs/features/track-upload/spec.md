@@ -170,7 +170,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 
 | Requirement ID | Story | Phase | Status |
 | -------------- | ----- | ----- | ------ |
-| UPL-01 | P1-AC1: Biblioteca abre "Nova música" | Execute | In Tasks |
+| UPL-01 | P1-AC1: Biblioteca abre "Nova música" | Execute | Implementing |
 | UPL-02 | P1-AC2: campos e seções da tela | Execute | Implementing |
 | UPL-03 | P1-AC3/AC4: escolher arquivo e mostrar nome e tamanho | Execute | Implementing |
 | UPL-04 | P1-AC5: salvar copia, confere hash, grava e abre o Detalhe | Execute | Implementing |
@@ -186,7 +186,7 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Implementing |
 | UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | Implementing |
 | UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | Implementing |
-| UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | In Tasks |
+| UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | Implementing |
 | UPL-18 | P4-AC3/AC4: trocar e remover com confirmação | Execute | Implementing |
 | UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Implementing |
 | UPL-20 | P4-AC6: descartar alterações pede confirmação | Execute | Implementing |

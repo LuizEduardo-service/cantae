@@ -85,7 +85,7 @@ class TrackAlignScreen extends ConsumerWidget {
         return _StateScaffold(
           backLabel: backLabel,
           onBack: () => _handleBack(context, state),
-          body: const _NoTracksBody(),
+          body: _NoTracksBody(songId: songId),
         );
       case TrackAlignStatus.error:
         return _StateScaffold(
@@ -161,7 +161,9 @@ class _NotFoundBody extends StatelessWidget {
 }
 
 class _NoTracksBody extends StatelessWidget {
-  const _NoTracksBody();
+  const _NoTracksBody({required this.songId});
+
+  final String songId;
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +174,10 @@ class _NoTracksBody extends StatelessWidget {
       primaryLabel: 'Cortar áudio no Studio',
       onPrimary: () => context.goNamed('studio'),
       secondaryLabel: 'Enviar faixa',
-      onSecondary: () => context.goNamed('track-upload'),
+      onSecondary: () => context.goNamed(
+        'track-upload',
+        pathParameters: {'id': songId},
+      ),
     );
   }
 }
@@ -213,9 +218,12 @@ class _LoadedScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<CantaeColors>()!;
     final song = state.song!;
-    final tracksByNaipe = {
-      for (final track in song.tracks) track.naipe: track,
-    };
+    // The 4 standard naipes in order, then the custom naipes (UPL-16).
+    final rows = [
+      for (final naipe in _standardNaipes)
+        ...song.tracks.where((t) => t.naipe == naipe).take(1),
+      ...song.tracks.where((t) => t.customNaipe != null),
+    ];
 
     return CantaeScaffold(
       topLeft: NavPill(
@@ -236,24 +244,20 @@ class _LoadedScaffold extends StatelessWidget {
             style: CantaeTypography.bodySmall.copyWith(color: colors.text2),
           ),
           const SizedBox(height: CantaeSpacing.space5),
-          for (final naipe in _standardNaipes)
-            if (tracksByNaipe[naipe] != null) ...[
-              TrackAlignRow(
-                naipe: naipe,
-                startDelayMs:
-                    state.startDelayMsByTrackId[tracksByNaipe[naipe]!.id] ??
-                        tracksByNaipe[naipe]!.startDelayMs,
-                muted: state.mutedByTrackId[tracksByNaipe[naipe]!.id] ?? false,
-                solo: state.soloTrackId == tracksByNaipe[naipe]!.id,
-                onOffsetChanged: (ms) =>
-                    notifier.setOffset(tracksByNaipe[naipe]!.id, ms),
-                onMuteChanged: (muted) =>
-                    notifier.setMuted(tracksByNaipe[naipe]!.id, muted),
-                onSoloChanged: (solo) =>
-                    notifier.setSolo(tracksByNaipe[naipe]!.id, solo),
-              ),
-              const SizedBox(height: CantaeSpacing.space3),
-            ],
+          for (final track in rows) ...[
+            TrackAlignRow(
+              naipe: track.naipe,
+              customNaipe: track.customNaipe,
+              startDelayMs:
+                  state.startDelayMsByTrackId[track.id] ?? track.startDelayMs,
+              muted: state.mutedByTrackId[track.id] ?? false,
+              solo: state.soloTrackId == track.id,
+              onOffsetChanged: (ms) => notifier.setOffset(track.id, ms),
+              onMuteChanged: (muted) => notifier.setMuted(track.id, muted),
+              onSoloChanged: (solo) => notifier.setSolo(track.id, solo),
+            ),
+            const SizedBox(height: CantaeSpacing.space3),
+          ],
           const SizedBox(height: CantaeSpacing.space3),
           Text(
             'Testar trecho',

@@ -45,14 +45,14 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 
 ## 6.2b Biblioteca vazia
 - `EmptyState`: "Nenhuma música ainda" + frase.
-- [P] Cadastrar primeira música · [S] Abrir pacote .cantae.
+- [P] Cadastrar primeira música (abre "Nova música", §6.4) · [S] Abrir pacote .cantae.
 - Card inferior: "Tem ensaio rolando por perto?" + "Entrar em sala".
 
 ## 6.3 Detalhe da música
 - **Topo:** ‹ Biblioteca · Exportar.
 - **Cabeçalho:** título, "Autor · duração · origem".
 - **Banner warning (condicional):** rascunho do Studio pendente → "Retomar corte" / "Descartar" (Descartar pede confirmação).
-- **Naipes:** grupo com 4 linhas; faltante com selo tracejado e "Enviar faixa".
+- **Naipes:** grupo com 4 linhas; faltante com selo tracejado e "Enviar faixa" (abre "Faixas" já no seletor daquele naipe, §6.4). Naipes extras aparecem abaixo, com selo neutro e a inicial.
 - **Preparar:** Cortar áudio no Studio › · Alinhar entradas › · Sincronizar letra (3 de 5) › · Ensaios anteriores (7) ›.
 - **Rodapé:** [S] Ensaiar só · [P] Ensaiar em grupo.
 - **Papéis:** Cantor que recebeu a música vê versão somente leitura: sem "Preparar" nem "Enviar faixa"; mantém "Ensaiar só" e uma seção "Ensaios" só com "Ensaios anteriores (N)" (o histórico vale para todos os papéis, PRD UX §6.16).
@@ -86,7 +86,7 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 
 ## 6.5 Alinhamento de faixas
 - **Topo:** ‹ nome da música. Título "Alinhar entradas" + instrução.
-- **Conteúdo:** 4 `TrackAlignRow`.
+- **Conteúdo:** uma `TrackAlignRow` por faixa: os 4 naipes padrão na ordem e depois os naipes extras (selo neutro e nome).
 - **Rodapé:** [S] Ouvir em loop · [P] Salvar atrasos (toast "Atrasos salvos").
 - **Estados:**
   - *Sem faixas*: EmptyState que leva ao Studio ou ao upload.

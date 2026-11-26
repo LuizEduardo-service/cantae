@@ -115,6 +115,11 @@ GoRouter _buildRouter() {
         builder: (context, state) => const Text('route:profile'),
       ),
       GoRoute(
+        path: '/song-editor',
+        name: 'song-create',
+        builder: (context, state) => const Text('route:song-create'),
+      ),
+      GoRoute(
         path: '/import',
         name: 'package-import',
         builder: (context, state) => const Text('route:package-import'),
@@ -199,6 +204,18 @@ void main() {
       expect(find.text('Abrir pacote .cantae'), findsOneWidget);
       expect(find.text('Tem ensaio rolando por perto?'), findsOneWidget);
       expect(find.byType(TextField), findsNothing);
+    });
+
+    testWidgets('empty: "Cadastrar primeira música" opens Nova música (UPL-01)',
+        (tester) async {
+      final repo = _FakeSongRepository(const []);
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Cadastrar primeira música'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('route:song-create'), findsOneWidget);
     });
 
     testWidgets(

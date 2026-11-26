@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/entities/custom_naipe.dart';
 import 'package:cantae/domain/entities/naipe.dart';
 import 'package:cantae/domain/entities/rehearsal_log.dart';
 import 'package:cantae/domain/entities/song.dart';
@@ -128,11 +129,18 @@ GoRouter _buildRouter() {
         builder: (context, state) =>
             Text('route:song-history:${state.pathParameters['id']}'),
       ),
+      GoRoute(
+        path: '/song-editor/:id',
+        name: 'track-upload',
+        builder: (_, state) => Text(
+          'route:track-upload:${state.pathParameters['id']}'
+          '${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}',
+        ),
+      ),
       for (final name in [
         'studio',
         'room-create',
         'package-import',
-        'track-upload',
       ])
         GoRoute(
           path: '/$name',
@@ -294,19 +302,45 @@ void main() {
       },
     );
 
-    testWidgets('"Enviar faixa" navigates to the track-upload route', (
-      tester,
-    ) async {
+    testWidgets(
+        '"Enviar faixa" opens this song\'s tracks on that naipe (UPL-17)',
+        (tester) async {
       final repo = _FakeSongRepository(
         getById: (_) async => Result.success(_incompleteSong()),
       );
       await tester.pumpWidget(_wrap(repo));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Enviar faixa').first);
+      await tester.tap(find.text('Enviar faixa').at(1));
       await tester.pumpAndSettle();
 
-      expect(find.text('route:track-upload'), findsOneWidget);
+      expect(find.text('route:track-upload:s1?naipe=tenor'), findsOneWidget);
+    });
+
+    testWidgets(
+        'a custom naipe track is listed with its name and initial '
+        '(UPL-16)', (tester) async {
+      final repo = _FakeSongRepository(
+        getById: (_) async => const Result.success(Song(
+          id: 's1',
+          name: 'Ave Maria',
+          author: 'Schubert',
+          tracks: [
+            SongTrack(id: 't1', filePath: 'a.wav', naipe: Naipe.soprano),
+            SongTrack(
+              id: 't2',
+              filePath: 'b.wav',
+              naipe: Naipe.custom,
+              customNaipe: CustomNaipe(id: 'n1', name: 'Solista'),
+            ),
+          ],
+        )),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Solista'), findsOneWidget);
+      expect(find.text('S'), findsNWidgets(2));
     });
 
     testWidgets('Preparar rows navigate to their own placeholder routes', (

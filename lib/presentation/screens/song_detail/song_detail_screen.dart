@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../domain/core/failures.dart';
 import '../../../domain/entities/naipe.dart';
+import '../../../domain/entities/song_track.dart';
 import '../../../domain/entities/song.dart';
 import '../../../domain/entities/song_origin.dart';
 import '../../providers/library_providers.dart';
@@ -222,8 +223,15 @@ class _HubScaffold extends StatelessWidget {
               naipe: naipe,
               hasTrack: covered.contains(naipe),
               showUploadAction: !isReadOnly,
-              onUpload: () => context.goNamed('track-upload'),
+              onUpload: () => context.goNamed(
+                'track-upload',
+                pathParameters: {'id': song.id},
+                queryParameters: {'naipe': naipe.name},
+              ),
             ),
+          // Custom naipes (UPL-16): name + neutral badge with the initial.
+          for (final track in song.tracks.where((t) => t.customNaipe != null))
+            _CustomNaipeRow(track: track),
           if (!isReadOnly) ...[
             const SizedBox(height: CantaeSpacing.space6),
             const _SectionLabel('Preparar'),
@@ -355,6 +363,32 @@ class _NaipeRow extends StatelessWidget {
                 ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CustomNaipeRow extends StatelessWidget {
+  const _CustomNaipeRow({required this.track});
+
+  final SongTrack track;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).extension<CantaeColors>()!;
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: CantaeSpacing.space2),
+      child: Row(
+        children: [
+          NaipeBadge(naipe: track.naipe, customNaipe: track.customNaipe),
+          const SizedBox(width: CantaeSpacing.space3),
+          Expanded(
+            child: Text(
+              trackDisplayName(track),
+              style: CantaeTypography.body.copyWith(color: colors.text),
+            ),
+          ),
         ],
       ),
     );

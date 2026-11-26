@@ -348,10 +348,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests: library empty state → `route:song-create`; detail Tenor row → `route:track-upload:<id>?naipe=tenor`; solo empty → `track-upload:<id>`; align empty → `track-upload:<id>`; detail shows "Solista" with an "S" badge; solo mix row and align row show "Solista" (the router test for both new routes landed in T11, with the routes)
-- [ ] UI_SPEC §6.2b/§6.3 updated
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 7 new
+- [x] Tests: library empty state → `route:song-create`; detail Tenor row → `route:track-upload:<id>?naipe=tenor`; solo empty → `track-upload:<id>`; align empty → `track-upload:<id>`; detail shows "Solista" with an "S" badge; solo mix row and align row show "Solista" (the router test for both new routes landed in T11, with the routes)
+- [x] UI_SPEC §6.2b/§6.3 updated
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 7 new
 
 **Tests**: widget
 **Gate**: full

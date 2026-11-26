@@ -52,16 +52,7 @@ class LibraryScreen extends ConsumerWidget {
         data: (songs) {
           if (songs.isEmpty) {
             return _EmptyBody(
-              // SPEC_DEVIATION: no named route exists yet for "cadastrar uma
-              // música" (song editor is out of this feature's scope per
-              // spec.md). Reuses `song-detail` (the nav map's own next step
-              // from Biblioteca) with a placeholder id so the button has a
-              // real, non-empty callback; not one of T19's required
-              // navigation assertions.
-              onCreateSong: () => context.goNamed(
-                'song-detail',
-                pathParameters: const {'id': 'new'},
-              ),
+              onCreateSong: () => context.goNamed('song-create'),
               onOpenPackage: () => context.goNamed('package-import'),
               onJoinRoom: () => context.goNamed('room-join'),
             );

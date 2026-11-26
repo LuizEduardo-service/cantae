@@ -126,7 +126,8 @@ class SoloPlayerScreen extends ConsumerWidget {
           ),
         );
       case SoloPlayerStatus.noTracks:
-        return _StateScaffold(onBack: back, body: const _NoTracksBody());
+        return _StateScaffold(
+            onBack: back, body: _NoTracksBody(songId: songId));
       case SoloPlayerStatus.audioError:
         return _StateScaffold(
           onBack: back,
@@ -265,7 +266,9 @@ class _NotFoundBody extends StatelessWidget {
 }
 
 class _NoTracksBody extends StatelessWidget {
-  const _NoTracksBody();
+  const _NoTracksBody({required this.songId});
+
+  final String songId;
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +277,10 @@ class _NoTracksBody extends StatelessWidget {
       title: 'Esta música ainda não tem faixas',
       message: 'Envie ao menos uma faixa para ensaiar esta música.',
       primaryLabel: 'Enviar faixa',
-      onPrimary: () => context.goNamed('track-upload'),
+      onPrimary: () => context.goNamed(
+        'track-upload',
+        pathParameters: {'id': songId},
+      ),
     );
   }
 }
