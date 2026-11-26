@@ -278,9 +278,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: flutter-ui-ux
 
 **Done when**:
-- [ ] Tests: names for the 4 naipes, Playback, "Solista", a nameless custom → "Outro naipe"; custom badge shows "S" for "Solista" in light and dark; existing screen tests still pass
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests: names for the 4 naipes, Playback, "Solista", a nameless custom → "Outro naipe"; custom badge shows "S" for "Solista" in light and dark; existing screen tests still pass
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: full

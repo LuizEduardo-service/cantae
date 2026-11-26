@@ -94,6 +94,8 @@ Linha da Biblioteca.
 ### `VoicePartBadge`
 - Tamanhos: 18, 22, 26. Raio 6–8. Letra Geist Mono.
 - Variantes: `filled` (cor do naipe), `missing` (tracejado), `visitor` (contorno sólido, "V"), `all` (tinta, "Todos").
+- `custom`: naipe extra ("Solista"), cores neutras de `all` com a inicial do nome. O nome sempre aparece ao lado do selo.
+- `NaipeBadge` (`naipe_labels.dart`) escolhe a variante a partir do naipe da faixa. `naipe_labels.dart` é o único lugar que converte naipe em nome ("Baixo", "Playback", o nome do naipe extra).
 
 ### `ParticipantRow`
 Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carregando em `text2`), latência em mono à direita (`warningInline` 600 quando fraca).

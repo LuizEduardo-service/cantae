@@ -402,17 +402,11 @@ class _ReadyScaffold extends StatelessWidget {
 
   Widget _mixRow(SongTrack track) {
     final mix = view.mix[track.id] ?? const TrackMix();
-    final String label;
-    if (track.isPlayback) {
-      label = 'Playback';
-    } else {
-      final name = naipeDisplayName(track.naipe);
-      label = name.isEmpty ? 'Outro naipe' : name;
-    }
     return MixTrackRow(
       key: ValueKey('mix-${track.id}'),
       naipe: track.isPlayback ? null : track.naipe,
-      label: label,
+      customNaipe: track.customNaipe,
+      label: trackDisplayName(track),
       volume: mix.volume,
       muted: mix.muted,
       solo: view.soloTrackId == track.id,

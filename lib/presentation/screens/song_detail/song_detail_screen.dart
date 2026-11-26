@@ -20,6 +20,7 @@ import '../../widgets/empty_state.dart';
 import '../../widgets/inline_banner.dart';
 import '../../widgets/nav_pill.dart';
 import '../../widgets/voice_part_badge.dart';
+import '../../widgets/naipe_labels.dart';
 
 const List<Naipe> _standardNaipes = [
   Naipe.soprano,
@@ -27,36 +28,6 @@ const List<Naipe> _standardNaipes = [
   Naipe.tenor,
   Naipe.bass,
 ];
-
-String _naipeName(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return 'Soprano';
-    case Naipe.contralto:
-      return 'Contralto';
-    case Naipe.tenor:
-      return 'Tenor';
-    case Naipe.bass:
-      return 'Baixo';
-    case Naipe.custom:
-      return '';
-  }
-}
-
-VoicePart _voicePartFor(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return VoicePart.soprano;
-    case Naipe.contralto:
-      return VoicePart.contralto;
-    case Naipe.tenor:
-      return VoicePart.tenor;
-    case Naipe.bass:
-      return VoicePart.baixo;
-    case Naipe.custom:
-      return VoicePart.todos;
-  }
-}
 
 /// Hub for one música — `UI_SPEC.md` §6.3. All states/modes live in this one
 /// file (same precedent as `library-screen`'s `LibraryScreen`).
@@ -363,19 +334,19 @@ class _NaipeRow extends StatelessWidget {
             variant: hasTrack
                 ? VoicePartBadgeVariant.filled
                 : VoicePartBadgeVariant.missing,
-            part: _voicePartFor(naipe),
+            part: voicePartForNaipe(naipe),
           ),
           const SizedBox(width: CantaeSpacing.space3),
           Expanded(
             child: Text(
-              _naipeName(naipe),
+              naipeDisplayName(naipe),
               style: CantaeTypography.body.copyWith(color: colors.text),
             ),
           ),
           if (!hasTrack && showUploadAction)
             Semantics(
               button: true,
-              label: 'Enviar faixa de ${_naipeName(naipe)}',
+              label: 'Enviar faixa de ${naipeDisplayName(naipe)}',
               child: InkWell(
                 onTap: onUpload,
                 child: Text(

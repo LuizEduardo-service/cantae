@@ -2,42 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../domain/entities/custom_naipe.dart';
 import '../../domain/entities/naipe.dart';
 import '../theme/cantae_colors.dart';
 import '../theme/cantae_spacing.dart';
 import '../theme/cantae_typography.dart';
 import 'mute_solo_toggle.dart';
-import 'voice_part_badge.dart';
-
-String _naipeName(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return 'Soprano';
-    case Naipe.contralto:
-      return 'Contralto';
-    case Naipe.tenor:
-      return 'Tenor';
-    case Naipe.bass:
-      return 'Baixo';
-    case Naipe.custom:
-      return '';
-  }
-}
-
-VoicePart _voicePartFor(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return VoicePart.soprano;
-    case Naipe.contralto:
-      return VoicePart.contralto;
-    case Naipe.tenor:
-      return VoicePart.tenor;
-    case Naipe.bass:
-      return VoicePart.baixo;
-    case Naipe.custom:
-      return VoicePart.todos;
-  }
-}
+import 'naipe_labels.dart';
 
 /// `mm:ss.s` formatting shared by [TrackAlignRow]'s offset field.
 abstract final class TrackAlignDuration {
@@ -84,9 +55,13 @@ class TrackAlignRow extends StatefulWidget {
     required this.onOffsetChanged,
     required this.onMuteChanged,
     required this.onSoloChanged,
+    this.customNaipe,
   });
 
   final Naipe naipe;
+
+  /// The named custom naipe, shown with its name and neutral badge.
+  final CustomNaipe? customNaipe;
   final int startDelayMs;
   final bool muted;
   final bool solo;
@@ -169,14 +144,11 @@ class _TrackAlignRowState extends State<TrackAlignRow> {
         children: [
           Row(
             children: [
-              VoicePartBadge(
-                variant: VoicePartBadgeVariant.filled,
-                part: _voicePartFor(widget.naipe),
-              ),
+              NaipeBadge(naipe: widget.naipe, customNaipe: widget.customNaipe),
               const SizedBox(width: CantaeSpacing.space2),
               Expanded(
                 child: Text(
-                  _naipeName(widget.naipe),
+                  naipeLabel(widget.naipe, customNaipe: widget.customNaipe),
                   style: CantaeTypography.body.copyWith(color: colors.text),
                 ),
               ),

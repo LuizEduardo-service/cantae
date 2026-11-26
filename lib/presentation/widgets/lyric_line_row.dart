@@ -8,36 +8,7 @@ import '../theme/cantae_typography.dart';
 import 'segmented_control.dart';
 import 'track_align_row.dart' show TrackAlignDuration;
 import 'voice_part_badge.dart';
-
-String _naipeName(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return 'Soprano';
-    case Naipe.contralto:
-      return 'Contralto';
-    case Naipe.tenor:
-      return 'Tenor';
-    case Naipe.bass:
-      return 'Baixo';
-    case Naipe.custom:
-      return '';
-  }
-}
-
-VoicePart _voicePartFor(Naipe naipe) {
-  switch (naipe) {
-    case Naipe.soprano:
-      return VoicePart.soprano;
-    case Naipe.contralto:
-      return VoicePart.contralto;
-    case Naipe.tenor:
-      return VoicePart.tenor;
-    case Naipe.bass:
-      return VoicePart.baixo;
-    case Naipe.custom:
-      return VoicePart.todos;
-  }
-}
+import 'naipe_labels.dart';
 
 /// Naipe options: the badge letters, read out by full name. Full names do
 /// not fit five segments on a 360 dp phone.
@@ -298,7 +269,7 @@ class _NaipeLine extends StatelessWidget {
           if (naipe != null)
             VoicePartBadge(
               variant: VoicePartBadgeVariant.filled,
-              part: _voicePartFor(naipe),
+              part: voicePartForNaipe(naipe),
               size: 18,
             ),
           if (naipe != null && dynamics != null)
@@ -306,7 +277,9 @@ class _NaipeLine extends StatelessWidget {
           if (dynamics != null)
             Flexible(
               child: Text(
-                naipe == null ? dynamics : '${_naipeName(naipe)} · $dynamics',
+                naipe == null
+                    ? dynamics
+                    : '${naipeDisplayName(naipe)} · $dynamics',
                 style: style,
               ),
             ),

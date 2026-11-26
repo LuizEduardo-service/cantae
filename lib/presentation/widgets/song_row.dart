@@ -6,6 +6,7 @@ import '../theme/cantae_colors.dart';
 import '../theme/cantae_spacing.dart';
 import '../theme/cantae_typography.dart';
 import 'voice_part_badge.dart';
+import 'naipe_labels.dart';
 
 /// One library list row: title, "Autor · status" subtitle, up to 4
 /// [VoicePartBadge]s, and an optional "destacado" (highlighted) background.
@@ -29,36 +30,6 @@ class SongRow extends StatelessWidget {
     Naipe.bass,
   ];
 
-  static String _naipeName(Naipe naipe) {
-    switch (naipe) {
-      case Naipe.soprano:
-        return 'Soprano';
-      case Naipe.contralto:
-        return 'Contralto';
-      case Naipe.tenor:
-        return 'Tenor';
-      case Naipe.bass:
-        return 'Baixo';
-      case Naipe.custom:
-        return '';
-    }
-  }
-
-  static VoicePart _voicePartFor(Naipe naipe) {
-    switch (naipe) {
-      case Naipe.soprano:
-        return VoicePart.soprano;
-      case Naipe.contralto:
-        return VoicePart.contralto;
-      case Naipe.tenor:
-        return VoicePart.tenor;
-      case Naipe.bass:
-        return VoicePart.baixo;
-      case Naipe.custom:
-        return VoicePart.todos;
-    }
-  }
-
   Set<Naipe> get _coveredNaipes =>
       song.tracks.where((t) => !t.isPlayback).map((t) => t.naipe).toSet();
 
@@ -71,7 +42,7 @@ class SongRow extends StatelessWidget {
   String? get _statusText {
     if (song.isComplete) return null;
     final missing = _missingNaipes;
-    if (missing.length == 1) return 'Falta ${_naipeName(missing.first)}';
+    if (missing.length == 1) return 'Falta ${naipeDisplayName(missing.first)}';
     return 'Faltam ${missing.length} naipes';
   }
 
@@ -141,7 +112,7 @@ class SongRow extends StatelessWidget {
                       variant: present
                           ? VoicePartBadgeVariant.filled
                           : VoicePartBadgeVariant.missing,
-                      part: _voicePartFor(naipe),
+                      part: voicePartForNaipe(naipe),
                     ),
                   );
                 }).toList(),
