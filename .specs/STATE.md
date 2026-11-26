@@ -78,6 +78,12 @@
 
 ---
 
+### AD-013 — `file_picker` added for choosing audio files, behind a domain port
+**Decision:** The project adds `file_picker` (`^13.4.1`) as a runtime dependency. It is used only in `lib/infrastructure/files/`, behind the domain port `TrackFilePicker`; screens and notifiers never import the plugin.
+**Rationale:** Amends AD-004 the same way AD-009 and AD-011 did: creating a song (RF13) needs the system file chooser, which was not foreseen in the Phase 0 list. The user chose `file_picker` over writing a platform channel. The port keeps tests free of the plugin.
+
+---
+
 ## Handoff
 
 Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (RF24) and **stabilize-flaky-tests** are merged to `develop` (pushed up to `dda2959`). **rehearsal-history** (Ensaios anteriores, RF39/RF40) is complete and verified on branch `feature/phase-5-rehearsal-history` (not yet merged).
