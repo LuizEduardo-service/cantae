@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:cantae/infrastructure/database/tables/custom_naipes_table.dart';
 import 'package:cantae/infrastructure/database/tables/songs_table.dart';
 import 'package:cantae/infrastructure/database/tables/song_tracks_table.dart';
 import 'package:cantae/infrastructure/database/tables/lyric_lines_table.dart';
@@ -7,13 +8,19 @@ import 'package:cantae/infrastructure/database/tables/rehearsal_logs_table.dart'
 part 'app_database.g.dart';
 
 @DriftDatabase(
-  tables: [SongsTable, SongTracksTable, LyricLinesTable, RehearsalLogsTable],
+  tables: [
+    SongsTable,
+    SongTracksTable,
+    LyricLinesTable,
+    RehearsalLogsTable,
+    CustomNaipesTable,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase(super.executor);
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   // SPEC_DEVIATION: AD-009/design.md's original sketch named drift's
   // `stepByStep(from1To2: ...)` helper. That helper now only exists as
@@ -41,6 +48,13 @@ class AppDatabase extends _$AppDatabase {
             // rehearsal-history: a new table (and its index) only.
             await m.createTable(rehearsalLogsTable);
             await m.createIndex(rehearsalLogsSongId);
+          }
+          if (from < 5) {
+            // track-upload: custom naipes and the picked file's facts.
+            await m.createTable(customNaipesTable);
+            await m.addColumn(songTracksTable, songTracksTable.customNaipeId);
+            await m.addColumn(songTracksTable, songTracksTable.fileName);
+            await m.addColumn(songTracksTable, songTracksTable.fileSizeBytes);
           }
         },
         beforeOpen: (details) async {

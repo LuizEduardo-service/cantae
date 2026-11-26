@@ -41,6 +41,19 @@ void main() {
           dynamics TEXT NULL
         );
       ''');
+      // song_tracks exists since Phase 2 (schema v1); the v5 step adds
+      // columns to it.
+      raw.execute('''
+        CREATE TABLE song_tracks (
+          id TEXT NOT NULL PRIMARY KEY,
+          song_id TEXT NOT NULL REFERENCES songs (id) ON DELETE CASCADE,
+          file_path TEXT NOT NULL,
+          naipe TEXT NOT NULL,
+          start_delay_ms INTEGER NOT NULL,
+          is_playback INTEGER NOT NULL,
+          is_playback_slot INTEGER NOT NULL DEFAULT 0
+        );
+      ''');
       raw.execute(
         "INSERT INTO songs (id, name, author, version) VALUES ('legacy-1', 'Legacy Song', 'Legacy Author', '')",
       );
@@ -200,6 +213,68 @@ void main() {
       expect(left.map((r) => r.songId), ['aleluia']);
     });
   });
+  // Failure modes (UPL-15, UPL-19, schema v5): upgrading a v4 library loses
+  // songs, tracks or rehearsals; old tracks get non-null values in the new
+  // columns; custom_naipes is missing after an upgrade or a fresh install;
+  // two custom naipes with the same name (any case) are stored.
+  group('AppDatabase migration v4 -> v5 (custom naipes)', () {
+    test('a v4 library upgrades with its song, track and rehearsal intact',
+        () async {
+      final db = AppDatabase(NativeDatabase(File(_seedV4Database())));
+      addTearDown(db.close);
+
+      final song = await db.select(db.songsTable).getSingle();
+      expect(song.id, 'ave-1');
+      final track = await db.select(db.songTracksTable).getSingle();
+      expect(track.id, 't-sop');
+      expect(track.startDelayMs, 400);
+      expect(track.customNaipeId, isNull);
+      expect(track.fileName, isNull);
+      expect(track.fileSizeBytes, isNull);
+      final logs = await db.select(db.rehearsalLogsTable).get();
+      expect(logs.map((l) => l.id), ['log-1']);
+      expect(await _columnsOf(db, 'custom_naipes'), _customNaipeColumns);
+      expect(
+        await _columnsOf(db, 'song_tracks'),
+        containsAll(['custom_naipe_id', 'file_name', 'file_size_bytes']),
+      );
+    });
+
+    test('a fresh install creates custom_naipes and the track columns',
+        () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      expect(await _columnsOf(db, 'custom_naipes'), _customNaipeColumns);
+      expect(
+        await _columnsOf(db, 'song_tracks'),
+        containsAll(['custom_naipe_id', 'file_name', 'file_size_bytes']),
+      );
+    });
+
+    test('a second custom naipe with the same name key is refused', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+      await db.into(db.customNaipesTable).insert(
+            CustomNaipesTableCompanion.insert(
+              id: 'n1',
+              name: 'Solista',
+              nameKey: 'solista',
+            ),
+          );
+
+      expect(
+        () => db.into(db.customNaipesTable).insert(
+              CustomNaipesTableCompanion.insert(
+                id: 'n2',
+                name: 'SOLISTA',
+                nameKey: 'solista',
+              ),
+            ),
+        throwsA(isA<SqliteException>()),
+      );
+    });
+  });
 }
 
 /// A schema-v2 database file: `onset_ms` is still NOT NULL, with one song
@@ -232,6 +307,19 @@ String _seedV2Database() {
       onset_ms INTEGER NOT NULL,
       naipe TEXT NULL,
       dynamics TEXT NULL
+    );
+  ''');
+  // song_tracks exists since Phase 2 (schema v1); the v5 step adds columns
+  // to it.
+  raw.execute('''
+    CREATE TABLE song_tracks (
+      id TEXT NOT NULL PRIMARY KEY,
+      song_id TEXT NOT NULL REFERENCES songs (id) ON DELETE CASCADE,
+      file_path TEXT NOT NULL,
+      naipe TEXT NOT NULL,
+      start_delay_ms INTEGER NOT NULL,
+      is_playback INTEGER NOT NULL,
+      is_playback_slot INTEGER NOT NULL DEFAULT 0
     );
   ''');
   raw.execute(
@@ -310,6 +398,44 @@ String _seedV3Database() {
     "INSERT INTO songs (id, name, author, version) VALUES ('ave-1', 'Ave Verum Corpus', 'Mozart', '')",
   );
   raw.execute('PRAGMA user_version = 3;');
+  raw.close();
+  return dbPath;
+}
+
+const _customNaipeColumns = {'id', 'name', 'name_key'};
+
+/// A schema-v4 database file: the v3 library plus `rehearsal_logs`, one
+/// Soprano track (delay 400 ms) and one rehearsal.
+String _seedV4Database() {
+  final dbPath = _seedV3Database();
+  final raw = raw_sqlite3.sqlite3.open(dbPath);
+  raw.execute('''
+    CREATE TABLE rehearsal_logs (
+      id TEXT NOT NULL PRIMARY KEY,
+      song_id TEXT NOT NULL REFERENCES songs (id) ON DELETE CASCADE,
+      started_at INTEGER NOT NULL,
+      ended_at INTEGER NOT NULL,
+      duration_ms INTEGER NOT NULL,
+      mode TEXT NOT NULL,
+      local_role TEXT NULL,
+      max_participants INTEGER NOT NULL,
+      loop_count INTEGER NOT NULL
+    );
+  ''');
+  raw.execute(
+    'CREATE INDEX rehearsal_logs_song_id ON rehearsal_logs (song_id);',
+  );
+  raw.execute(
+    'INSERT INTO song_tracks (id, song_id, file_path, naipe, start_delay_ms, '
+    "is_playback, is_playback_slot) VALUES ('t-sop', 'ave-1', "
+    "'/library/tracks/abc.mp3', 'soprano', 400, 0, 0)",
+  );
+  raw.execute(
+    'INSERT INTO rehearsal_logs (id, song_id, started_at, ended_at, '
+    'duration_ms, mode, max_participants, loop_count) VALUES '
+    "('log-1', 'ave-1', 1764100800, 1764101700, 900000, 'solo', 1, 3)",
+  );
+  raw.execute('PRAGMA user_version = 4;');
   raw.close();
   return dbPath;
 }

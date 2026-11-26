@@ -184,11 +184,11 @@ O domínio tem `Naipe.custom`, sem nome, e não há seletor de arquivos no proje
 | UPL-12 | P3-AC1: Playback opcional | Execute | In Tasks |
 | UPL-13 | P3-AC2/AC3: adicionar naipe extra existente ou novo | Execute | In Tasks |
 | UPL-14 | P3-AC4/AC5: regras do nome e limite de 4 | Execute | Implementing |
-| UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | In Tasks |
+| UPL-15 | P3-AC6/AC8: lista reutilizável no aparelho | Execute | Implementing |
 | UPL-16 | P3-AC7: selo e nome do naipe extra nas telas | Execute | In Tasks |
 | UPL-17 | P4-AC1/AC2: entradas "Enviar faixa" levam à tela da música | Execute | In Tasks |
 | UPL-18 | P4-AC3/AC4: trocar e remover com confirmação | Execute | In Tasks |
-| UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | In Tasks |
+| UPL-19 | P4-AC5: salvar preserva atraso, letra, andamento e origem | Execute | Implementing |
 | UPL-20 | P4-AC6: descartar alterações pede confirmação | Execute | In Tasks |
 | UPL-21 | P4-AC7/AC8: não encontrada, erro, música recebida | Execute | In Tasks |
 | UPL-22 | Edge: mesmo arquivo em dois naipes e arquivo já na biblioteca | Execute | In Tasks |

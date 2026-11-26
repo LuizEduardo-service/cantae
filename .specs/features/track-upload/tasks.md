@@ -138,10 +138,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests: a v4 file with a song, tracks and a rehearsal upgrades to v5 intact; new columns are null on old tracks; `custom_naipes` columns asserted exactly; `name_key` rejects a duplicate
-- [ ] `app_database.g.dart` regenerated
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 3 new
+- [x] Tests: a v4 file with a song, tracks and a rehearsal upgrades to v5 intact; new columns are null on old tracks; `custom_naipes` columns asserted exactly; `name_key` rejects a duplicate
+- [x] `app_database.g.dart` regenerated
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 3 new
 
 **Tests**: unit
 **Gate**: full
