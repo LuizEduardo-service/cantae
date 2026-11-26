@@ -6,6 +6,7 @@ import 'package:crypto/crypto.dart';
 import 'package:cantae/domain/transfer/chunk_planner.dart';
 import 'package:cantae/domain/transfer/file_transfer_state.dart';
 
+import '../library/track_file_importer.dart' show sha256OfFile;
 import 'library_storage_paths.dart';
 import '../session/room_application_message.dart';
 import '../session/room_session_controller.dart';
@@ -233,9 +234,10 @@ class ChunkedFileReceiver {
         }
 
         final partialFile = File(partialPath);
-        final bytes =
-            totalChunks == 0 ? Uint8List(0) : await partialFile.readAsBytes();
-        final actualSha256 = sha256.convert(bytes).toString();
+        // Streamed and off the calling isolate: a track can be up to 100 MB.
+        final actualSha256 = totalChunks == 0
+            ? sha256.convert(const <int>[]).toString()
+            : await sha256OfFile(partialPath);
 
         if (actualSha256 == expectedSha256) {
           if (totalChunks == 0) {

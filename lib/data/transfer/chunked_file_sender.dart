@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:crypto/crypto.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
@@ -11,6 +10,7 @@ import 'package:cantae/domain/entities/song_track.dart';
 import 'package:cantae/domain/session/ids.dart';
 import 'package:cantae/domain/transfer/chunk_planner.dart';
 
+import '../library/track_file_importer.dart' show sha256OfFile;
 import '../session/room_application_message.dart';
 import '../session/room_session_controller.dart';
 
@@ -63,9 +63,10 @@ class ChunkedFileSender {
     required ParticipantId to,
     int resumeFromChunkIndex = 0,
   }) async {
-    final bytes = await File(track.filePath).readAsBytes();
-    final totalSizeBytes = bytes.length;
-    final sha256Declared = sha256.convert(bytes).toString();
+    final source = File(track.filePath);
+    final totalSizeBytes = await source.length();
+    // Streamed and off the calling isolate: a track can be up to 100 MB.
+    final sha256Declared = await sha256OfFile(track.filePath);
     final totalChunks = ChunkPlanner.chunkCount(
       totalSizeBytes: totalSizeBytes,
       chunkSize: chunkSize,
@@ -94,24 +95,30 @@ class ChunkedFileSender {
       ChunkPlanner.resumeFromChunkIndex(lastAckedChunkIndex: reportedLastAcked),
     );
 
-    for (var chunkIndex = effectiveResumeFrom;
-        chunkIndex < totalChunks;
-        chunkIndex++) {
-      final start = chunkIndex * chunkSize;
-      final end = min(start + chunkSize, totalSizeBytes);
-      final chunkBytes = Uint8List.sublistView(bytes, start, end);
+    final reader = await source.open();
+    try {
+      for (var chunkIndex = effectiveResumeFrom;
+          chunkIndex < totalChunks;
+          chunkIndex++) {
+        final start = chunkIndex * chunkSize;
+        final end = min(start + chunkSize, totalSizeBytes);
+        await reader.setPosition(start);
+        final chunkBytes = await reader.read(end - start);
 
-      final delivered = await _sendChunkWithRetry(
-        to: to,
-        trackId: track.id,
-        chunkIndex: chunkIndex,
-        chunkBytes: chunkBytes,
-      );
-      if (!delivered) {
-        return Result.failure(
-          NetworkFailure(code: 'transfer.chunk-delivery-failed'),
+        final delivered = await _sendChunkWithRetry(
+          to: to,
+          trackId: track.id,
+          chunkIndex: chunkIndex,
+          chunkBytes: chunkBytes,
         );
+        if (!delivered) {
+          return Result.failure(
+            NetworkFailure(code: 'transfer.chunk-delivery-failed'),
+          );
+        }
       }
+    } finally {
+      await reader.close();
     }
 
     await _controller.sendEnvelopeTo(
