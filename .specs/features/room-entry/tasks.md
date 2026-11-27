@@ -363,9 +363,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first (loopback + bus discovery): host then join on the same notifier closes the hosted room first; close as host ends the room and disposes the controller; close as member leaves; join outcome mapped through `joinOutcomeFor`; host failure leaves state `null`
-- [ ] Gate check passes: `flutter test test/presentation/providers`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Failure modes first (loopback + bus discovery): host then join on the same notifier closes the hosted room first; close as host ends the room and disposes the controller; close as member leaves; join outcome mapped through `joinOutcomeFor`; host failure leaves state `null`
+- [x] Gate check passes: `flutter test test/presentation/providers`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick
