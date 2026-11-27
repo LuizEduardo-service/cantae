@@ -258,4 +258,17 @@ void main() {
     await Future<void>.delayed(const Duration(milliseconds: 100));
     expect(lost, 1);
   });
+
+  test('a room that left the network can no longer be asked', () async {
+    final joiner = controller('ana');
+    final events = joiner.discoverRooms().take(2).toList();
+    const id = RoomId('gone');
+    bus.add(const DiscoveredRoom(id: id, host: '127.0.0.1', port: 1));
+    bus.add(const DiscoveredRoom(id: id, host: '', port: 0, available: false));
+    await events.timeout(const Duration(seconds: 5));
+
+    final result = await joiner.requestJoin(id, '1234', displayName: 'Ana');
+
+    expect(failureCode(result), 'session.room-not-found');
+  });
 }

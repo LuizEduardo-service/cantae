@@ -250,9 +250,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests on the pure functions: round-trip; 300-byte song name cut without breaking a UTF-8 character; no TXT (older app) → listed with "Sem nome" and version 0; `lost` → unavailable; error cause mapping; the NET-01 test now asserts the TXT holds no code and no key material (D7)
-- [ ] Gate check passes: `flutter test test/infrastructure/network`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Tests on the pure functions: round-trip; 300-byte song name cut without breaking a UTF-8 character; no TXT (older app) → listed with "Sem nome" and version 0; `lost` → unavailable; error cause mapping; the NET-01 test now asserts the TXT holds no code and no key material (D7)
+- [x] Gate check passes: `flutter test test/infrastructure/network`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick

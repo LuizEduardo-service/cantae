@@ -163,7 +163,11 @@ class RoomSessionController {
 
   Stream<DiscoveredRoom> discoverRooms() {
     return _discovery.discover().map((room) {
-      _knownRooms[room.id] = room;
+      if (room.available) {
+        _knownRooms[room.id] = room;
+      } else {
+        _knownRooms.remove(room.id);
+      }
       return room;
     });
   }
