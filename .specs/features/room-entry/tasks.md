@@ -732,8 +732,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] The flow passes and prints the artifact; the pending singer is absent from "Na sala" until "Aprovar" (ROOM-46)
-- [ ] Gate check passes: `flutter test`
+- [x] The flow passes and prints the artifact; the pending singer is absent from "Na sala" until "Aprovar" (ROOM-46)
+- [x] Gate check passes: `flutter test`
 
 **Tests**: e2e
 **Gate**: build
