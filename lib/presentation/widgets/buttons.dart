@@ -130,6 +130,7 @@ class TonalButton extends StatelessWidget {
     required this.label,
     this.onPressed,
     this.positive = false,
+    this.semanticLabel,
   });
 
   static const double _height = 44;
@@ -137,6 +138,10 @@ class TonalButton extends StatelessWidget {
   final String label;
   final VoidCallback? onPressed;
   final bool positive;
+
+  /// Read instead of [label] when the visible text needs context, e.g.
+  /// "Aprovar Marina" for a button showing "Aprovar".
+  final String? semanticLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +164,9 @@ class TonalButton extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
-      label: label,
+      label: semanticLabel ?? label,
+      excludeSemantics: semanticLabel != null,
+      onTap: semanticLabel != null ? onPressed : null,
       child: SizedBox(
         width: double.infinity,
         height: _height,

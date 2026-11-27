@@ -43,6 +43,7 @@ Fundo `fillSecondary`, texto `text`. Mesmas medidas do primário.
 ### `TonalButton`
 Dentro de cards ou ao lado do botão primário (ações de loop do Modo solo). Fundo `fillOnSurface` (neutro, texto `text`) ou `accentSoft` (positivo, texto `onAccentSoft`). Altura 44, pílula, ocupa a largura disponível.
 - Desabilitado (sem `onPressed`): fundo `fillField`, texto `textDisabled`, semântica "não habilitado".
+- `semanticLabel` opcional: o leitor de tela lê esse texto no lugar do visível quando o botão precisa de contexto ("Aprovar Marina" num botão "Aprovar").
 - Props: `label`, `onPressed`, `positive`.
 
 ### `DestructiveButton`
@@ -96,6 +97,9 @@ Linha da Biblioteca.
 - Variantes: `filled` (cor do naipe), `missing` (tracejado), `visitor` (contorno sólido, "V"), `all` (tinta, "Todos").
 - `custom`: naipe extra ("Solista"), cores neutras de `all` com a inicial do nome. O nome sempre aparece ao lado do selo.
 - `NaipeBadge` (`naipe_labels.dart`) escolhe a variante a partir do naipe da faixa. `naipe_labels.dart` é o único lugar que converte naipe em nome ("Baixo", "Playback", o nome do naipe extra).
+
+### `JoinRequestRow`
+Pedido de entrada na tela do Mestre (Criar sala e sala provisória): nome em `listTitle`; abaixo, "Recusar" (neutro) e "Aprovar" (positivo), dois `TonalButton` lado a lado. Leitor de tela: "Recusar Marina" / "Aprovar Marina". Com a sala cheia, "Aprovar" fica desativado e a linha mostra "Sala cheia: 8 de 8." como região viva.
 
 ### `ParticipantRow`
 Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carregando em `text2`), latência em mono à direita (`warningInline` 600 quando fraca).

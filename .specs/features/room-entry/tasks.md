@@ -524,9 +524,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: callbacks, labels with the name, full state disables approve and shows the sentence, ≥ 44 dp, dark theme, 360 dp at 130 %
-- [ ] Gate check passes: `flutter test test/presentation/widgets`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Widget tests: callbacks, labels with the name, full state disables approve and shows the sentence, ≥ 44 dp, dark theme, 360 dp at 130 %
+- [x] Gate check passes: `flutter test test/presentation/widgets`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: widget
 **Gate**: quick
