@@ -182,10 +182,10 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| ROOM-01 | P1: Nome na sala | Design | Pending |
+| ROOM-01 | P1: Nome na sala | Execute | Implementing |
 | ROOM-02 | P1: Nome na sala | Execute | Implementing |
 | ROOM-03 | P1: Nome na sala | Execute | Implementing |
-| ROOM-04 | P1: Nome na sala | Design | Pending |
+| ROOM-04 | P1: Nome na sala | Execute | Implementing |
 | ROOM-05 | P1: Criar sala | Execute | Implementing |
 | ROOM-06 | P1: Criar sala | Execute | Implementing |
 | ROOM-07 | P1: Criar sala | Execute | Implementing |

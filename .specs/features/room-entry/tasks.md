@@ -593,9 +593,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: blank and 41 chars keep the button off; 41 shows the sentence; save stores the trimmed name; failure keeps the field with "Não foi possível salvar o nome."; close returns null; dark theme
-- [ ] Gate check passes: `flutter test test/presentation/screens/room`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Widget tests: blank and 41 chars keep the button off; 41 shows the sentence; save stores the trimmed name; failure keeps the field with "Não foi possível salvar o nome."; close returns null; dark theme
+- [x] Gate check passes: `flutter test test/presentation/screens/room`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: widget
 **Gate**: quick
