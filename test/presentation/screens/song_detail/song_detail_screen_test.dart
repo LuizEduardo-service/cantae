@@ -140,9 +140,13 @@ GoRouter _buildRouter() {
           '${state.uri.query.isEmpty ? '' : '?${state.uri.query}'}',
         ),
       ),
+      GoRoute(
+        path: '/room/create',
+        name: 'room-create',
+        builder: (_, state) => Text('route:room-create?${state.uri.query}'),
+      ),
       for (final name in [
         'studio',
-        'room-create',
         'package-import',
       ])
         GoRoute(
@@ -539,7 +543,8 @@ void main() {
       expect(find.text('route:solo-player:s1'), findsOneWidget);
     });
 
-    testWidgets('rodapé: "Ensaiar em grupo" navigates to the room-create route',
+    testWidgets(
+        'rodapé: "Ensaiar em grupo" opens Criar sala with this song (ROOM-07)',
         (
       tester,
     ) async {
@@ -551,7 +556,7 @@ void main() {
 
       await tester.tap(find.text('Ensaiar em grupo'));
       await tester.pumpAndSettle();
-      expect(find.text('route:room-create'), findsOneWidget);
+      expect(find.text('route:room-create?songId=s1'), findsOneWidget);
     });
 
     testWidgets(

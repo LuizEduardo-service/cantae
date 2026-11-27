@@ -24,7 +24,7 @@ Pílula de navegação no topo.
 Status à direita do topo.
 - Variantes: `synced` (accentSoft, ponto accent, "Sincronizado"), `weak` (warningBg, "Conexão fraca"), `offline` (dangerBg, "× Sem rede"), `neutral` ("Visitante", "Sala 4827").
 - Altura 44, região viva para leitor de tela.
-- Implementado até agora: só `neutral` (fundo `fillMuted`, texto `text2`), usado no Modo solo ("Funciona offline"). As demais variantes chegam com as telas de sala.
+- Implementado até agora: `neutral` (fundo `fillMuted`, texto `text2`), usado no Modo solo ("Funciona offline"); e `synced` (fundo `accentSoft`, ponto 8 px `accent`, texto `onAccentSoft`), usado em Criar sala ("Visível neste Wi‑Fi"). `weak` e `offline` chegam com a Sala do Mestre e a Tela do Cantor.
 
 ### `SectionLabel`
 Rótulo de seção ("Naipes", "Seus dados"). `caption` 13/600 `text2`. Pode ter texto auxiliar à direita ("3 de 4 com faixa").
@@ -43,6 +43,7 @@ Fundo `fillSecondary`, texto `text`. Mesmas medidas do primário.
 ### `TonalButton`
 Dentro de cards ou ao lado do botão primário (ações de loop do Modo solo). Fundo `fillOnSurface` (neutro, texto `text`) ou `accentSoft` (positivo, texto `onAccentSoft`). Altura 44, pílula, ocupa a largura disponível.
 - Desabilitado (sem `onPressed`): fundo `fillField`, texto `textDisabled`, semântica "não habilitado".
+- `semanticLabel` opcional: o leitor de tela lê esse texto no lugar do visível quando o botão precisa de contexto ("Aprovar Marina" num botão "Aprovar").
 - Props: `label`, `onPressed`, `positive`.
 
 ### `DestructiveButton`
@@ -66,7 +67,7 @@ Fundo `fillField`, raio 12, altura 44, ícone de lupa `text2`, placeholder "Busc
 Fundo `surface` (ou `bg` dentro de card), borda 2 px `accent` quando focado, `dangerSolid` em erro, raio 14, altura 52.
 
 ### `CodeInput`
-Campo de 4 dígitos. Geist Mono 28/+8, teclado numérico, `maxLength 4`. Borda de erro quando o código não existe.
+Campo de 4 dígitos. Geist Mono 28/+8 (`monoInput`), teclado numérico, só dígitos, no máximo 4. Fundo `fillField`, raio `radiusMd`; foco com borda 2 px `accent`; borda de erro 2 px `dangerSolid` quando o código não foi encontrado. Leitor de tela: "Código da sala".
 
 ### `ChoiceTile` (rádio em card)
 Card `surface`, altura ≥ 56, borda 2 px `accent` quando selecionado. Usado no naipe padrão do Onboarding e nas opções de conflito de importação (opção destrutiva em `dangerSolid`).
@@ -97,11 +98,17 @@ Linha da Biblioteca.
 - `custom`: naipe extra ("Solista"), cores neutras de `all` com a inicial do nome. O nome sempre aparece ao lado do selo.
 - `NaipeBadge` (`naipe_labels.dart`) escolhe a variante a partir do naipe da faixa. `naipe_labels.dart` é o único lugar que converte naipe em nome ("Baixo", "Playback", o nome do naipe extra).
 
+### `JoinRequestRow`
+Pedido de entrada na tela do Mestre (Criar sala e sala provisória): nome em `listTitle`; abaixo, "Recusar" (neutro) e "Aprovar" (positivo), dois `TonalButton` lado a lado. Leitor de tela: "Recusar Marina" / "Aprovar Marina". Com a sala cheia, "Aprovar" fica desativado e a linha mostra "Sala cheia: 8 de 8." como região viva.
+
 ### `ParticipantRow`
 Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carregando em `text2`), latência em mono à direita (`warningInline` 600 quando fraca).
 
+### `RoomPersonRow`
+Versão mínima do `ParticipantRow` para a sala provisória: nome em `body` (`text`, cortado com reticências) e " · papel" (`text2`), altura ≥ 44. "Você · Mestre" para o próprio Mestre. Leitor de tela: um só item "Marina, Cantor". O `ParticipantRow` completo (naipe, estado, latência) chega com a Sala do Mestre.
+
 ### `RoomTile`
-Sala encontrada na rede: código em mono, nome do Mestre, "música · N pessoas", chevron. Borda 2 px `accent` quando é a sala do pedido em andamento.
+Sala encontrada na rede: "Sala de <Mestre>", música (ou "Sem música escolhida"), chevron; altura ≥ 64. Sem o código (NET-01: o código nunca é anunciado no Wi‑Fi) e sem "N pessoas" (fora do MVP). Borda 2 px `accent` quando é a sala escolhida ou a do pedido em andamento; desativado durante um pedido. Leitor de tela: um só botão "Sala de Marina, Ave Verum Corpus".
 
 ### `StatTile`
 Número grande em mono (`monoStat`, 26) + legenda (`caption`, `text2`), em cartão `surface` de raio `radiusMd`. Usado no Histórico, três lado a lado. Leitor de tela: um só item "legenda: valor". O número encolhe para caber numa linha.
@@ -152,7 +159,7 @@ Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`
 - Props: `positionMs`, `durationMs`, `onSeek`, `loopStartMs`, `loopEndMs` (região só com os dois), `caption`.
 
 ### `RoomCodeDisplay`
-Card `surface` raio 24: rótulo "Código da sala", código em `monoLarge`, botão "Copiar" (toast "Código copiado"), frase de instrução.
+Card `surface` raio `radiusXl`: rótulo "Código da sala", código em `monoLarge` (encolhe para caber em fonte grande), botão "Copiar" (`TonalButton`, toast "Código copiado"), frase de instrução. Leitor de tela: um só item "Código da sala 4 8 2 7", dígito por dígito.
 
 ---
 

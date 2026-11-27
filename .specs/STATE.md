@@ -82,11 +82,29 @@
 **Decision:** The project adds `file_picker` (`^13.4.1`) as a runtime dependency. It is used only in `lib/infrastructure/files/`, behind the domain port `TrackFilePicker`; screens and notifiers never import the plugin.
 **Rationale:** Amends AD-004 the same way AD-009 and AD-011 did: creating a song (RF13) needs the system file chooser, which was not foreseen in the Phase 0 list. The user chose `file_picker` over writing a platform channel. The port keeps tests free of the plugin.
 
+### AD-014 — One-row `local_profile` table holds the device id and the room name
+**Decision:** Schema v6 adds `local_profile` (always `id = 1`) with `device_id` (UUID v4 created on the first read and never changed), `display_name` (1–40 characters) and `created_at`. It is read through the domain port `LocalProfileRepository`. The future Perfil screen extends this row instead of adding a second identity store.
+**Rationale:** Rooms need a stable `deviceId` for transport identity (PRD §2.1) and a name for visual approval (RF27). The project has no key-value store; drift is already the local persistence (AD-009), so a single additive table avoids a new dependency.
+
+### AD-015 — Room protocol version travels in the join request; the master refuses a mismatch
+**Decision:** The domain constant `roomProtocolVersion` (now 1) goes at the end of `JoinRequestMessage` and in the mDNS TXT record `v`. The master's state machine refuses a different version with `session.protocol-mismatch` before checking the code. A request without the field decodes as version 0. Any change to the session wire format bumps the constant.
+**Rationale:** PRD §12 asks the UI to tell an incompatible app apart from other failures. The master is the authority for admission (PRD §6.3), so the check lives there; appending fields keeps old bytes decodable, so an older app gets a clear refusal instead of a broken connection.
+
 ---
 
 ## Handoff
 
-Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player** and **solo-metronome** are merged to `develop`, pushed to `origin` up to `0487781`. **background-audio** (RF24) and **stabilize-flaky-tests** are merged to `develop` (pushed up to `dda2959`). **rehearsal-history** (RF39/RF40) is merged to `develop` and pushed (`99f69e7`). **track-upload** (Cadastrar música e enviar faixas, RF13/RF16/RF17) is complete and verified on branch `feature/phase-5-track-upload` (not yet merged).
+Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **track-align-screen**, **lyrics-editor**, **solo-player**, **solo-metronome**, **background-audio**, **stabilize-flaky-tests**, **rehearsal-history** and **track-upload** are merged to `develop` and pushed (`7e76f21`). **fix/phase-5-state-debts** (streamed transfer hash, Detalhe upload button semantics, orphan library files) is merged to `develop` locally (`03d0e64`), **not pushed**. **room-entry** (Criar sala + Entrar em sala, RF01/RF02/RF26/RF27/RF29) is complete and verified on branch `feature/phase-5-room-entry` (not merged).
+
+- **room-entry:** 29 tasks, executed inline in sequence.
+  - User decisions (context.md D1–D7): name asked once and kept on the device; temporary rooms until the full master/singer screens; no Visitante yet; song optional; extend the Phase 3 session (approach A); iOS permission hint in "Nenhuma sala"; **NET-01 kept: the room code is never announced** (tiles show master and song; the code is always typed).
+  - Session: JoinRequest v2 with protocol version and name (AD-015); refusal and expiry carry a reason; joiner gets connect-failed / connection-lost / 75 s expiry instead of hanging; `cancelJoin`, `leaveRoom`, `masterConnectionLost`; TXT `m`/`s`/`v`; lost services forgotten; `securityIssue` → permission state.
+  - Persistence: schema v6 `local_profile` (device id + room name, AD-014).
+  - Platform: Android release manifest gains INTERNET + network/Wi‑Fi/multicast; iOS local network keys; `cantae/system_settings` channel for "Abrir ajustes" (Kotlin compiles; Swift not compiled on Windows).
+  - UI: `ActiveRoomNotifier` (one room per device), host/join/member notifiers; `RoomCodeDisplay`, `CodeInput`, `RoomTile`, `JoinRequestRow`, `RoomPersonRow`, `StatusPill.synced`, `TonalButton.semanticLabel`; screens Criar sala, Entrar em sala, both temporary rooms, name sheet, song sheet; UI_SPEC §6.7/§6.8 and COMPONENTS.md updated.
+  - Bugs fixed red-first: `TcpSessionTransport.close()` during a pending flush left the socket open (pre-existing, `b39e74d`); merged room-row semantics (`6733ec0`); `close()` on a disposed active room (`f67df1c`); refusal racing the room tick (inside T5).
+  - Verifier: author fallback; 58/58 requirements, 73/73 mutants killed, 1177 tests (965 before). Report: `.specs/features/room-entry/validation.md`.
+  - Not run on a device: `docs/device-test-room-entry.md` (mDNS, iOS prompt, "Abrir ajustes", release build).
 
 - **track-upload:** 13 tasks, executed inline in sequence.
   - Domain:
@@ -142,6 +160,6 @@ Phase 5 (UI): **theme-tokens**, **library-screen**, **song-detail-screen**, **tr
   - no l10n;
   - each `room_session_controller_test` test takes ~5 s when the file runs alone (also on `develop`; the join itself takes ~70 ms); cause not found, no failures.
 
-**Next:** merging `feature/phase-5-track-upload` into `develop` needs the user's go-ahead. Candidates after that:
-- run the device script (now also the file chooser);
-- **Studio**.
+**Next:** merging `feature/phase-5-room-entry` into `develop` (and pushing `develop`) needs the user's go-ahead. Candidates after that:
+- **Sala do Mestre + Tela do Cantor** (§6.9–6.10), replacing the temporary rooms; fold the old room `BackgroundAudioHandler` into `PlaybackRemote` there;
+- run the device scripts (background audio, file chooser, rooms).

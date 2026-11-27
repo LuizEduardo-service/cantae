@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cantae/domain/session/ids.dart';
+import 'package:cantae/domain/session/room_entry_rules.dart';
 
 abstract class SessionWireMessage {
   const SessionWireMessage();
@@ -53,26 +54,58 @@ class JoinRequestMessage extends SessionWireMessage {
   final String deviceId;
   final String code;
 
-  const JoinRequestMessage({required this.deviceId, required this.code});
+  /// Appended in AD-015. A request without it decodes as version 0.
+  final int protocolVersion;
+
+  /// Name typed by the singer; untrusted until sanitized by the master.
+  final String displayName;
+
+  const JoinRequestMessage({
+    required this.deviceId,
+    required this.code,
+    this.protocolVersion = roomProtocolVersion,
+    this.displayName = '',
+  });
 
   @override
   Uint8List encode() {
-    final deviceIdBytes = utf8.encode(deviceId);
-    final codeBytes = utf8.encode(code);
     final out = BytesBuilder();
     out.addByte(0x01);
-    out.add(
-        (ByteData(2)..setUint16(0, deviceIdBytes.length)).buffer.asUint8List());
-    out.add(deviceIdBytes);
-    out.add((ByteData(2)..setUint16(0, codeBytes.length)).buffer.asUint8List());
-    out.add(codeBytes);
+    for (final value in [deviceId, code]) {
+      out.add(_u16Bytes(utf8.encode(value).length));
+      out.add(utf8.encode(value));
+    }
+    out.add(_u16Bytes(protocolVersion));
+    final nameBytes = utf8.encode(displayName);
+    out.add(_u16Bytes(nameBytes.length));
+    out.add(nameBytes);
     return out.toBytes();
   }
 
+  static Uint8List _u16Bytes(int value) =>
+      (ByteData(2)..setUint16(0, value)).buffer.asUint8List();
+
   static JoinRequestMessage _decodeBody(Uint8List body) {
     final (deviceId, next) = _readU16LenString(body, 0);
-    final (code, _) = _readU16LenString(body, next);
-    return JoinRequestMessage(deviceId: deviceId, code: code);
+    final (code, afterCode) = _readU16LenString(body, next);
+    if (body.length < afterCode + 2) {
+      return JoinRequestMessage(
+        deviceId: deviceId,
+        code: code,
+        protocolVersion: 0,
+      );
+    }
+    final version =
+        body.buffer.asByteData(body.offsetInBytes + afterCode).getUint16(0);
+    final (displayName, _) = body.length < afterCode + 4
+        ? ('', 0)
+        : _readU16LenString(body, afterCode + 2);
+    return JoinRequestMessage(
+      deviceId: deviceId,
+      code: code,
+      protocolVersion: version,
+      displayName: displayName,
+    );
   }
 }
 

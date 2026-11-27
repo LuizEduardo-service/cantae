@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:cantae/data/session/session_wire_message.dart';
 import 'package:cantae/domain/session/ids.dart';
+import 'package:cantae/domain/session/room_entry_rules.dart';
 
 void main() {
   group('SessionWireMessage encode/decode round-trip', () {
@@ -75,6 +76,52 @@ void main() {
 
       expect(decoded.requiresMasterRole, isFalse);
       expect(decoded.payload, isEmpty);
+    });
+  });
+
+  // Failure modes (ROOM-11, ROOM-34): the name or the version is lost on
+  // the wire; accents arrive broken; an older app's request (no version)
+  // decodes as the current version and gets in.
+  group('JoinRequestMessage v2', () {
+    JoinRequestMessage roundTrip(JoinRequestMessage m) =>
+        SessionWireMessage.decode(m.encode()) as JoinRequestMessage;
+
+    test('carries the protocol version and the name, with accents', () {
+      final decoded = roundTrip(const JoinRequestMessage(
+        deviceId: 'device-1',
+        code: '4827',
+        protocolVersion: 7,
+        displayName: 'João Conceição',
+      ));
+
+      expect(decoded.deviceId, 'device-1');
+      expect(decoded.code, '4827');
+      expect(decoded.protocolVersion, 7);
+      expect(decoded.displayName, 'João Conceição');
+    });
+
+    test('defaults to this app version and an empty name', () {
+      final decoded = roundTrip(
+        const JoinRequestMessage(deviceId: 'd', code: '1111'),
+      );
+
+      expect(decoded.protocolVersion, roomProtocolVersion);
+      expect(decoded.displayName, '');
+    });
+
+    test('a request in the old format decodes as version 0, no name', () {
+      final legacy = Uint8List.fromList([
+        0x01,
+        0, 1, 0x64, // "d"
+        0, 4, 0x34, 0x38, 0x32, 0x37, // "4827"
+      ]);
+
+      final decoded = SessionWireMessage.decode(legacy) as JoinRequestMessage;
+
+      expect(decoded.deviceId, 'd');
+      expect(decoded.code, '4827');
+      expect(decoded.protocolVersion, 0);
+      expect(decoded.displayName, '');
     });
   });
 }

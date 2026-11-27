@@ -8,6 +8,7 @@ import 'envelope_authenticator.dart';
 import 'ids.dart';
 import 'participant_session.dart';
 import 'room.dart';
+import 'room_entry_rules.dart';
 
 class RoomSessionStateMachine {
   static const maxApprovedParticipants = 8;
@@ -31,7 +32,20 @@ class RoomSessionStateMachine {
   List<ParticipantSession> get allParticipants =>
       List.unmodifiable(_participants.values);
 
-  Result<Unit, Failure> requestJoin(DeviceId id, String code, DateTime now) {
+  /// [protocolVersion] defaults to this app's version so callers from before
+  /// AD-015 keep compiling; the controller passes the decoded one.
+  Result<Unit, Failure> requestJoin(
+    DeviceId id,
+    String code,
+    DateTime now, {
+    String displayName = '',
+    int protocolVersion = roomProtocolVersion,
+  }) {
+    if (protocolVersion != roomProtocolVersion) {
+      return Result.failure(
+        ValidationFailure(code: 'session.protocol-mismatch'),
+      );
+    }
     if (code != _room.code) {
       return Result.failure(ValidationFailure(code: 'session.invalid-code'));
     }
@@ -60,6 +74,7 @@ class RoomSessionStateMachine {
       lastAcceptedSequence: -1,
       lastActivityAt: now,
       pendingSince: now,
+      displayName: displayName,
     );
     return const Result.success(Unit());
   }

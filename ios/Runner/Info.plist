@@ -47,6 +47,12 @@
 			</array>
 		</dict>
 	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>O Cantaê usa a rede Wi‑Fi local para encontrar a sala do ensaio e tocar junto com o coral.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_cantae._tcp</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

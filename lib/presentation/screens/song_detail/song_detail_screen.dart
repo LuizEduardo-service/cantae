@@ -296,7 +296,10 @@ class _HubScaffold extends StatelessWidget {
           Expanded(
             child: PrimaryButton(
               label: 'Ensaiar em grupo',
-              onPressed: () => context.goNamed('room-create'),
+              onPressed: () => context.goNamed(
+                'room-create',
+                queryParameters: {'songId': song.id},
+              ),
             ),
           ),
         ],

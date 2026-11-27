@@ -74,14 +74,33 @@ class TcpSessionTransport implements SessionTransport {
     return _receiveControllers[id]?.stream ?? const Stream.empty();
   }
 
+  /// The write in flight per socket. A socket refuses `add`/`close` while a
+  /// `flush` is pending ("StreamSink is bound to a stream"), so writes are
+  /// chained and [close] waits for the last one.
+  final Map<ParticipantId, Future<void>> _pendingWrites = {};
+
   @override
   Future<void> send(ParticipantId id, Uint8List bytes) async {
     final socket = _sockets[id];
     if (socket == null) {
       return;
     }
-    socket.add(bytes);
-    await socket.flush();
+    final previous = _pendingWrites[id];
+    Future<void> writeNow() {
+      if (!identical(_sockets[id], socket)) return Future<void>.value();
+      socket.add(bytes);
+      return socket.flush();
+    }
+
+    final write = previous == null
+        ? writeNow()
+        : previous.then((_) => writeNow(), onError: (Object _) => writeNow());
+    _pendingWrites[id] = write;
+    try {
+      await write;
+    } finally {
+      if (identical(_pendingWrites[id], write)) _pendingWrites.remove(id);
+    }
   }
 
   @override
@@ -95,6 +114,14 @@ class TcpSessionTransport implements SessionTransport {
     // have been listened to.
     unawaited(_socketSubscriptions.remove(id)?.cancel());
     unawaited(_receiveControllers.remove(id)?.close());
+    final pending = _pendingWrites.remove(id);
+    if (pending != null) {
+      try {
+        await pending;
+      } on Object {
+        // The peer is gone; closing is all that is left.
+      }
+    }
     await socket.close();
   }
 

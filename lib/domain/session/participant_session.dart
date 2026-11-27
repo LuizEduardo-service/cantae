@@ -23,6 +23,10 @@ class ParticipantSession {
   final DateTime? pendingSince;
   final DateTime? approvedSince;
 
+  /// Name the person typed for the room, already made safe by the
+  /// controller. Display only; never an identity (ROOM-48).
+  final String displayName;
+
   const ParticipantSession({
     required this.id,
     required this.role,
@@ -32,6 +36,7 @@ class ParticipantSession {
     required this.lastActivityAt,
     required this.pendingSince,
     this.approvedSince,
+    this.displayName = '',
   });
 
   ParticipantSession copyWith({
@@ -56,6 +61,7 @@ class ParticipantSession {
           clearPendingSince ? null : (pendingSince ?? this.pendingSince),
       approvedSince:
           clearApprovedSince ? null : (approvedSince ?? this.approvedSince),
+      displayName: displayName,
     );
   }
 }

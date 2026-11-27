@@ -2,6 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../screens/coming_soon/coming_soon_screen.dart';
+import '../screens/room_create/room_create_screen.dart';
+import '../screens/room_host/room_host_screen.dart';
+import '../screens/room_join/room_join_screen.dart';
+import '../screens/room_member/room_member_screen.dart';
 import '../screens/history/rehearsal_history_screen.dart';
 import '../screens/library/library_screen.dart';
 import '../screens/lyrics_editor/lyrics_editor_screen.dart';
@@ -34,13 +38,22 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/room/create',
         name: 'room-create',
         builder: (context, state) =>
-            const ComingSoonScreen(title: 'Criar sala'),
+            RoomCreateScreen(songId: state.uri.queryParameters['songId']),
+      ),
+      GoRoute(
+        path: '/room/host',
+        name: 'room-host',
+        builder: (context, state) => const RoomHostScreen(),
+      ),
+      GoRoute(
+        path: '/room/member',
+        name: 'room-member',
+        builder: (context, state) => const RoomMemberScreen(),
       ),
       GoRoute(
         path: '/room/join',
         name: 'room-join',
-        builder: (context, state) =>
-            const ComingSoonScreen(title: 'Entrar em sala'),
+        builder: (context, state) => const RoomJoinScreen(),
       ),
       GoRoute(
         path: '/profile',

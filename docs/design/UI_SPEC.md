@@ -102,30 +102,41 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Estados:** carregando, não encontrada, erro ao abrir (banner + "Tentar de novo"), vazio (sem linhas, sem rodapé; ação "Acrescentar linha"), editando, marcando (tocando), marcando (pausado: "Continuar" retoma de onde parou, "Marcar agora" desabilitado), erro ao tocar as faixas (banner, edição continua), erro ao salvar (banner, alterações mantidas). Sair com alterações não salvas abre `ConfirmSheet`; sair para o áudio.
 
 ## 6.7 Criar sala
-- **Topo:** Cancelar · StatusPill "Visível no Coral‑WiFi".
-- **Conteúdo:** `RoomCodeDisplay` (4827, Copiar); linha "Música · Trocar"; seção "Pedindo para entrar · N" com Recusar/Aprovar por pessoa e "5/30 na sala"; lista de quem já entrou.
-- **Rodapé:** [P] Começar a conduzir → Sala do Mestre.
+- **Antes de tudo:** sem nome salvo, folha "Como você quer aparecer na sala?" (campo "Seu nome", 1–40 caracteres, [P] Salvar nome). Fechar a folha volta à Biblioteca.
+- **Topo:** Cancelar · StatusPill `synced` "Visível neste Wi‑Fi" (sem o nome da rede: ler o nome do Wi‑Fi exige permissão de localização no Android).
+- **Conteúdo:** `RoomCodeDisplay` (4827, Copiar); seção "Música": nome da música e "Trocar", ou "Nenhuma música escolhida" e "Escolher música" (folha "Música da sala" com a biblioteca e "Sem música"); seção "Pedindo para entrar · N" com `JoinRequestRow` por pessoa; seção "Na sala · N de 8" com "Você · Mestre" e quem já entrou (`RoomPersonRow`).
+- **Rodapé:** [P] Começar a conduzir → sala provisória do Mestre (a Sala do Mestre completa, §6.9, chega na próxima feature). Desativado até a sala estar pronta.
+- **Limite:** 8 pessoas além do Mestre (RF26; o canvas mostrava 30). Com 8, "Aprovar" fica desativado e cada pedido mostra "Sala cheia: 8 de 8."
+- **Música:** opcional. Vinda do Detalhe ("Ensaiar em grupo"), já escolhida; vinda da Biblioteca, nenhuma.
+- **Sair:** Cancelar ou voltar pelo sistema. Sem ninguém na sala nem pedindo, encerra direto; com alguém, `ConfirmSheet` "Encerrar sala?" ("Continuar na sala" / "Encerrar sala").
 - **Estados:**
-  - *Gerando código*.
-  - *Aguardando participantes* (sem pedidos: "Ninguém pediu para entrar ainda").
-  - *Sem permissão de rede local* (banner error + "Abrir ajustes").
+  - *Gerando código* (indicador + "Gerando código").
+  - *Aguardando participantes* (sem pedidos nem pessoas: "Ninguém pediu para entrar ainda").
+  - *Sem permissão de rede local* (banner error "Sem acesso à rede local" + "Abrir ajustes").
+  - *Falha ao criar* (banner error "Não foi possível criar a sala." + "Tentar de novo").
 
 ## 6.8 Entrar em sala
+- **Antes de tudo:** sem nome salvo, a mesma folha de nome de §6.7.
 - **Topo:** ‹ Biblioteca. Título "Entrar em sala".
-- **Conteúdo:** card com `CodeInput` + [P] Entrar; "Salas neste Wi‑Fi" com `RoomTile`s; banner de estado.
-- **Rodapé:** "Você entra como Cantor. O Mestre pode mudar seu papel."
+- **Conteúdo:** card com frase "Digite o código que aparece na tela do Mestre." (ou "…na tela de <Mestre>." com uma sala escolhida), `CodeInput` e [P] Entrar (ativo com 4 dígitos); banner de estado; "Salas neste Wi‑Fi" com `RoomTile`s (Mestre e música, **sem código**).
+- **Código:** nunca anunciado no Wi‑Fi (NET-01); o cantor sempre digita o que vê na tela do Mestre. Tocar um `RoomTile` escolhe a sala e põe o foco no campo; "Entrar" pede só a ela. Sem sala escolhida, o app pede às salas encontradas, uma por vez, até uma aceitar o código.
+- **Rodapé:** "Você entra como Cantor." (a troca de papel chega com o Visitante).
 - **Estados (banner):**
 
 | Estado | Título | Ação |
 |---|---|---|
-| buscando | — (lista + "procurando…") | — |
-| nenhuma | Nenhuma sala neste Wi‑Fi | Procurar de novo |
+| buscando | — ("Procurando salas…" enquanto a lista está vazia) | — |
+| nenhuma (10 s sem salas) | Nenhuma sala neste Wi‑Fi | Procurar de novo (no iOS, também a frase "Se você negou o acesso à rede local, libere nos ajustes." e "Abrir ajustes") |
 | aguardando | Aguardando a Marina aprovar | Cancelar pedido |
 | rejeitado | Entrada recusada | Escolher outra sala |
-| cheia | Sala cheia (30 de 30) | Entrar como visitante |
-| protocolo | Versão do app incompatível | Atualizar o app |
-| permissão | Sem acesso à rede local | Abrir ajustes |
+| cheia | Sala cheia (8 de 8) | Escolher outra sala |
+| protocolo | Versão do app incompatível ("Atualize o Cantaê nos dois aparelhos.") | Escolher outra sala |
+| sem resposta (60 s) | O Mestre não respondeu | Tentar de novo |
+| conexão | Não foi possível falar com a sala | Tentar de novo |
+| permissão (Android) | Sem acesso à rede local | Abrir ajustes |
 | código inválido | Código não encontrado (borda de erro no campo) | Digitar de novo |
+
+- Durante "aguardando", o campo e os outros `RoomTile`s ficam desativados e o da sala do pedido tem borda `accent`. Aprovado, abre a sala provisória do Cantor ("Você está na sala de <Mestre>", "Sair da sala"); a Tela do Cantor completa (§6.10) chega na próxima feature.
 
 ## 6.9 Sala do Mestre — Tema
 - **Topo:** "Sala 4827" · botão "N pedidos para entrar" (abre a lista de aprovação).

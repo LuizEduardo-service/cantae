@@ -12,6 +12,7 @@ import 'package:cantae/domain/session/ids.dart';
 import 'package:cantae/domain/session/participant_session.dart';
 import 'package:cantae/domain/session/room.dart';
 import 'package:cantae/domain/session/room_discovery.dart';
+import 'package:cantae/domain/session/room_entry_rules.dart';
 import 'package:cantae/domain/session/room_session_snapshot.dart';
 import 'package:cantae/domain/session/room_session_state_machine.dart';
 import 'package:cantae/domain/session/session_transport.dart';
@@ -57,6 +58,10 @@ class RoomSessionController {
   int _visitorNextSequence = 0;
   int _visitorLastAcceptedFromMaster = -1;
   Completer<Result<Unit, Failure>>? _joinCompleter;
+  Timer? _joinTimer;
+  bool _listeningForMasterClose = false;
+  final Duration _joinAnswerTimeout;
+  final _masterLostController = StreamController<Unit>.broadcast();
 
   RoomSessionController({
     required SessionTransport transport,
@@ -66,8 +71,10 @@ class RoomSessionController {
     EnvelopeAuthenticator? authenticator,
     DateTime Function()? now,
     Duration tickInterval = const Duration(seconds: 5),
+    Duration joinAnswerTimeout = const Duration(seconds: 75),
     Random? random,
   })  : _transport = transport,
+        _joinAnswerTimeout = joinAnswerTimeout,
         _discovery = discovery,
         _handshakeService = handshakeService,
         _selfDeviceId = selfDeviceId,
@@ -92,7 +99,19 @@ class RoomSessionController {
   Stream<(ParticipantId, Uint8List)> get applicationMessages =>
       _applicationMessagesController.stream;
 
-  Future<Result<RoomId, Failure>> createRoom() async {
+  /// What this room tells the Wi‑Fi; never the code (NET-01).
+  RoomAnnouncement? _announcement;
+
+  /// The 4-digit code of the room this controller hosts, if any.
+  String? get roomCode => _stateMachine?.room.code;
+
+  /// Hosts a room announced as [masterName]'s, with [songName] if chosen.
+  /// Fails with the discovery's code when the room cannot be announced; a
+  /// retry needs a new controller.
+  Future<Result<RoomId, Failure>> createRoom({
+    String masterName = '',
+    String? songName,
+  }) async {
     await _transport.listen(0);
     final roomId = RoomId(_generateRoomId());
     final code = _generateCode();
@@ -104,7 +123,22 @@ class RoomSessionController {
     );
     _stateMachine = RoomSessionStateMachine(room: room);
     _emitSnapshot();
-    await _discovery.advertise(roomId, _transport.boundPort);
+    final announcement =
+        RoomAnnouncement(masterName: masterName, songName: songName);
+    final advertised = await _discovery.advertise(
+      roomId,
+      _transport.boundPort,
+      announcement,
+    );
+    final advertiseFailure = advertised.when<Failure?>(
+      success: (_) => null,
+      failure: (f) => f,
+    );
+    if (advertiseFailure != null) {
+      _stateMachine = null;
+      return Result.failure(advertiseFailure);
+    }
+    _announcement = announcement;
 
     _subscriptions
       ..add(_transport.incomingConnections.listen(_handleIncomingConnection))
@@ -114,37 +148,143 @@ class RoomSessionController {
     return Result.success(roomId);
   }
 
+  /// Announces the room again with [songName] (ROOM-09). The Wi‑Fi sees
+  /// the room leave and come back.
+  Future<void> updateAnnouncement({String? songName}) async {
+    final current = _announcement;
+    final machine = _stateMachine;
+    if (current == null || machine == null) return;
+    final next =
+        RoomAnnouncement(masterName: current.masterName, songName: songName);
+    await _discovery.stopAdvertising();
+    await _discovery.advertise(machine.room.id, _transport.boundPort, next);
+    _announcement = next;
+  }
+
   Stream<DiscoveredRoom> discoverRooms() {
     return _discovery.discover().map((room) {
-      _knownRooms[room.id] = room;
+      if (room.available) {
+        _knownRooms[room.id] = room;
+      } else {
+        _knownRooms.remove(room.id);
+      }
       return room;
     });
   }
 
-  Future<Result<Unit, Failure>> requestJoin(RoomId room, String code) async {
+  /// Asks [room] to let this device in, as [displayName]. Completes with
+  /// success once the secure connection is ready, or with the reason the
+  /// request ended: the master's refusal code, `session.connect-failed`,
+  /// `session.connection-lost`, `session.request-expired` (no answer in
+  /// [_joinAnswerTimeout]) or `session.join-cancelled`. A refused request
+  /// leaves the controller ready to ask another room.
+  Future<Result<Unit, Failure>> requestJoin(
+    RoomId room,
+    String code, {
+    String displayName = '',
+  }) async {
     final discovered = _knownRooms[room];
     if (discovered == null) {
       return Result.failure(NotFoundFailure(code: 'session.room-not-found'));
     }
+    _resetJoinerSide();
+    final completer = _joinCompleter = Completer<Result<Unit, Failure>>();
+    _listenForMasterClose();
 
-    _joinCompleter = Completer<Result<Unit, Failure>>();
-    final connection = await _transport.connect(
-      discovered.host,
-      discovered.port,
-    );
+    final ParticipantId connection;
+    try {
+      connection = await _transport.connect(discovered.host, discovered.port);
+    } on Object {
+      _finishJoin(
+          Result.failure(NetworkFailure(code: 'session.connect-failed')));
+      return completer.future;
+    }
+    if (completer.isCompleted) {
+      // Cancelled while connecting.
+      unawaited(_transport.close(connection));
+      return completer.future;
+    }
     _masterConnection = connection;
     _subscriptions.add(_transport.receive(connection).listen((chunk) {
       for (final frame in _reassemble(connection, chunk)) {
+        if (connection != _masterConnection) return;
         unawaited(_handleVisitorMessage(SessionWireMessage.decode(frame)));
       }
     }));
+    _joinTimer = Timer(_joinAnswerTimeout, () {
+      _finishJoin(
+          Result.failure(NetworkFailure(code: 'session.request-expired')));
+      _dropMasterConnection();
+    });
 
     await _sendMessage(
       connection,
-      JoinRequestMessage(deviceId: _selfDeviceId.value, code: code),
+      JoinRequestMessage(
+        deviceId: _selfDeviceId.value,
+        code: code,
+        displayName: displayName,
+      ),
     );
 
-    return _joinCompleter!.future;
+    return completer.future;
+  }
+
+  /// "Cancelar pedido" (ROOM-30): ends a request still waiting.
+  Future<void> cancelJoin() async {
+    _finishJoin(
+        Result.failure(ValidationFailure(code: 'session.join-cancelled')));
+    _dropMasterConnection();
+  }
+
+  /// "Sair da sala" (ROOM-43): closes this device's connection to the master.
+  /// Leaving on purpose is not reported on [masterConnectionLost].
+  Future<void> leaveRoom() async {
+    _dropMasterConnection();
+    _visitorSessionKey = null;
+  }
+
+  /// Fires once when the master's connection closes after this device got
+  /// in: the room ended or the network dropped (ROOM-44).
+  Stream<Unit> get masterConnectionLost => _masterLostController.stream;
+
+  void _finishJoin(Result<Unit, Failure> result) {
+    _joinTimer?.cancel();
+    _joinTimer = null;
+    final completer = _joinCompleter;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(result);
+    }
+  }
+
+  /// Forgets the previous request's connection and keys before a new one.
+  void _resetJoinerSide() {
+    _finishJoin(
+        Result.failure(ValidationFailure(code: 'session.join-cancelled')));
+    _dropMasterConnection();
+    _visitorSessionKey = null;
+    _visitorNextSequence = 0;
+    _visitorLastAcceptedFromMaster = -1;
+  }
+
+  void _dropMasterConnection() {
+    final connection = _masterConnection;
+    _masterConnection = null;
+    if (connection != null) unawaited(_transport.close(connection));
+  }
+
+  void _listenForMasterClose() {
+    if (_listeningForMasterClose) return;
+    _listeningForMasterClose = true;
+    _subscriptions.add(_transport.closedConnections.listen((connection) {
+      if (connection != _masterConnection) return;
+      final wasIn = _joinCompleter?.isCompleted ?? false;
+      _finishJoin(
+          Result.failure(NetworkFailure(code: 'session.connection-lost')));
+      if (wasIn && _visitorSessionKey != null && !_disposed) {
+        _visitorSessionKey = null;
+        _masterLostController.add(const Unit());
+      }
+    }));
   }
 
   /// Signs and sends an application-level envelope from this visitor to the
@@ -269,10 +409,28 @@ class RoomSessionController {
   Result<Unit, Failure> reject(ParticipantId id) {
     final result = _stateMachine!.reject(id);
     if (result.isSuccess) {
-      _closeConnectionFor(id);
+      unawaited(_refuseAndClose(id, 'session.rejected'));
       _emitSnapshot();
     }
     return result;
+  }
+
+  /// Tells a joiner why it is out (ROOM-13, ROOM-15), then closes. The
+  /// connection leaves the maps first, so a tick during the send cannot
+  /// close the socket under it.
+  Future<void> _refuseAndClose(ParticipantId id, String reasonCode) async {
+    final connection = _connectionByParticipant.remove(id);
+    if (connection == null) return;
+    _participantByConnection.remove(connection);
+    try {
+      await _sendMessage(
+        connection,
+        JoinRejectedMessage(reasonCode: reasonCode),
+      );
+    } on Object {
+      // The joiner is already gone; closing below is all that is left.
+    }
+    unawaited(_transport.close(connection));
   }
 
   /// NET-20: transitions every participant to disconnected, closes every
@@ -333,6 +491,8 @@ class RoomSessionController {
         DeviceId(message.deviceId),
         message.code,
         _now(),
+        displayName: sanitizeRemoteDisplayName(message.displayName),
+        protocolVersion: message.protocolVersion,
       );
       if (result.isFailure) {
         result.when(
@@ -397,7 +557,7 @@ class RoomSessionController {
 
   Future<void> _handleVisitorMessage(SessionWireMessage message) async {
     if (message is JoinRejectedMessage) {
-      _joinCompleter?.complete(
+      _finishJoin(
         Result.failure(ValidationFailure(code: message.reasonCode)),
       );
       return;
@@ -416,10 +576,10 @@ class RoomSessionController {
             _masterConnection!,
             HandshakeResponseMessage(publicKey: keyPair.publicKeyBytes),
           );
-          _joinCompleter?.complete(const Result.success(Unit()));
+          _finishJoin(const Result.success(Unit()));
         },
         failure: (f) async {
-          _joinCompleter?.complete(Result.failure(f));
+          _finishJoin(Result.failure(f));
         },
       );
       return;
@@ -477,8 +637,10 @@ class RoomSessionController {
 
   void _startTicking() {
     _tickTimer = Timer.periodic(_tickInterval, (_) {
+      final pendingBefore = _pendingIds();
       _stateMachine?.tick(_now());
-      _closeConnectionsForTerminatedParticipants();
+      _closeConnectionsForTerminatedParticipants(
+          expiredRequests: pendingBefore);
       _emitSnapshot();
     });
   }
@@ -488,7 +650,13 @@ class RoomSessionController {
   /// expired pending-approval request past 60s) without the controller's
   /// knowledge — close their transport connection, if still open, when that
   /// happens so a TTL expiry actually drops the socket, not just the domain state.
-  void _closeConnectionsForTerminatedParticipants() {
+  ///
+  /// A request that was pending before this tick ([expiredRequests]) and is
+  /// now terminal ran out of time: the joiner is told so (ROOM-35). A
+  /// stalled handshake just closes.
+  void _closeConnectionsForTerminatedParticipants({
+    Set<ParticipantId> expiredRequests = const {},
+  }) {
     final machine = _stateMachine;
     if (machine == null) {
       return;
@@ -496,11 +664,23 @@ class RoomSessionController {
     for (final participant in machine.allParticipants) {
       final isTerminal = participant.state == ParticipantState.expired ||
           participant.state == ParticipantState.rejected;
-      if (isTerminal && _connectionByParticipant.containsKey(participant.id)) {
+      if (!isTerminal ||
+          !_connectionByParticipant.containsKey(participant.id)) {
+        continue;
+      }
+      if (expiredRequests.contains(participant.id)) {
+        unawaited(_refuseAndClose(participant.id, 'session.request-expired'));
+      } else {
         _closeConnectionFor(participant.id);
       }
     }
   }
+
+  Set<ParticipantId> _pendingIds() => {
+        for (final p
+            in _stateMachine?.allParticipants ?? const <ParticipantSession>[])
+          if (p.state == ParticipantState.pendingApproval) p.id,
+      };
 
   /// A frame already being verified when [dispose] ran may finish after
   /// it; its result is dropped instead of added to a closed stream.
@@ -532,6 +712,8 @@ class RoomSessionController {
   void dispose() {
     _disposed = true;
     _tickTimer?.cancel();
+    _joinTimer?.cancel();
+    unawaited(_masterLostController.close());
     for (final subscription in _subscriptions) {
       unawaited(subscription.cancel());
     }
