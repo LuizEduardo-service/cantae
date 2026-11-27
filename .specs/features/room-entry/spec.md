@@ -223,7 +223,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-39 | P1: Sala provisória | Design | Pending |
 | ROOM-40 | P1: Sala provisória | Execute | Implementing |
 | ROOM-41 | P1: Sala provisória | Execute | Implementing |
-| ROOM-42 | P1: Sala provisória | Design | Pending |
+| ROOM-42 | P1: Sala provisória | Execute | Implementing |
 | ROOM-43 | P1: Sala provisória | Execute | Implementing |
 | ROOM-44 | P1: Sala provisória | Execute | Implementing |
 | ROOM-45 | P1: Sala provisória | Design | Pending |

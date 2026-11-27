@@ -432,9 +432,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests: master ends → lost true once; leave → active room null and master sees disconnected
-- [ ] Gate check passes: `flutter test test/presentation/providers`
-- [ ] Test count: all existing + ≥ 2 new
+- [x] Tests: master ends → lost true once; leave → active room null and master sees disconnected
+- [x] Gate check passes: `flutter test test/presentation/providers`
+- [x] Test count: all existing + ≥ 2 new
 
 **Tests**: unit
 **Gate**: quick
