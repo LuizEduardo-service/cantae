@@ -203,10 +203,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first, loopback tests: announcement holds master/song/version and no code; song change re-announces; advertise failure → createRoom failure with the same code; reject → joiner receives `session.rejected`; expiry (injected clock) → `session.request-expired`; stalled handshake still closes without a reason; 200-char name arrives cut to 40
-- [ ] Playback and transfer tests still pass
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 7 new
+- [x] Failure modes first, loopback tests: announcement holds master/song/version and no code; song change re-announces; advertise failure → createRoom failure with the same code; reject → joiner receives `session.rejected`; expiry (injected clock) → `session.request-expired`; stalled handshake still closes without a reason; 200-char name arrives cut to 40
+- [x] Playback and transfer tests still pass
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 7 new
 
 **Tests**: integration
 **Gate**: full
