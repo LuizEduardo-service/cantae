@@ -104,7 +104,11 @@ class RoomSessionController {
     );
     _stateMachine = RoomSessionStateMachine(room: room);
     _emitSnapshot();
-    await _discovery.advertise(roomId, _transport.boundPort);
+    await _discovery.advertise(
+      roomId,
+      _transport.boundPort,
+      const RoomAnnouncement(masterName: ''),
+    );
 
     _subscriptions
       ..add(_transport.incomingConnections.listen(_handleIncomingConnection))

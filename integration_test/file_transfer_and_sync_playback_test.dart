@@ -9,6 +9,9 @@ import 'package:integration_test/integration_test.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:audio_service/audio_service.dart';
 
+import 'package:cantae/domain/core/failures.dart';
+import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/data/playback/playback_command_broadcaster.dart';
 import 'package:cantae/data/playback/playback_command_handler.dart';
 import 'package:cantae/data/transfer/chunked_file_receiver.dart';
@@ -70,8 +73,13 @@ class _FakeRoomDiscovery implements RoomDiscovery {
   _FakeRoomDiscovery(this._bus);
 
   @override
-  Future<void> advertise(RoomId id, int port) async {
+  Future<Result<Unit, NetworkFailure>> advertise(
+    RoomId id,
+    int port,
+    RoomAnnouncement announcement,
+  ) async {
     _bus.add(DiscoveredRoom(id: id, host: '127.0.0.1', port: port));
+    return const Result.success(Unit());
   }
 
   @override

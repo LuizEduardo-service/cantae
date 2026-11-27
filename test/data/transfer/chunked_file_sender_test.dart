@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:cantae/domain/core/failures.dart';
+import 'package:cantae/domain/core/unit.dart';
+import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/data/session/room_application_message.dart';
 import 'package:cantae/data/session/room_session_controller.dart';
 import 'package:cantae/data/transfer/chunked_file_sender.dart';
@@ -20,8 +23,13 @@ class _FakeRoomDiscovery implements RoomDiscovery {
   _FakeRoomDiscovery(this._bus);
 
   @override
-  Future<void> advertise(RoomId id, int port) async {
+  Future<Result<Unit, NetworkFailure>> advertise(
+    RoomId id,
+    int port,
+    RoomAnnouncement announcement,
+  ) async {
     _bus.add(DiscoveredRoom(id: id, host: '127.0.0.1', port: port));
+    return const Result.success(Unit());
   }
 
   @override

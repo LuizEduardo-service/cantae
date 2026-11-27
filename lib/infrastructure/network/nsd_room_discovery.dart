@@ -2,6 +2,9 @@ import 'dart:async';
 
 import 'package:nsd/nsd.dart' as nsd;
 
+import 'package:cantae/domain/core/failures.dart';
+import 'package:cantae/domain/core/result.dart';
+import 'package:cantae/domain/core/unit.dart';
 import 'package:cantae/domain/session/ids.dart';
 import 'package:cantae/domain/session/room_discovery.dart';
 
@@ -11,10 +14,15 @@ class NsdRoomDiscovery implements RoomDiscovery {
   nsd.Registration? _registration;
 
   @override
-  Future<void> advertise(RoomId id, int port) async {
+  Future<Result<Unit, NetworkFailure>> advertise(
+    RoomId id,
+    int port,
+    RoomAnnouncement announcement,
+  ) async {
     _registration = await nsd.register(
       nsd.Service(name: id.value, type: serviceType, port: port),
     );
+    return const Result.success(Unit());
   }
 
   @override

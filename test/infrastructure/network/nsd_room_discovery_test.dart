@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nsd_platform_interface/nsd_platform_interface.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:cantae/domain/session/ids.dart';
+import 'package:cantae/domain/session/room_discovery.dart';
 import 'package:cantae/infrastructure/network/nsd_room_discovery.dart';
 
 class _FakeNsdPlatform extends NsdPlatformInterface
@@ -48,6 +49,8 @@ class _FakeNsdPlatform extends NsdPlatformInterface
   void disableServiceTypeValidation(bool value) {}
 }
 
+const _announcement = RoomAnnouncement(masterName: 'Marina');
+
 void main() {
   late _FakeNsdPlatform fakePlatform;
 
@@ -62,7 +65,7 @@ void main() {
         () async {
       final discovery = NsdRoomDiscovery();
 
-      await discovery.advertise(const RoomId('room-456'), 5001);
+      await discovery.advertise(const RoomId('room-456'), 5001, _announcement);
 
       expect(fakePlatform.registeredService!.name, equals('room-456'));
       expect(
@@ -77,7 +80,7 @@ void main() {
         () async {
       final discovery = NsdRoomDiscovery();
 
-      await discovery.advertise(const RoomId('room-456'), 5001);
+      await discovery.advertise(const RoomId('room-456'), 5001, _announcement);
 
       // NET-01: "advertise it ... with a service name, a random room ID, and
       // no embedded secret." advertise()'s signature never accepts a code at
@@ -90,7 +93,7 @@ void main() {
   group('NsdRoomDiscovery.stopAdvertising', () {
     test('unregisters the active registration', () async {
       final discovery = NsdRoomDiscovery();
-      await discovery.advertise(const RoomId('room-789'), 6000);
+      await discovery.advertise(const RoomId('room-789'), 6000, _announcement);
 
       await discovery.stopAdvertising();
 

@@ -158,8 +158,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] 9 fakes compile with the new signature; no assertion changed
-- [ ] Gate check passes: `flutter test` (all existing tests pass)
+- [x] 9 fakes compile with the new signature; no assertion changed
+- [x] Gate check passes: `flutter test` (all existing tests pass)
 
 **Tests**: none
 **Gate**: full
