@@ -478,9 +478,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: letters and a 5th digit refused; error border on `hasError`; disabled state; semantics label "Código da sala"; dark theme
-- [ ] Gate check passes: `flutter test test/presentation/widgets`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Widget tests: letters and a 5th digit refused; error border on `hasError`; disabled state; semantics label "Código da sala"; dark theme
+- [x] Gate check passes: `flutter test test/presentation/widgets`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: widget
 **Gate**: quick

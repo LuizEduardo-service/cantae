@@ -66,7 +66,7 @@ Fundo `fillField`, raio 12, altura 44, ícone de lupa `text2`, placeholder "Busc
 Fundo `surface` (ou `bg` dentro de card), borda 2 px `accent` quando focado, `dangerSolid` em erro, raio 14, altura 52.
 
 ### `CodeInput`
-Campo de 4 dígitos. Geist Mono 28/+8, teclado numérico, `maxLength 4`. Borda de erro quando o código não existe.
+Campo de 4 dígitos. Geist Mono 28/+8 (`monoInput`), teclado numérico, só dígitos, no máximo 4. Fundo `fillField`, raio `radiusMd`; foco com borda 2 px `accent`; borda de erro 2 px `dangerSolid` quando o código não foi encontrado. Leitor de tela: "Código da sala".
 
 ### `ChoiceTile` (rádio em card)
 Card `surface`, altura ≥ 56, borda 2 px `accent` quando selecionado. Usado no naipe padrão do Onboarding e nas opções de conflito de importação (opção destrutiva em `dangerSolid`).
