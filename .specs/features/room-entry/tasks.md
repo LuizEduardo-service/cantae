@@ -319,8 +319,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Both files carry the entries (checked by reading them)
-- [ ] Gate check passes: `flutter analyze && flutter test`
+- [x] Both files carry the entries (checked by reading them)
+- [x] Gate check passes: `flutter analyze && flutter test`
 
 **Tests**: none
 **Gate**: build

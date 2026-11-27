@@ -230,7 +230,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-46 | P1: Base comum da sala | Execute | Implementing |
 | ROOM-47 | P1: Base comum da sala | Design | Pending |
 | ROOM-48 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-49 | P1: Base comum da sala | Design | Pending |
+| ROOM-49 | P1: Base comum da sala | Execute | Implementing |
 | ROOM-50 | P1: Base comum da sala | Execute | Implementing |
 | ROOM-51 | P1: Base comum da sala | Design | Pending |
 | ROOM-52 | P1: Base comum da sala | Design | Pending |
