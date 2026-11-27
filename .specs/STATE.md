@@ -82,6 +82,14 @@
 **Decision:** The project adds `file_picker` (`^13.4.1`) as a runtime dependency. It is used only in `lib/infrastructure/files/`, behind the domain port `TrackFilePicker`; screens and notifiers never import the plugin.
 **Rationale:** Amends AD-004 the same way AD-009 and AD-011 did: creating a song (RF13) needs the system file chooser, which was not foreseen in the Phase 0 list. The user chose `file_picker` over writing a platform channel. The port keeps tests free of the plugin.
 
+### AD-014 — One-row `local_profile` table holds the device id and the room name
+**Decision:** Schema v6 adds `local_profile` (always `id = 1`) with `device_id` (UUID v4 created on the first read and never changed), `display_name` (1–40 characters) and `created_at`. It is read through the domain port `LocalProfileRepository`. The future Perfil screen extends this row instead of adding a second identity store.
+**Rationale:** Rooms need a stable `deviceId` for transport identity (PRD §2.1) and a name for visual approval (RF27). The project has no key-value store; drift is already the local persistence (AD-009), so a single additive table avoids a new dependency.
+
+### AD-015 — Room protocol version travels in the join request; the master refuses a mismatch
+**Decision:** The domain constant `roomProtocolVersion` (now 1) goes at the end of `JoinRequestMessage` and in the mDNS TXT record `v`. The master's state machine refuses a different version with `session.protocol-mismatch` before checking the code. A request without the field decodes as version 0. Any change to the session wire format bumps the constant.
+**Rationale:** PRD §12 asks the UI to tell an incompatible app apart from other failures. The master is the authority for admission (PRD §6.3), so the check lives there; appending fields keeps old bytes decodable, so an older app gets a clear refusal instead of a broken connection.
+
 ---
 
 ## Handoff

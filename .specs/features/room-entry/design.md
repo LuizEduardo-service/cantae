@@ -2,7 +2,7 @@
 
 **Spec**: `.specs/features/room-entry/spec.md`
 **Context**: `.specs/features/room-entry/context.md` (D1–D6)
-**Status**: Draft
+**Status**: Approved
 
 ---
 
@@ -302,4 +302,4 @@ sequenceDiagram
 | "Abrir ajustes" | `MethodChannel` próprio de um método | Evita dependência nova para uma chamada nativa de uma linha |
 | Código no TXT do mDNS | Sim | PRD: o código é identificação visual, não autenticação (RNF-SEC-02); a aprovação continua obrigatória |
 
-Decisões de projeto a registrar no STATE.md ao aprovar: **AD-014** (`local_profile` de uma linha guarda `deviceId` e nome na sala) e **AD-015** (versão do protocolo de sala no JoinRequest; versão diferente é recusada pelo Mestre).
+Decisões de projeto registradas no STATE.md: **AD-014** (`local_profile` de uma linha guarda `deviceId` e nome na sala) e **AD-015** (versão do protocolo de sala no JoinRequest; versão diferente é recusada pelo Mestre).
