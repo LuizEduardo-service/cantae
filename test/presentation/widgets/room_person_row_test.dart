@@ -48,4 +48,29 @@ void main() {
     final role = tester.getRect(find.text(' · Cantor'));
     expect(role.right, lessThanOrEqualTo(360 - 16));
   });
+
+  testWidgets(
+      'regression: two rows in one list item stay two items for the screen '
+      'reader', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: ListView(
+          children: const [
+            Column(
+              children: [
+                RoomPersonRow(name: 'Você', role: 'Mestre'),
+                RoomPersonRow(name: 'Marina', role: 'Cantor'),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ));
+
+    expect(find.bySemanticsLabel('Você, Mestre'), findsOneWidget);
+    expect(find.bySemanticsLabel('Marina, Cantor'), findsOneWidget);
+    semantics.dispose();
+  });
 }

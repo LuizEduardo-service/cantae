@@ -18,6 +18,7 @@ class RoomPersonRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).extension<CantaeColors>()!;
     return Semantics(
+      container: true,
       label: '$name, $role',
       excludeSemantics: true,
       child: ConstrainedBox(

@@ -242,6 +242,7 @@ class HostPeopleSections extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: CantaeSpacing.space6),
             child: Semantics(
+              container: true,
               liveRegion: true,
               child: Text(
                 'Ninguém pediu para entrar ainda',
@@ -269,6 +270,7 @@ class HostSectionLabel extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: CantaeSpacing.space2),
       child: Semantics(
+        container: true,
         header: true,
         child: Text(
           text,

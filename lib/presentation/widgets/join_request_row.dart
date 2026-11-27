@@ -30,29 +30,38 @@ class JoinRequestRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: CantaeTypography.listTitle.copyWith(color: colors.text),
+          Semantics(
+            container: true,
+            child: Text(
+              name,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: CantaeTypography.listTitle.copyWith(color: colors.text),
+            ),
           ),
           const SizedBox(height: CantaeSpacing.space2),
           Row(
             children: [
               Expanded(
-                child: TonalButton(
-                  label: 'Recusar',
-                  semanticLabel: 'Recusar $name',
-                  onPressed: onReject,
+                child: Semantics(
+                  container: true,
+                  child: TonalButton(
+                    label: 'Recusar',
+                    semanticLabel: 'Recusar $name',
+                    onPressed: onReject,
+                  ),
                 ),
               ),
               const SizedBox(width: CantaeSpacing.space2),
               Expanded(
-                child: TonalButton(
-                  label: 'Aprovar',
-                  semanticLabel: 'Aprovar $name',
-                  positive: true,
-                  onPressed: roomFull ? null : onApprove,
+                child: Semantics(
+                  container: true,
+                  child: TonalButton(
+                    label: 'Aprovar',
+                    semanticLabel: 'Aprovar $name',
+                    positive: true,
+                    onPressed: roomFull ? null : onApprove,
+                  ),
                 ),
               ),
             ],
@@ -60,6 +69,7 @@ class JoinRequestRow extends StatelessWidget {
           if (roomFull) ...[
             const SizedBox(height: CantaeSpacing.space1),
             Semantics(
+              container: true,
               liveRegion: true,
               child: Text(
                 'Sala cheia: 8 de 8.',

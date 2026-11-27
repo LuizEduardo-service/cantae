@@ -94,4 +94,34 @@ void main() {
           greaterThanOrEqualTo(CantaeSpacing.minTouchTarget));
     }
   });
+
+  testWidgets(
+      'regression: two requests in one list item keep separate buttons and '
+      'names for the screen reader', (tester) async {
+    final semantics = tester.ensureSemantics();
+    await tester.pumpWidget(MaterialApp(
+      theme: AppTheme.light,
+      home: Scaffold(
+        body: ListView(
+          children: [
+            Column(
+              children: [
+                for (final name in ['Ana', 'Bruno'])
+                  JoinRequestRow(
+                    name: name,
+                    onReject: () {},
+                    onApprove: () {},
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ));
+
+    for (final label in ['Ana', 'Bruno', 'Aprovar Ana', 'Recusar Bruno']) {
+      expect(find.bySemanticsLabel(label), findsOneWidget, reason: label);
+    }
+    semantics.dispose();
+  });
 }
