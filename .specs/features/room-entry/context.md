@@ -8,6 +8,8 @@ Data: 2026-11-26. Respostas do usuário às áreas cinzentas levantadas na espec
 | D2 | Destino de "Começar a conduzir" e da aprovação, antes da Sala do Mestre / Tela do Cantor | Tela provisória da sala | História P1 "Sala provisória" (ROOM-30..36). A feature seguinte a substitui. |
 | D3 | Papel Visitante (RF33, Should) | Deixar para a feature do Visitante | Todos entram como Cantor. "Sala cheia" não oferece "Entrar como visitante". |
 | D4 | Música obrigatória para criar sala | Opcional | Vindo do Detalhe, já escolhida; vindo da Biblioteca, "Escolher música". |
+| D5 | Como ligar as telas à sessão da Fase 3 (design) | A: estender o `RoomSessionController` e o protocolo de entrada | design.md, abordagem A |
+| D6 | "Sem acesso à rede local" no iOS, onde o sistema não avisa | Dica e "Abrir ajustes" no banner "Nenhuma sala neste Wi‑Fi" | ROOM-57; ROOM-37 fica só para o Android |
 
 Decisões tomadas por precedência de documentos (PRD > UI_SPEC), sem pergunta:
 

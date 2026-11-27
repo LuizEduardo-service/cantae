@@ -34,7 +34,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | Tamanho do nome na sala | 1 a 40 caracteres depois de tirar espaços das pontas | Cabe numa linha de `RoomTile` e `ParticipantRow` em 360 dp | n |
 | Tempo até "Nenhuma sala neste Wi‑Fi" | 10 s sem nenhuma sala encontrada | Descoberta mDNS costuma responder em 1–3 s; 10 s evita falso "nenhuma" | n |
 | Pedido sem resposta do Mestre | O pedido expira em 60 s (regra já existente na máquina de estados) e o Cantor vê "O Mestre não respondeu" | Reaproveita o prazo de NET-07 em vez de criar outro | n |
-| Detecção de "sem permissão de rede local" | Uma falha de anúncio ou de descoberta que o sistema atribui a permissão negada | iOS não tem API para consultar a permissão de rede local; o erro do Bonjour é o único sinal | n |
+| Detecção de "sem permissão de rede local" | Android: erro de segurança informado pelo sistema. iOS: não detectável; dica no banner "Nenhuma sala" (ROOM-57) | O plugin de mDNS no iOS nunca informa permissão negada, só não encontra salas | y (context.md D6) |
 | "Abrir ajustes" | Abre a página de ajustes do Cantaê no sistema | PRD §12 iOS: "Oferecer atalho para Ajustes" | n |
 | "Versão do app incompatível" | Ação "Escolher outra sala" + frase "Atualize o Cantaê nos dois aparelhos." em vez de "Atualizar o app" | Não há loja nem servidor para onde levar a pessoa; a frase diz o que fazer | n |
 | O Mestre sai da tela Criar sala ou da sala provisória | Com ninguém na sala nem pedindo: encerra sem perguntar. Com alguém: `ConfirmSheet` "Encerrar sala?" | Encerrar derruba os outros: ação com efeito fora da tela (AGENTS.md) | n |
@@ -118,8 +118,9 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 13. IF o app do Mestre usa outra versão do protocolo de sala THEN o app SHALL mostrar "Versão do app incompatível", a frase "Atualize o Cantaê nos dois aparelhos." e "Escolher outra sala". (ROOM-34)
 14. IF o pedido expira sem resposta do Mestre THEN o app SHALL mostrar "O Mestre não respondeu" com "Tentar de novo", que repete o pedido. (ROOM-35)
 15. IF a conexão com a sala cai ou não abre enquanto o pedido está em andamento THEN o app SHALL mostrar "Não foi possível falar com a sala" com "Tentar de novo". (ROOM-36)
-16. IF a busca falha por falta de permissão de rede local THEN o app SHALL mostrar "Sem acesso à rede local" com "Abrir ajustes". (ROOM-37)
+16. IF a busca falha e o sistema informa permissão de rede local negada (Android) THEN o app SHALL mostrar "Sem acesso à rede local" com "Abrir ajustes". (ROOM-37)
 17. The app SHALL mostrar no rodapé "Você entra como Cantor." (ROOM-38)
+18. WHERE o aparelho é iOS, WHEN o banner "Nenhuma sala neste Wi‑Fi" aparece THEN o app SHALL acrescentar a frase "Se você negou o acesso à rede local, libere nos ajustes." e a ação secundária "Abrir ajustes". (ROOM-57)
 
 **Independent Test**: Teste ponta a ponta com descoberta e transporte em memória: o cantor vê a sala, digita um código errado (erro), digita o certo, aguarda, o Mestre aprova e o cantor chega à sala provisória; repetir com recusa, sala cheia e versão diferente.
 
@@ -172,6 +173,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 - IF o cantor toca "Entrar" ou um `RoomTile` de novo durante um pedido em andamento THEN o app SHALL ignorar o toque (os controles já estão desativados). (ROOM-55)
 - WHEN a mesma sala é encontrada mais de uma vez THEN o app SHALL mostrar um único `RoomTile` para ela. (ROOM-56)
 - IF o app do Cantor fecha durante o pedido THEN o Mestre SHALL ver o pedido sumir (ROOM-15).
+- IF mais de uma sala encontrada tem o código digitado THEN o app SHALL mostrar só essas salas na lista com a frase "Mais de uma sala com esse código. Toque na sua." e não pedir entrada até o cantor tocar uma. (ROOM-58)
 
 ---
 
@@ -235,8 +237,10 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-54 | Edge cases | Design | Pending |
 | ROOM-55 | Edge cases | Design | Pending |
 | ROOM-56 | Edge cases | Design | Pending |
+| ROOM-57 | P1: Entrar em sala | Design | Pending |
+| ROOM-58 | Edge cases | Design | Pending |
 
-**Coverage:** 56 total, 0 mapped to tasks, 56 unmapped ⚠️ (tasks not written yet)
+**Coverage:** 58 total, 0 mapped to tasks, 58 unmapped ⚠️ (tasks not written yet)
 
 ---
 
@@ -245,8 +249,8 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | Dimension | Coverage |
 | --- | --- |
 | Input validation & bounds | Nome 1–40 (ROOM-02); código só dígitos, 4 (ROOM-27); limite de 8 (ROOM-14, ROOM-54) |
-| Failure / partial-failure states | Permissão (ROOM-20, ROOM-37), criação (ROOM-21), nenhuma sala (ROOM-24), código (ROOM-26), recusa (ROOM-32), cheia (ROOM-33), protocolo (ROOM-34), expirado (ROOM-35), conexão (ROOM-36, ROOM-44) |
-| Idempotency / retry / duplicates | "Tentar de novo"/"Procurar de novo" (ROOM-21, 24, 35, 36); toque repetido (ROOM-55); sala duplicada (ROOM-56); pedido repetido do mesmo aparelho já é recusado pela máquina de estados (NET-18) |
+| Failure / partial-failure states | Permissão (ROOM-20, ROOM-37, ROOM-57), criação (ROOM-21), nenhuma sala (ROOM-24), código (ROOM-26), recusa (ROOM-32), cheia (ROOM-33), protocolo (ROOM-34), expirado (ROOM-35), conexão (ROOM-36, ROOM-44) |
+| Idempotency / retry / duplicates | "Tentar de novo"/"Procurar de novo" (ROOM-21, 24, 35, 36); toque repetido (ROOM-55); sala duplicada (ROOM-56); código repetido entre salas (ROOM-58); pedido repetido do mesmo aparelho já é recusado pela máquina de estados (NET-18) |
 | Auth boundaries & rate limits | Aprovação obrigatória (ROOM-46); só o Mestre aprova (existente, PRD §6.3); rate limit N/A porque o Mestre aprova um a um e pedidos expiram em 60 s |
 | Concurrency / ordering | Pedidos simultâneos (ROOM-53); corrida pela 8ª vaga (ROOM-54); uma sala por aparelho (ROOM-47) |
 | Data lifecycle / expiry | Pedido expira em 60 s (ROOM-15, ROOM-35); sala some ao encerrar (ROOM-41); TTL de 30 min já existente (RNF-CONF-05), N/A de nova regra; nome guardado até apagar dados (ROOM-03) |
