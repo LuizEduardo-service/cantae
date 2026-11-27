@@ -101,7 +101,7 @@ Linha da Biblioteca.
 Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carregando em `text2`), latência em mono à direita (`warningInline` 600 quando fraca).
 
 ### `RoomTile`
-Sala encontrada na rede: código em mono, nome do Mestre, "música · N pessoas", chevron. Borda 2 px `accent` quando é a sala do pedido em andamento.
+Sala encontrada na rede: "Sala de <Mestre>", música (ou "Sem música escolhida"), chevron; altura ≥ 64. Sem o código (NET-01: o código nunca é anunciado no Wi‑Fi) e sem "N pessoas" (fora do MVP). Borda 2 px `accent` quando é a sala escolhida ou a do pedido em andamento; desativado durante um pedido. Leitor de tela: um só botão "Sala de Marina, Ave Verum Corpus".
 
 ### `StatTile`
 Número grande em mono (`monoStat`, 26) + legenda (`caption`, `text2`), em cartão `surface` de raio `radiusMd`. Usado no Histórico, três lado a lado. Leitor de tela: um só item "legenda: valor". O número encolhe para caber numa linha.

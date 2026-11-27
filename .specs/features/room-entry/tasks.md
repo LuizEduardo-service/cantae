@@ -501,9 +501,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: content, no-song text, selected border, disabled ignores taps, one button node "Sala de Marina, Ave Verum Corpus", ≥ 44 dp, dark theme, 360 dp at 130 % without overflow
-- [ ] Gate check passes: `flutter test test/presentation/widgets`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Widget tests: content, no-song text, selected border, disabled ignores taps, one button node "Sala de Marina, Ave Verum Corpus", ≥ 44 dp, dark theme, 360 dp at 130 % without overflow
+- [x] Gate check passes: `flutter test test/presentation/widgets`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: widget
 **Gate**: quick
