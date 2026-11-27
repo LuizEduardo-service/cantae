@@ -616,9 +616,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: choosing returns the song; "Sem música" returns none; empty library text; error text; current one marked for the screen reader
-- [ ] Gate check passes: `flutter test test/presentation/screens/room_create`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Widget tests: choosing returns the song; "Sem música" returns none; empty library text; error text; current one marked for the screen reader
+- [x] Gate check passes: `flutter test test/presentation/screens/room_create`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: widget
 **Gate**: quick
