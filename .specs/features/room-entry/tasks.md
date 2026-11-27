@@ -227,9 +227,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first, loopback tests: a refused attempt (invalid-code) followed by a second `requestJoin` on another room works on the same controller; master closes before answering → connection-lost (no hang); unreachable port → connect-failed; injected short answer timeout → request-expired; cancelJoin → join completes with join-cancelled and the master snapshot drops the pending request; leaveRoom → master snapshot shows disconnected; master `endRoom` → `masterConnectionLost` fires once
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 6 new
+- [x] Failure modes first, loopback tests: a refused attempt (invalid-code) followed by a second `requestJoin` on another room works on the same controller; master closes before answering → connection-lost (no hang); unreachable port → connect-failed; injected short answer timeout → request-expired; cancelJoin → join completes with join-cancelled and the master snapshot drops the pending request; leaveRoom → master snapshot shows disconnected; master `endRoom` → `masterConnectionLost` fires once
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 6 new
 
 **Tests**: integration
 **Gate**: full

@@ -206,12 +206,12 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-22 | P1: Entrar em sala | Design | Pending |
 | ROOM-23 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-24 | P1: Entrar em sala | Design | Pending |
-| ROOM-25 | P1: Entrar em sala | Design | Pending |
+| ROOM-25 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-26 | P1: Entrar em sala | Design | Pending |
 | ROOM-27 | P1: Entrar em sala | Design | Pending |
 | ROOM-28 | P1: Entrar em sala | Design | Pending |
 | ROOM-29 | P1: Entrar em sala | Design | Pending |
-| ROOM-30 | P1: Entrar em sala | Design | Pending |
+| ROOM-30 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-31 | P1: Entrar em sala | Design | Pending |
 | ROOM-32 | P1: Entrar em sala | Design | Pending |
 | ROOM-33 | P1: Entrar em sala | Design | Pending |
@@ -224,8 +224,8 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-40 | P1: Sala provisória | Design | Pending |
 | ROOM-41 | P1: Sala provisória | Design | Pending |
 | ROOM-42 | P1: Sala provisória | Design | Pending |
-| ROOM-43 | P1: Sala provisória | Design | Pending |
-| ROOM-44 | P1: Sala provisória | Design | Pending |
+| ROOM-43 | P1: Sala provisória | Execute | Implementing |
+| ROOM-44 | P1: Sala provisória | Execute | Implementing |
 | ROOM-45 | P1: Sala provisória | Design | Pending |
 | ROOM-46 | P1: Base comum da sala | Execute | Implementing |
 | ROOM-47 | P1: Base comum da sala | Design | Pending |
@@ -239,7 +239,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-55 | Edge cases | Design | Pending |
 | ROOM-56 | Edge cases | Design | Pending |
 | ROOM-57 | P1: Entrar em sala | Design | Pending |
-| ROOM-58 | Edge cases | Design | Pending |
+| ROOM-58 | Edge cases | Execute | Implementing |
 
 **Coverage:** 58 total, 0 mapped to tasks, 58 unmapped ⚠️ (tasks not written yet)
 
