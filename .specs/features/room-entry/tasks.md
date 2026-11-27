@@ -570,9 +570,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: synced colors from tokens in both themes, live region, neutral unchanged (existing tests pass)
-- [ ] Gate check passes: `flutter test test/presentation/widgets`
-- [ ] Test count: all existing + ≥ 2 new
+- [x] Widget tests: synced colors from tokens in both themes, live region, neutral unchanged (existing tests pass)
+- [x] Gate check passes: `flutter test test/presentation/widgets`
+- [x] Test count: all existing + ≥ 2 new
 
 **Tests**: widget
 **Gate**: quick
