@@ -116,21 +116,27 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
   - *Falha ao criar* (banner error "Não foi possível criar a sala." + "Tentar de novo").
 
 ## 6.8 Entrar em sala
+- **Antes de tudo:** sem nome salvo, a mesma folha de nome de §6.7.
 - **Topo:** ‹ Biblioteca. Título "Entrar em sala".
-- **Conteúdo:** card com `CodeInput` + [P] Entrar; "Salas neste Wi‑Fi" com `RoomTile`s; banner de estado.
-- **Rodapé:** "Você entra como Cantor. O Mestre pode mudar seu papel."
+- **Conteúdo:** card com frase "Digite o código que aparece na tela do Mestre." (ou "…na tela de <Mestre>." com uma sala escolhida), `CodeInput` e [P] Entrar (ativo com 4 dígitos); banner de estado; "Salas neste Wi‑Fi" com `RoomTile`s (Mestre e música, **sem código**).
+- **Código:** nunca anunciado no Wi‑Fi (NET-01); o cantor sempre digita o que vê na tela do Mestre. Tocar um `RoomTile` escolhe a sala e põe o foco no campo; "Entrar" pede só a ela. Sem sala escolhida, o app pede às salas encontradas, uma por vez, até uma aceitar o código.
+- **Rodapé:** "Você entra como Cantor." (a troca de papel chega com o Visitante).
 - **Estados (banner):**
 
 | Estado | Título | Ação |
 |---|---|---|
-| buscando | — (lista + "procurando…") | — |
-| nenhuma | Nenhuma sala neste Wi‑Fi | Procurar de novo |
+| buscando | — ("Procurando salas…" enquanto a lista está vazia) | — |
+| nenhuma (10 s sem salas) | Nenhuma sala neste Wi‑Fi | Procurar de novo (no iOS, também a frase "Se você negou o acesso à rede local, libere nos ajustes." e "Abrir ajustes") |
 | aguardando | Aguardando a Marina aprovar | Cancelar pedido |
 | rejeitado | Entrada recusada | Escolher outra sala |
-| cheia | Sala cheia (30 de 30) | Entrar como visitante |
-| protocolo | Versão do app incompatível | Atualizar o app |
-| permissão | Sem acesso à rede local | Abrir ajustes |
+| cheia | Sala cheia (8 de 8) | Escolher outra sala |
+| protocolo | Versão do app incompatível ("Atualize o Cantaê nos dois aparelhos.") | Escolher outra sala |
+| sem resposta (60 s) | O Mestre não respondeu | Tentar de novo |
+| conexão | Não foi possível falar com a sala | Tentar de novo |
+| permissão (Android) | Sem acesso à rede local | Abrir ajustes |
 | código inválido | Código não encontrado (borda de erro no campo) | Digitar de novo |
+
+- Durante "aguardando", o campo e os outros `RoomTile`s ficam desativados e o da sala do pedido tem borda `accent`. Aprovado, abre a sala provisória do Cantor ("Você está na sala de <Mestre>", "Sair da sala"); a Tela do Cantor completa (§6.10) chega na próxima feature.
 
 ## 6.9 Sala do Mestre — Tema
 - **Topo:** "Sala 4827" · botão "N pedidos para entrar" (abre a lista de aprovação).

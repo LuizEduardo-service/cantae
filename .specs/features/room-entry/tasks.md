@@ -686,9 +686,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`, `flutter-routing`
 
 **Done when**:
-- [ ] Widget tests, one per state with its text and action: procurando; nenhuma (Android) and nenhuma + dica (iOS via `debugDefaultTargetPlatformOverride`); tile tap selects the room and focuses the field with the master's name; código não encontrado (border + Digitar de novo clears and focuses); aguardando (tile border, controls disabled, cancel); recusada; cheia; versão; não respondeu; sem conexão; permissão; joined → `room-member`; footer; banners are live regions; both themes; 360 dp at 130 %
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 16 new
+- [x] Widget tests, one per state with its text and action: procurando; nenhuma (Android) and nenhuma + dica (iOS via `debugDefaultTargetPlatformOverride`); tile tap selects the room and focuses the field with the master's name; código não encontrado (border + Digitar de novo clears and focuses); aguardando (tile border, controls disabled, cancel); recusada; cheia; versão; não respondeu; sem conexão; permissão; joined → `room-member`; footer; banners are live regions; both themes; 360 dp at 130 %
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 16 new
 
 **Tests**: widget
 **Gate**: full

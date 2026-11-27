@@ -219,7 +219,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-35 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-36 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-37 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-38 | P1: Entrar em sala | Design | Pending |
+| ROOM-38 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-39 | P1: Sala provisória | Execute | Implementing |
 | ROOM-40 | P1: Sala provisória | Execute | Implementing |
 | ROOM-41 | P1: Sala provisória | Execute | Implementing |

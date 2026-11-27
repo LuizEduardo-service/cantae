@@ -10,6 +10,7 @@ import 'package:cantae/presentation/providers/song_repository_provider.dart';
 import 'package:cantae/presentation/providers/track_upload_providers.dart';
 import 'package:cantae/presentation/routing/app_router.dart';
 import 'package:cantae/presentation/screens/room_create/room_create_screen.dart';
+import 'package:cantae/presentation/screens/room_join/room_join_screen.dart';
 import 'package:cantae/presentation/screens/coming_soon/coming_soon_screen.dart';
 import 'package:cantae/presentation/screens/history/rehearsal_history_screen.dart';
 import 'package:cantae/presentation/screens/library/library_screen.dart';
@@ -112,14 +113,13 @@ void main() {
       );
     });
 
-    testWidgets('room-join renders ComingSoonScreen', (tester) async {
+    testWidgets('room-join renders RoomJoinScreen', (tester) async {
       final router = await _pumpRouter(tester);
 
       router.goNamed('room-join');
-      await tester.pumpAndSettle();
+      await tester.pump();
 
-      expect(find.byType(ComingSoonScreen), findsOneWidget);
-      expect(find.text('Entrar em sala'), findsOneWidget);
+      expect(find.byType(RoomJoinScreen), findsOneWidget);
     });
 
     testWidgets('profile renders ComingSoonScreen', (tester) async {
