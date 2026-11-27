@@ -203,18 +203,18 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-19 | P1: Criar sala | Design | Pending |
 | ROOM-20 | P1: Criar sala | Execute | Implementing |
 | ROOM-21 | P1: Criar sala | Execute | Implementing |
-| ROOM-22 | P1: Entrar em sala | Design | Pending |
+| ROOM-22 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-23 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-24 | P1: Entrar em sala | Design | Pending |
+| ROOM-24 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-25 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-26 | P1: Entrar em sala | Design | Pending |
-| ROOM-27 | P1: Entrar em sala | Design | Pending |
-| ROOM-28 | P1: Entrar em sala | Design | Pending |
-| ROOM-29 | P1: Entrar em sala | Design | Pending |
+| ROOM-26 | P1: Entrar em sala | Execute | Implementing |
+| ROOM-27 | P1: Entrar em sala | Execute | Implementing |
+| ROOM-28 | P1: Entrar em sala | Execute | Implementing |
+| ROOM-29 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-30 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-31 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-32 | P1: Entrar em sala | Design | Pending |
-| ROOM-33 | P1: Entrar em sala | Design | Pending |
+| ROOM-32 | P1: Entrar em sala | Execute | Implementing |
+| ROOM-33 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-34 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-35 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-36 | P1: Entrar em sala | Execute | Implementing |
@@ -236,8 +236,8 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-52 | P1: Base comum da sala | Design | Pending |
 | ROOM-53 | Edge cases | Execute | Implementing |
 | ROOM-54 | Edge cases | Execute | Implementing |
-| ROOM-55 | Edge cases | Design | Pending |
-| ROOM-56 | Edge cases | Design | Pending |
+| ROOM-55 | Edge cases | Execute | Implementing |
+| ROOM-56 | Edge cases | Execute | Implementing |
 | ROOM-57 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-58 | Edge cases | Execute | Implementing |
 

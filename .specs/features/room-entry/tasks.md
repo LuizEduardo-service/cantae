@@ -409,9 +409,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests for every phase and transition with a fake clock: 10 s → noneFound, late room still added; searchAgain restarts; same room twice → one entry; lost room removed; selected room + code → only that room asked; no selection → rooms asked in order, next only after invalid-code, the first that accepts keeps the request (ROOM-58); every room invalid-code or no room → codeNotFound; selected room invalid-code → codeNotFound; awaiting ignores a second join; every outcome; cancel returns to the list; permission error → permissionDenied
-- [ ] Gate check passes: `flutter test test/presentation/providers`
-- [ ] Test count: all existing + ≥ 12 new
+- [x] Tests for every phase and transition with a fake clock: 10 s → noneFound, late room still added; searchAgain restarts; same room twice → one entry; lost room removed; selected room + code → only that room asked; no selection → rooms asked in order, next only after invalid-code, the first that accepts keeps the request (ROOM-58); every room invalid-code or no room → codeNotFound; selected room invalid-code → codeNotFound; awaiting ignores a second join; every outcome; cancel returns to the list; permission error → permissionDenied
+- [x] Gate check passes: `flutter test test/presentation/providers`
+- [x] Test count: all existing + ≥ 12 new
 
 **Tests**: unit
 **Gate**: quick
