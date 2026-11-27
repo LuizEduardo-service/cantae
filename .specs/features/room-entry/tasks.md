@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/room-entry/design.md`
-**Status**: In Progress
+**Status**: Done
 
 ---
 
@@ -754,8 +754,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Script lists each step with the expected screen text
-- [ ] Gate check passes: build gate
+- [x] Script lists each step with the expected screen text
+- [x] Gate check passes: build gate
 
 **Tests**: none
 **Gate**: build
