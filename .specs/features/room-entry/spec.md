@@ -238,7 +238,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-54 | Edge cases | Design | Pending |
 | ROOM-55 | Edge cases | Design | Pending |
 | ROOM-56 | Edge cases | Design | Pending |
-| ROOM-57 | P1: Entrar em sala | Design | Pending |
+| ROOM-57 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-58 | Edge cases | Execute | Implementing |
 
 **Coverage:** 58 total, 0 mapped to tasks, 58 unmapped ⚠️ (tasks not written yet)

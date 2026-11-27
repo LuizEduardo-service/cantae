@@ -341,8 +341,8 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Dart side calls the channel method (checked through `TestDefaultBinaryMessenger` mock handler); a `MissingPluginException` is swallowed
-- [ ] Gate check passes: `flutter analyze && flutter test`
+- [x] Dart side calls the channel method (checked through `TestDefaultBinaryMessenger` mock handler); a `MissingPluginException` is swallowed
+- [x] Gate check passes: `flutter analyze && flutter test`
 
 **Tests**: unit
 **Gate**: build
