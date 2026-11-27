@@ -9,7 +9,7 @@ Implement these tasks with the `tlc-spec-driven` skill: **activate it by name an
 ---
 
 **Design**: `.specs/features/room-entry/design.md`
-**Status**: Draft
+**Status**: In Progress
 
 ---
 
@@ -111,10 +111,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes in the test header, then tests: name blank, 1, 40, 41 chars; trimmed result; remote name with control characters, 200 chars, only spaces → "Sem nome"; each code (`session.rejected`, `room-full`, `protocol-mismatch`, `request-expired`, `invalid-code`, `join-cancelled`) → its outcome; unknown code → `connectionLost`
-- [ ] `python scripts/check_layers.py` passes
-- [ ] Gate check passes: `flutter test test/domain/session`
-- [ ] Test count: all existing + ≥ 12 new
+- [x] Failure modes in the test header, then tests: name blank, 1, 40, 41 chars; trimmed result; remote name with control characters, 200 chars, only spaces → "Sem nome"; each code (`session.rejected`, `room-full`, `protocol-mismatch`, `request-expired`, `invalid-code`, `join-cancelled`) → its outcome; unknown code → `connectionLost`
+- [x] `python scripts/check_layers.py` passes
+- [x] Gate check passes: `flutter test test/domain/session`
+- [x] Test count: all existing + ≥ 12 new
 
 **Tests**: unit
 **Gate**: quick
