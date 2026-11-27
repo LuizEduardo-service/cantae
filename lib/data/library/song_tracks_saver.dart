@@ -1,4 +1,5 @@
 import 'package:cantae/data/ids/uuid_v4.dart';
+import 'package:cantae/data/library/library_file_releaser.dart';
 import 'package:cantae/data/library/track_file_importer.dart';
 import 'package:cantae/data/library/track_file_inspector.dart';
 import 'package:cantae/domain/core/failures.dart';
@@ -59,13 +60,16 @@ class SongTracksSaver {
   SongTracksSaver({
     required SongRepository repository,
     required TrackFileImporter importer,
+    required LibraryFileReleaser releaser,
     String Function() newId = uuidV4,
   })  : _repository = repository,
         _importer = importer,
+        _releaser = releaser,
         _newId = newId;
 
   final SongRepository _repository;
   final TrackFileImporter _importer;
+  final LibraryFileReleaser _releaser;
   final String Function() _newId;
 
   Future<Result<Song, Failure>> save(SongSaveRequest request) async {
@@ -112,7 +116,18 @@ class SongTracksSaver {
       await rollback();
       return Result.failure(saveFailure);
     }
+    await _releaser.release(_droppedPaths(base, song));
     return Result.success(song);
+  }
+
+  /// Files [base] used that [song] no longer does.
+  static Set<String> _droppedPaths(Song? base, Song song) {
+    if (base == null) return const {};
+    Set<String> paths(Song s) => {
+          for (final t in s.tracks) t.filePath,
+          if (s.playbackTrack case final pb?) pb.filePath,
+        };
+    return paths(base).difference(paths(song));
   }
 
   /// Imports [choice]'s file and returns its new track (delay 0), or null.

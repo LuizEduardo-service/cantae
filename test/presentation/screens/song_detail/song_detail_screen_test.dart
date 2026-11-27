@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cantae/data/library/library_file_releaser.dart';
 import 'package:cantae/domain/core/failures.dart';
 import 'package:cantae/domain/core/result.dart';
 import 'package:cantae/domain/core/unit.dart';
@@ -13,9 +14,11 @@ import 'package:cantae/domain/repositories/rehearsal_repository.dart';
 import 'package:cantae/domain/repositories/song_repository.dart';
 import 'package:cantae/presentation/providers/rehearsal_providers.dart';
 import 'package:cantae/presentation/providers/song_repository_provider.dart';
+import 'package:cantae/presentation/providers/track_upload_providers.dart';
 import 'package:cantae/presentation/screens/song_detail/song_detail_screen.dart';
 import 'package:cantae/presentation/theme/app_theme.dart';
 import 'package:cantae/presentation/widgets/buttons.dart';
+import 'package:cantae/presentation/theme/cantae_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -151,14 +154,34 @@ GoRouter _buildRouter() {
   );
 }
 
+/// Records the paths handed over for deletion instead of touching disk.
+class _RecordingReleaser extends LibraryFileReleaser {
+  _RecordingReleaser(SongRepository repository)
+      : super(
+          repository: repository,
+          resolveRoot: () async => throw UnimplementedError(),
+        );
+
+  final released = <String>[];
+
+  @override
+  Future<int> release(Iterable<String> paths) async {
+    released.addAll(paths);
+    return 0;
+  }
+}
+
 Widget _wrap(
   SongRepository repository, {
   ThemeData? theme,
   int rehearsals = 0,
+  _RecordingReleaser? releaser,
 }) {
   return ProviderScope(
     overrides: [
       songRepositoryProvider.overrideWithValue(repository),
+      libraryFileReleaserProvider
+          .overrideWithValue(releaser ?? _RecordingReleaser(repository)),
       rehearsalRepositoryProvider
           .overrideWithValue(_FakeRehearsals(rehearsals)),
     ],
@@ -315,6 +338,37 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('route:track-upload:s1?naipe=tenor'), findsOneWidget);
+    });
+
+    testWidgets(
+        'regression: a missing naipe exposes one "Enviar faixa de <naipe>" '
+        'button of at least 44 dp, apart from the naipe name', (tester) async {
+      final semantics = tester.ensureSemantics();
+      final repo = _FakeSongRepository(
+        getById: (_) async => Result.success(_incompleteSong()),
+      );
+      await tester.pumpWidget(_wrap(repo));
+      await tester.pumpAndSettle();
+
+      final button = find.bySemanticsLabel('Enviar faixa de Tenor');
+      expect(button, findsOneWidget);
+      expect(
+        tester.getSemantics(button),
+        matchesSemantics(
+          label: 'Enviar faixa de Tenor',
+          isButton: true,
+          hasTapAction: true,
+          isFocusable: true,
+          hasFocusAction: true,
+        ),
+      );
+      final size = tester.getSize(button);
+      expect(size.width, greaterThanOrEqualTo(CantaeSpacing.minTouchTarget));
+      expect(size.height, greaterThanOrEqualTo(CantaeSpacing.minTouchTarget));
+      final name = tester.getSemantics(find.text('Tenor'));
+      expect(name.label, isNot(contains('Enviar faixa')));
+      expect(name.getSemanticsData().flagsCollection.isButton, isFalse);
+      semantics.dispose();
     });
 
     testWidgets(
@@ -530,7 +584,8 @@ void main() {
             return const Result.success(Unit());
           },
         );
-        await tester.pumpWidget(_wrap(repo));
+        final releaser = _RecordingReleaser(repo);
+        await tester.pumpWidget(_wrap(repo, releaser: releaser));
         await tester.pumpAndSettle();
 
         await tester.scrollUntilVisible(
@@ -545,6 +600,8 @@ void main() {
 
         expect(deletedId, equals('s1'));
         expect(find.text('route:library'), findsOneWidget);
+        expect(releaser.released, ['a.wav', 'b.wav', 'c.wav', 'd.wav'],
+            reason: 'the files of the deleted song go for deletion');
       },
     );
 
@@ -585,7 +642,8 @@ void main() {
           getById: (_) async => Result.success(_completeSong()),
           delete: (_) async => Result.failure(StorageFailure(code: 'x')),
         );
-        await tester.pumpWidget(_wrap(repo));
+        final releaser = _RecordingReleaser(repo);
+        await tester.pumpWidget(_wrap(repo, releaser: releaser));
         await tester.pumpAndSettle();
 
         await tester.scrollUntilVisible(
@@ -600,6 +658,7 @@ void main() {
 
         expect(find.text('Não foi possível apagar'), findsOneWidget);
         expect(find.text('route:library'), findsNothing);
+        expect(releaser.released, isEmpty);
       },
     );
 

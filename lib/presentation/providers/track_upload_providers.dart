@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../data/ids/uuid_v4.dart';
+import '../../data/library/library_file_releaser.dart';
 import '../../data/library/song_tracks_saver.dart';
 import '../../data/library/track_file_importer.dart';
 import '../../data/library/track_file_inspector.dart';
@@ -28,10 +29,20 @@ final trackFileImporterProvider = Provider<TrackFileImporter>(
   ),
 );
 
+/// Deletes library files no track uses any more. Overridden in tests with a
+/// temporary root.
+final libraryFileReleaserProvider = Provider<LibraryFileReleaser>(
+  (ref) => LibraryFileReleaser(
+    repository: ref.watch(songRepositoryProvider),
+    resolveRoot: LibraryStoragePaths.resolveLibraryRoot,
+  ),
+);
+
 final songTracksSaverProvider = Provider<SongTracksSaver>(
   (ref) => SongTracksSaver(
     repository: ref.watch(songRepositoryProvider),
     importer: ref.watch(trackFileImporterProvider),
+    releaser: ref.watch(libraryFileReleaserProvider),
   ),
 );
 
