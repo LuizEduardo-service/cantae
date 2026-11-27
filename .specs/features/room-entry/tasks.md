@@ -709,9 +709,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`, `flutter-routing`
 
 **Done when**:
-- [ ] Widget tests: texts; leave → Biblioteca; lost → Biblioteca + toast "A sala foi encerrada ou a conexão caiu."; no active room → Biblioteca; both themes; 360 dp at 130 %
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Widget tests: texts; leave → Biblioteca; lost → Biblioteca + toast "A sala foi encerrada ou a conexão caiu."; no active room → Biblioteca; both themes; 360 dp at 130 %
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: widget
 **Gate**: full
