@@ -455,9 +455,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: code shown in mono, copy puts the code in the clipboard and shows the toast, semantics label "Código da sala 4827", dark theme, ≥ 44 dp button
-- [ ] Gate check passes: `flutter test test/presentation/widgets`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Widget tests: code shown in mono, copy puts the code in the clipboard and shows the toast, semantics label "Código da sala 4827", dark theme, ≥ 44 dp button
+- [x] Gate check passes: `flutter test test/presentation/widgets`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: widget
 **Gate**: quick

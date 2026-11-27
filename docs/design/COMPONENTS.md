@@ -152,7 +152,7 @@ Tempo atual e total em mono, trilho `divider/fillSecondary`, preenchido `accent`
 - Props: `positionMs`, `durationMs`, `onSeek`, `loopStartMs`, `loopEndMs` (região só com os dois), `caption`.
 
 ### `RoomCodeDisplay`
-Card `surface` raio 24: rótulo "Código da sala", código em `monoLarge`, botão "Copiar" (toast "Código copiado"), frase de instrução.
+Card `surface` raio `radiusXl`: rótulo "Código da sala", código em `monoLarge` (encolhe para caber em fonte grande), botão "Copiar" (`TonalButton`, toast "Código copiado"), frase de instrução. Leitor de tela: um só item "Código da sala 4 8 2 7", dígito por dígito.
 
 ---
 
