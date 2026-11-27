@@ -104,6 +104,9 @@ Pedido de entrada na tela do Mestre (Criar sala e sala provisória): nome em `li
 ### `ParticipantRow`
 Sala do Mestre. Selo de naipe, nome, "papel · estado" (pronto em `accent`, carregando em `text2`), latência em mono à direita (`warningInline` 600 quando fraca).
 
+### `RoomPersonRow`
+Versão mínima do `ParticipantRow` para a sala provisória: nome em `body` (`text`, cortado com reticências) e " · papel" (`text2`), altura ≥ 44. "Você · Mestre" para o próprio Mestre. Leitor de tela: um só item "Marina, Cantor". O `ParticipantRow` completo (naipe, estado, latência) chega com a Sala do Mestre.
+
 ### `RoomTile`
 Sala encontrada na rede: "Sala de <Mestre>", música (ou "Sem música escolhida"), chevron; altura ≥ 64. Sem o código (NET-01: o código nunca é anunciado no Wi‑Fi) e sem "N pessoas" (fora do MVP). Borda 2 px `accent` quando é a sala escolhida ou a do pedido em andamento; desativado durante um pedido. Leitor de tela: um só botão "Sala de Marina, Ave Verum Corpus".
 
