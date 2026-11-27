@@ -275,6 +275,34 @@ void main() {
       );
     });
   });
+
+  // Failure modes (ROOM-03, ROOM-48, schema v6): upgrading a v5 library
+  // loses songs, tracks, custom naipes or rehearsals; local_profile is
+  // missing after an upgrade or a fresh install.
+  group('AppDatabase migration v5 -> v6 (local profile)', () {
+    test('a v5 library upgrades intact, with an empty local_profile', () async {
+      final db = AppDatabase(NativeDatabase(File(_seedV5Database())));
+      addTearDown(db.close);
+
+      expect((await db.select(db.songsTable).getSingle()).id, 'ave-1');
+      final track = await db.select(db.songTracksTable).getSingle();
+      expect(track.id, 't-sop');
+      expect(track.customNaipeId, 'n-solista');
+      expect(
+          (await db.select(db.customNaipesTable).getSingle()).name, 'Solista');
+      expect((await db.select(db.rehearsalLogsTable).get()).map((l) => l.id),
+          ['log-1']);
+      expect(await _columnsOf(db, 'local_profile'), _localProfileColumns);
+      expect(await db.select(db.localProfileTable).get(), isEmpty);
+    });
+
+    test('a fresh install creates local_profile', () async {
+      final db = AppDatabase(NativeDatabase.memory());
+      addTearDown(db.close);
+
+      expect(await _columnsOf(db, 'local_profile'), _localProfileColumns);
+    });
+  });
 }
 
 /// A schema-v2 database file: `onset_ms` is still NOT NULL, with one song
@@ -439,3 +467,30 @@ String _seedV4Database() {
   raw.close();
   return dbPath;
 }
+
+/// A schema-v5 database file: the v4 library plus a custom naipe on its
+/// track. Deleted after the test.
+String _seedV5Database() {
+  final dbPath = _seedV4Database();
+  final raw = raw_sqlite3.sqlite3.open(dbPath);
+  raw.execute('''
+    CREATE TABLE custom_naipes (
+      id TEXT NOT NULL PRIMARY KEY,
+      name TEXT NOT NULL,
+      name_key TEXT NOT NULL UNIQUE
+    );
+  ''');
+  raw.execute('ALTER TABLE song_tracks ADD COLUMN custom_naipe_id TEXT NULL '
+      'REFERENCES custom_naipes (id)');
+  raw.execute('ALTER TABLE song_tracks ADD COLUMN file_name TEXT NULL');
+  raw.execute(
+      'ALTER TABLE song_tracks ADD COLUMN file_size_bytes INTEGER NULL');
+  raw.execute('INSERT INTO custom_naipes (id, name, name_key) '
+      "VALUES ('n-solista', 'Solista', 'solista')");
+  raw.execute("UPDATE song_tracks SET custom_naipe_id = 'n-solista'");
+  raw.execute('PRAGMA user_version = 5;');
+  raw.close();
+  return dbPath;
+}
+
+const _localProfileColumns = {'id', 'device_id', 'display_name', 'created_at'};

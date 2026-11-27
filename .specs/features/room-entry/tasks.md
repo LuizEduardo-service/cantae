@@ -273,9 +273,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Migration test: v5 database with songs, tracks, custom naipes and rehearsals opens at v6 with all rows and an empty `local_profile`
-- [ ] Gate check passes: `flutter test test/infrastructure/database`
-- [ ] Test count: all existing + ≥ 1 new
+- [x] Migration test: v5 database with songs, tracks, custom naipes and rehearsals opens at v6 with all rows and an empty `local_profile`
+- [x] Gate check passes: `flutter test test/infrastructure/database`
+- [x] Test count: all existing + ≥ 1 new
 
 **Tests**: unit
 **Gate**: quick
