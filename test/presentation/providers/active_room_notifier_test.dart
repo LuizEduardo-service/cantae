@@ -201,4 +201,15 @@ void main() {
     await ana.notifier.cancelJoin();
     expect(await outcome, JoinOutcome.cancelled);
   });
+
+  test('regression: close() after the notifier is disposed does nothing',
+      () async {
+    final notifier = ActiveRoomNotifier(
+      newController: (_) => throw UnimplementedError(),
+      profiles: InMemoryLocalProfiles('ana'),
+    );
+    notifier.dispose();
+
+    await expectLater(notifier.close(), completes);
+  });
 }

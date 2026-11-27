@@ -140,8 +140,10 @@ class ActiveRoomNotifier extends StateNotifier<ActiveRoom?> {
   /// "Cancelar pedido" (ROOM-30).
   Future<void> cancelJoin() async => _searching?.cancelJoin();
 
-  /// Leaves or ends the active room and stops any search.
+  /// Leaves or ends the active room and stops any search. After dispose
+  /// there is nothing left to close (dispose already released it).
   Future<void> close() async {
+    if (!mounted) return;
     final room = state;
     if (room != null) {
       if (room.role == RoomRole.host) {
