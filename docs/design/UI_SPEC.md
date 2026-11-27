@@ -102,13 +102,18 @@ Legenda: **[P]** ação primária · **[S]** secundária · **[D]** destrutiva �
 - **Estados:** carregando, não encontrada, erro ao abrir (banner + "Tentar de novo"), vazio (sem linhas, sem rodapé; ação "Acrescentar linha"), editando, marcando (tocando), marcando (pausado: "Continuar" retoma de onde parou, "Marcar agora" desabilitado), erro ao tocar as faixas (banner, edição continua), erro ao salvar (banner, alterações mantidas). Sair com alterações não salvas abre `ConfirmSheet`; sair para o áudio.
 
 ## 6.7 Criar sala
-- **Topo:** Cancelar · StatusPill "Visível no Coral‑WiFi".
-- **Conteúdo:** `RoomCodeDisplay` (4827, Copiar); linha "Música · Trocar"; seção "Pedindo para entrar · N" com Recusar/Aprovar por pessoa e "5/30 na sala"; lista de quem já entrou.
-- **Rodapé:** [P] Começar a conduzir → Sala do Mestre.
+- **Antes de tudo:** sem nome salvo, folha "Como você quer aparecer na sala?" (campo "Seu nome", 1–40 caracteres, [P] Salvar nome). Fechar a folha volta à Biblioteca.
+- **Topo:** Cancelar · StatusPill `synced` "Visível neste Wi‑Fi" (sem o nome da rede: ler o nome do Wi‑Fi exige permissão de localização no Android).
+- **Conteúdo:** `RoomCodeDisplay` (4827, Copiar); seção "Música": nome da música e "Trocar", ou "Nenhuma música escolhida" e "Escolher música" (folha "Música da sala" com a biblioteca e "Sem música"); seção "Pedindo para entrar · N" com `JoinRequestRow` por pessoa; seção "Na sala · N de 8" com "Você · Mestre" e quem já entrou (`RoomPersonRow`).
+- **Rodapé:** [P] Começar a conduzir → sala provisória do Mestre (a Sala do Mestre completa, §6.9, chega na próxima feature). Desativado até a sala estar pronta.
+- **Limite:** 8 pessoas além do Mestre (RF26; o canvas mostrava 30). Com 8, "Aprovar" fica desativado e cada pedido mostra "Sala cheia: 8 de 8."
+- **Música:** opcional. Vinda do Detalhe ("Ensaiar em grupo"), já escolhida; vinda da Biblioteca, nenhuma.
+- **Sair:** Cancelar ou voltar pelo sistema. Sem ninguém na sala nem pedindo, encerra direto; com alguém, `ConfirmSheet` "Encerrar sala?" ("Continuar na sala" / "Encerrar sala").
 - **Estados:**
-  - *Gerando código*.
-  - *Aguardando participantes* (sem pedidos: "Ninguém pediu para entrar ainda").
-  - *Sem permissão de rede local* (banner error + "Abrir ajustes").
+  - *Gerando código* (indicador + "Gerando código").
+  - *Aguardando participantes* (sem pedidos nem pessoas: "Ninguém pediu para entrar ainda").
+  - *Sem permissão de rede local* (banner error "Sem acesso à rede local" + "Abrir ajustes").
+  - *Falha ao criar* (banner error "Não foi possível criar a sala." + "Tentar de novo").
 
 ## 6.8 Entrar em sala
 - **Topo:** ‹ Biblioteca. Título "Entrar em sala".

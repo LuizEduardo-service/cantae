@@ -639,10 +639,10 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`, `flutter-routing`
 
 **Done when**:
-- [ ] Widget tests per state: name sheet first; generating; ready with code; song from Detalhe with "Trocar"; "Escolher música" from Biblioteca; empty requests text; request approve/reject; full; permission banner opens settings; failed banner retries; start → `room-host`; cancel empty → Biblioteca without sheet; cancel with people → `ConfirmSheet`; system back same; both themes; 360 dp at 130 %
-- [ ] Router and Detalhe tests updated
-- [ ] Gate check passes: `flutter test`
-- [ ] Test count: all existing + ≥ 15 new
+- [x] Widget tests per state: name sheet first; generating; ready with code; song from Detalhe with "Trocar"; "Escolher música" from Biblioteca; empty requests text; request approve/reject; full; permission banner opens settings; failed banner retries; start → `room-host`; cancel empty → Biblioteca without sheet; cancel with people → `ConfirmSheet`; system back same; both themes; 360 dp at 130 %
+- [x] Router and Detalhe tests updated
+- [x] Gate check passes: `flutter test`
+- [x] Test count: all existing + ≥ 15 new
 
 **Tests**: widget
 **Gate**: full
