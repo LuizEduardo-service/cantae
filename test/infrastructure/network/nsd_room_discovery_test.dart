@@ -17,6 +17,7 @@ class _FakeNsdPlatform extends NsdPlatformInterface
   Discovery? lastDiscovery;
   var _discoveryCounter = 0;
   Object? registerError;
+  final stoppedDiscoveries = <Discovery>[];
   Object? discoveryError;
 
   @override
@@ -45,7 +46,8 @@ class _FakeNsdPlatform extends NsdPlatformInterface
   }
 
   @override
-  Future<void> stopDiscovery(Discovery discovery) async {}
+  Future<void> stopDiscovery(Discovery discovery) async =>
+      stoppedDiscoveries.add(discovery);
 
   @override
   Future<Service> resolve(Service service) async => service;
@@ -240,5 +242,18 @@ void main() {
       expect(error, isA<NetworkFailure>());
       expect((error! as NetworkFailure).code, 'discovery.permission-denied');
     });
+  });
+
+  test(
+      'cancelling the room search stops the mDNS discovery, which releases '
+      'the multicast lock (ROOM-50)', () async {
+    final subscription = NsdRoomDiscovery().discover().listen((_) {});
+    await Future<void>.delayed(Duration.zero);
+    final started = fakePlatform.lastDiscovery;
+    expect(started, isNotNull);
+
+    await subscription.cancel();
+
+    expect(fakePlatform.stoppedDiscoveries, [started]);
   });
 }

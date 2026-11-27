@@ -182,66 +182,66 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 
 | Requirement ID | Story | Phase | Status |
 | --- | --- | --- | --- |
-| ROOM-01 | P1: Nome na sala | Execute | Implementing |
-| ROOM-02 | P1: Nome na sala | Execute | Implementing |
-| ROOM-03 | P1: Nome na sala | Execute | Implementing |
-| ROOM-04 | P1: Nome na sala | Execute | Implementing |
-| ROOM-05 | P1: Criar sala | Execute | Implementing |
-| ROOM-06 | P1: Criar sala | Execute | Implementing |
-| ROOM-07 | P1: Criar sala | Execute | Implementing |
-| ROOM-08 | P1: Criar sala | Execute | Implementing |
-| ROOM-09 | P1: Criar sala | Execute | Implementing |
-| ROOM-10 | P1: Criar sala | Execute | Implementing |
-| ROOM-11 | P1: Criar sala | Execute | Implementing |
-| ROOM-12 | P1: Criar sala | Execute | Implementing |
-| ROOM-13 | P1: Criar sala | Execute | Implementing |
-| ROOM-14 | P1: Criar sala | Execute | Implementing |
-| ROOM-15 | P1: Criar sala | Execute | Implementing |
-| ROOM-16 | P1: Criar sala | Execute | Implementing |
-| ROOM-17 | P1: Criar sala | Execute | Implementing |
-| ROOM-18 | P1: Criar sala | Execute | Implementing |
-| ROOM-19 | P1: Criar sala | Execute | Implementing |
-| ROOM-20 | P1: Criar sala | Execute | Implementing |
-| ROOM-21 | P1: Criar sala | Execute | Implementing |
-| ROOM-22 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-23 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-24 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-25 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-26 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-27 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-28 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-29 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-30 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-31 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-32 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-33 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-34 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-35 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-36 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-37 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-38 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-39 | P1: Sala provisória | Execute | Implementing |
-| ROOM-40 | P1: Sala provisória | Execute | Implementing |
-| ROOM-41 | P1: Sala provisória | Execute | Implementing |
-| ROOM-42 | P1: Sala provisória | Execute | Implementing |
-| ROOM-43 | P1: Sala provisória | Execute | Implementing |
-| ROOM-44 | P1: Sala provisória | Execute | Implementing |
-| ROOM-45 | P1: Sala provisória | Execute | Implementing |
-| ROOM-46 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-47 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-48 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-49 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-50 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-51 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-52 | P1: Base comum da sala | Execute | Implementing |
-| ROOM-53 | Edge cases | Execute | Implementing |
-| ROOM-54 | Edge cases | Execute | Implementing |
-| ROOM-55 | Edge cases | Execute | Implementing |
-| ROOM-56 | Edge cases | Execute | Implementing |
-| ROOM-57 | P1: Entrar em sala | Execute | Implementing |
-| ROOM-58 | Edge cases | Execute | Implementing |
+| ROOM-01 | P1: Nome na sala | Execute | Verified |
+| ROOM-02 | P1: Nome na sala | Execute | Verified |
+| ROOM-03 | P1: Nome na sala | Execute | Verified |
+| ROOM-04 | P1: Nome na sala | Execute | Verified |
+| ROOM-05 | P1: Criar sala | Execute | Verified |
+| ROOM-06 | P1: Criar sala | Execute | Verified |
+| ROOM-07 | P1: Criar sala | Execute | Verified |
+| ROOM-08 | P1: Criar sala | Execute | Verified |
+| ROOM-09 | P1: Criar sala | Execute | Verified |
+| ROOM-10 | P1: Criar sala | Execute | Verified |
+| ROOM-11 | P1: Criar sala | Execute | Verified |
+| ROOM-12 | P1: Criar sala | Execute | Verified |
+| ROOM-13 | P1: Criar sala | Execute | Verified |
+| ROOM-14 | P1: Criar sala | Execute | Verified |
+| ROOM-15 | P1: Criar sala | Execute | Verified |
+| ROOM-16 | P1: Criar sala | Execute | Verified |
+| ROOM-17 | P1: Criar sala | Execute | Verified |
+| ROOM-18 | P1: Criar sala | Execute | Verified |
+| ROOM-19 | P1: Criar sala | Execute | Verified |
+| ROOM-20 | P1: Criar sala | Execute | Verified |
+| ROOM-21 | P1: Criar sala | Execute | Verified |
+| ROOM-22 | P1: Entrar em sala | Execute | Verified |
+| ROOM-23 | P1: Entrar em sala | Execute | Verified |
+| ROOM-24 | P1: Entrar em sala | Execute | Verified |
+| ROOM-25 | P1: Entrar em sala | Execute | Verified |
+| ROOM-26 | P1: Entrar em sala | Execute | Verified |
+| ROOM-27 | P1: Entrar em sala | Execute | Verified |
+| ROOM-28 | P1: Entrar em sala | Execute | Verified |
+| ROOM-29 | P1: Entrar em sala | Execute | Verified |
+| ROOM-30 | P1: Entrar em sala | Execute | Verified |
+| ROOM-31 | P1: Entrar em sala | Execute | Verified |
+| ROOM-32 | P1: Entrar em sala | Execute | Verified |
+| ROOM-33 | P1: Entrar em sala | Execute | Verified |
+| ROOM-34 | P1: Entrar em sala | Execute | Verified |
+| ROOM-35 | P1: Entrar em sala | Execute | Verified |
+| ROOM-36 | P1: Entrar em sala | Execute | Verified |
+| ROOM-37 | P1: Entrar em sala | Execute | Verified |
+| ROOM-38 | P1: Entrar em sala | Execute | Verified |
+| ROOM-39 | P1: Sala provisória | Execute | Verified |
+| ROOM-40 | P1: Sala provisória | Execute | Verified |
+| ROOM-41 | P1: Sala provisória | Execute | Verified |
+| ROOM-42 | P1: Sala provisória | Execute | Verified |
+| ROOM-43 | P1: Sala provisória | Execute | Verified |
+| ROOM-44 | P1: Sala provisória | Execute | Verified |
+| ROOM-45 | P1: Sala provisória | Execute | Verified |
+| ROOM-46 | P1: Base comum da sala | Execute | Verified |
+| ROOM-47 | P1: Base comum da sala | Execute | Verified |
+| ROOM-48 | P1: Base comum da sala | Execute | Verified |
+| ROOM-49 | P1: Base comum da sala | Execute | Verified |
+| ROOM-50 | P1: Base comum da sala | Execute | Verified |
+| ROOM-51 | P1: Base comum da sala | Execute | Verified |
+| ROOM-52 | P1: Base comum da sala | Execute | Verified |
+| ROOM-53 | Edge cases | Execute | Verified |
+| ROOM-54 | Edge cases | Execute | Verified |
+| ROOM-55 | Edge cases | Execute | Verified |
+| ROOM-56 | Edge cases | Execute | Verified |
+| ROOM-57 | P1: Entrar em sala | Execute | Verified |
+| ROOM-58 | Edge cases | Execute | Verified |
 
-**Coverage:** 58 total, 0 mapped to tasks, 58 unmapped ⚠️ (tasks not written yet)
+**Coverage:** 58 total, 58 mapped to tasks, 58 verified
 
 ---
 

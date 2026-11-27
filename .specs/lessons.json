@@ -3,7 +3,7 @@
   "promote_threshold": 2,
   "window_days": 45,
   "quarantine_threshold": 2,
-  "next_id": 20,
+  "next_id": 22,
   "lessons": [
     {
       "id": "L-003",
@@ -310,6 +310,42 @@
       ],
       "created": "2026-11-25T01:46:36Z",
       "last_seen": "2026-11-25T01:46:36Z"
+    },
+    {
+      "id": "L-020",
+      "key": "ac_gap::when a requirement depends on a plugin side effect releasing a lock stopping a scan test the adapter call that triggers it not only the caller",
+      "text": "When a requirement depends on a plugin side effect (releasing a lock, stopping a scan), test the adapter call that triggers it, not only the caller.",
+      "signal": "ac_gap",
+      "scope": "infrastructure",
+      "status": "candidate",
+      "features": [
+        "room-entry"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "ROOM-50 (infrastructure)"
+      ],
+      "created": "2026-11-27T04:10:06Z",
+      "last_seen": "2026-11-27T04:10:06Z"
+    },
+    {
+      "id": "L-021",
+      "key": "spec_deviation::before specifying ui that exposes session data grep earlier features verified requirements and tests for constraints on that data",
+      "text": "Before specifying UI that exposes session data, grep earlier features' verified requirements and tests for constraints on that data.",
+      "signal": "spec_deviation",
+      "scope": "spec",
+      "status": "candidate",
+      "features": [
+        "room-entry"
+      ],
+      "recurrence": 1,
+      "harmful": 0,
+      "evidence": [
+        "context.md D7 (NET-01) (spec)"
+      ],
+      "created": "2026-11-27T04:10:07Z",
+      "last_seen": "2026-11-27T04:10:07Z"
     }
   ]
 }

@@ -116,6 +116,18 @@ Seen once or not yet corroborated. Tracked, not trusted.
 - evidence: spec.md Assumptions: 'Isolar (S) uma faixa com o metrônomo ligado' (found in T4) (audio)
 - last seen: 2026-11-25T01:46:36Z
 
+### L-020 - When a requirement depends on a plugin side effect (releasing a lock, stopping a scan), test the adapter call that triggers it, not only the caller.
+- signal: `ac_gap` · recurrence: 1 feature(s) · scope: `infrastructure` · harmful: 0
+- features: room-entry
+- evidence: ROOM-50 (infrastructure)
+- last seen: 2026-11-27T04:10:06Z
+
+### L-021 - Before specifying UI that exposes session data, grep earlier features' verified requirements and tests for constraints on that data.
+- signal: `spec_deviation` · recurrence: 1 feature(s) · scope: `spec` · harmful: 0
+- features: room-entry
+- evidence: context.md D7 (NET-01) (spec)
+- last seen: 2026-11-27T04:10:07Z
+
 ## Quarantined (failed when applied - ignore)
 
 A confirmed lesson that recurred alongside failure. Kept for the maintainer to review.
