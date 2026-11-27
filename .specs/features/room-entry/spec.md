@@ -188,16 +188,16 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-04 | P1: Nome na sala | Design | Pending |
 | ROOM-05 | P1: Criar sala | Execute | Implementing |
 | ROOM-06 | P1: Criar sala | Design | Pending |
-| ROOM-07 | P1: Criar sala | Design | Pending |
-| ROOM-08 | P1: Criar sala | Design | Pending |
+| ROOM-07 | P1: Criar sala | Execute | Implementing |
+| ROOM-08 | P1: Criar sala | Execute | Implementing |
 | ROOM-09 | P1: Criar sala | Execute | Implementing |
-| ROOM-10 | P1: Criar sala | Design | Pending |
+| ROOM-10 | P1: Criar sala | Execute | Implementing |
 | ROOM-11 | P1: Criar sala | Execute | Implementing |
-| ROOM-12 | P1: Criar sala | Design | Pending |
+| ROOM-12 | P1: Criar sala | Execute | Implementing |
 | ROOM-13 | P1: Criar sala | Execute | Implementing |
-| ROOM-14 | P1: Criar sala | Design | Pending |
+| ROOM-14 | P1: Criar sala | Execute | Implementing |
 | ROOM-15 | P1: Criar sala | Execute | Implementing |
-| ROOM-16 | P1: Criar sala | Design | Pending |
+| ROOM-16 | P1: Criar sala | Execute | Implementing |
 | ROOM-17 | P1: Criar sala | Execute | Implementing |
 | ROOM-18 | P1: Criar sala | Design | Pending |
 | ROOM-19 | P1: Criar sala | Design | Pending |
@@ -221,7 +221,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-37 | P1: Entrar em sala | Execute | Implementing |
 | ROOM-38 | P1: Entrar em sala | Design | Pending |
 | ROOM-39 | P1: Sala provisória | Design | Pending |
-| ROOM-40 | P1: Sala provisória | Design | Pending |
+| ROOM-40 | P1: Sala provisória | Execute | Implementing |
 | ROOM-41 | P1: Sala provisória | Execute | Implementing |
 | ROOM-42 | P1: Sala provisória | Design | Pending |
 | ROOM-43 | P1: Sala provisória | Execute | Implementing |
@@ -234,8 +234,8 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | ROOM-50 | P1: Base comum da sala | Execute | Implementing |
 | ROOM-51 | P1: Base comum da sala | Design | Pending |
 | ROOM-52 | P1: Base comum da sala | Design | Pending |
-| ROOM-53 | Edge cases | Design | Pending |
-| ROOM-54 | Edge cases | Design | Pending |
+| ROOM-53 | Edge cases | Execute | Implementing |
+| ROOM-54 | Edge cases | Execute | Implementing |
 | ROOM-55 | Edge cases | Design | Pending |
 | ROOM-56 | Edge cases | Design | Pending |
 | ROOM-57 | P1: Entrar em sala | Execute | Implementing |

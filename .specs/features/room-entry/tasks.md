@@ -386,9 +386,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests for every state: generating → ready with code; song from `songId`; choose/clear song re-announces; pending listed with name; approved hidden until connected; reject and expiry drop the request; member disconnect drops the member; 8 members → isFull and approve refused; two simultaneous requests; permission-denied and failed with retry
-- [ ] Gate check passes: `flutter test test/presentation/providers`
-- [ ] Test count: all existing + ≥ 10 new
+- [x] Tests for every state: generating → ready with code; song from `songId`; choose/clear song re-announces; pending listed with name; approved hidden until connected; reject and expiry drop the request; member disconnect drops the member; 8 members → isFull and approve refused; two simultaneous requests; permission-denied and failed with retry
+- [x] Gate check passes: `flutter test test/presentation/providers`
+- [x] Test count: all existing + ≥ 10 new
 
 **Tests**: unit
 **Gate**: quick
