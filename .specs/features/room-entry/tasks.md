@@ -135,9 +135,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first: wrong version with right code → protocol-mismatch (not invalid-code); version 0 → mismatch; name kept on the pending participant and after approval; pending never becomes connected without `approve` (ROOM-46); existing state machine tests unchanged and passing
-- [ ] Gate check passes: `flutter test test/domain/session`
-- [ ] Test count: all existing + ≥ 5 new
+- [x] Failure modes first: wrong version with right code → protocol-mismatch (not invalid-code); version 0 → mismatch; name kept on the pending participant and after approval; pending never becomes connected without `approve` (ROOM-46); existing state machine tests unchanged and passing
+- [x] Gate check passes: `flutter test test/domain/session`
+- [x] Test count: all existing + ≥ 5 new
 
 **Tests**: unit
 **Gate**: quick
