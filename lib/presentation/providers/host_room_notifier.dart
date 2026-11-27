@@ -141,6 +141,15 @@ class HostRoomNotifier extends StateNotifier<HostRoomState> {
     );
   }
 
+  /// Shows the hosted room without ever creating one (the master's
+  /// temporary room). False when this device hosts no room.
+  bool resume() {
+    final active = _ref.read(activeRoomProvider);
+    if (active == null || active.role != RoomRole.host) return false;
+    _attach(active);
+    return true;
+  }
+
   /// "Tentar de novo" (ROOM-21).
   Future<void> retry() async {
     final name = _masterName;

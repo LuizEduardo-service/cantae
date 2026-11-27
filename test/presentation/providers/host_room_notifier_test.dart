@@ -285,6 +285,22 @@ void main() {
     expect(masterDiscovery.announcements, hasLength(1));
   });
 
+  test('resume shows the hosted room and never creates one (ROOM-39)',
+      () async {
+    expect(notifier().resume(), isFalse);
+    expect(container.read(activeRoomProvider), isNull);
+    expect(masterDiscovery.announcements, isEmpty);
+
+    await notifier().start(masterName: 'Marina');
+    final code = state().code;
+    container.invalidate(hostRoomProvider);
+
+    expect(notifier().resume(), isTrue);
+    expect(state().code, code);
+    expect(state().status, HostRoomStatus.ready);
+    expect(masterDiscovery.announcements, hasLength(1));
+  });
+
   test('"Encerrar sala" ends the room (ROOM-41)', () async {
     final n = notifier();
     await n.start(masterName: 'Marina');
