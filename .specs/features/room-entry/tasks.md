@@ -180,9 +180,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests: v2 round-trip with accents ("João Conceição"); legacy bytes → version 0, empty name; empty name round-trip
-- [ ] Gate check passes: `flutter test test/data/session`
-- [ ] Test count: all existing + ≥ 3 new
+- [x] Tests: v2 round-trip with accents ("João Conceição"); legacy bytes → version 0, empty name; empty name round-trip
+- [x] Gate check passes: `flutter test test/data/session`
+- [x] Test count: all existing + ≥ 3 new
 
 **Tests**: unit
 **Gate**: quick
