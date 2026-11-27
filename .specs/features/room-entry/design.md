@@ -85,7 +85,7 @@ sequenceDiagram
 | `RoomSessionStateMachine` | `lib/domain/session/room_session_state_machine.dart` | Estender `requestJoin` com `displayName` e `protocolVersion`; regras de 8 vagas, 60 s e handshake ficam como estão |
 | `ParticipantSession` | `lib/domain/session/participant_session.dart` | Campo aditivo `displayName` |
 | `JoinRequestMessage` / `JoinRejectedMessage` | `lib/data/session/session_wire_message.dart` | Anexar `protocolVersion` (u16) e `displayName` ao fim do pedido; decodificação sem esses campos = versão 0 |
-| `NsdRoomDiscovery` | `lib/infrastructure/network/nsd_room_discovery.dart` | TXT `c`/`m`/`s`/`v`, evento `lost`, `NsdError(securityIssue)` → falha de permissão |
+| `NsdRoomDiscovery` | `lib/infrastructure/network/nsd_room_discovery.dart` | TXT `m`/`s`/`v` (nunca o código, NET-01), evento `lost`, `NsdError(securityIssue)` → falha de permissão |
 | `TcpSessionTransport`, `HandshakeService`, `EnvelopeAuthenticator` | `lib/infrastructure/network/`, `lib/domain/session/` | Sem mudança |
 | `InlineBanner`, `StatusPill`, `Toast`, `ConfirmSheet`, `PrimaryButton`/botões, `CantaeScaffold`, `SectionLabel`-like rows | `lib/presentation/widgets/` | Estados, avisos e confirmações das telas |
 | `songsProvider` | `lib/presentation/providers/library_providers.dart` | Lista de músicas na folha "Escolher música" |
@@ -132,14 +132,14 @@ sequenceDiagram
 
 ### `RoomDiscovery` (porta estendida) e `NsdRoomDiscovery`
 
-- **Purpose**: Anunciar código, Mestre, música e versão; avisar quando uma sala some; distinguir permissão negada.
+- **Purpose**: Anunciar Mestre, música e versão (nunca o código: NET-01, context.md D7); avisar quando uma sala some; distinguir permissão negada.
 - **Location**: `lib/domain/session/room_discovery.dart`, `lib/infrastructure/network/nsd_room_discovery.dart`
 - **Interfaces**:
-  - `class RoomAnnouncement { code, masterName, songName?, protocolVersion }`
+  - `class RoomAnnouncement { masterName, songName?, protocolVersion }`
   - `Future<Result<Unit, NetworkFailure>> advertise(RoomId id, int port, RoomAnnouncement announcement)` — `discovery.permission-denied` (`ErrorCause.securityIssue`) ou `discovery.failed`
   - `Future<void> stopAdvertising()`
-  - `Stream<DiscoveredRoom> discover()` — `DiscoveredRoom` ganha `code`, `masterName`, `songName`, `available` (`false` = sala sumiu); erro do stream é um `NetworkFailure` com os mesmos códigos
-  - TXT: `c` = código, `m` = nome do Mestre, `s` = música (cortada para caber em 255 bytes UTF-8), `v` = versão
+  - `Stream<DiscoveredRoom> discover()` — `DiscoveredRoom` ganha `masterName`, `songName`, `protocolVersion`, `available` (`false` = sala sumiu); erro do stream é um `NetworkFailure` com os mesmos códigos
+  - TXT: `m` = nome do Mestre, `s` = música (cortada para caber em 255 bytes UTF-8), `v` = versão
 - **Reuses**: serviço `_cantae._tcp`, ciclo `startDiscovery`/`stopDiscovery` (o plugin Android já segura e solta o multicast lock nesse ciclo — ROOM-50)
 
 ### `RoomSessionController` (estendido)
@@ -202,9 +202,9 @@ sequenceDiagram
 
 - **Purpose**: Estado de Entrar em sala.
 - **Location**: `lib/presentation/providers/join_room_notifier.dart`
-- **State**: `JoinRoomState { phase (searching | noneFound | awaiting | outcome | codeNotFound | codeAmbiguous | permissionDenied); List<RoomTileView> rooms (dedupe por `RoomId`, remove `available=false`); RoomTileView? target; JoinOutcome? outcome; String code }`
-- **Interfaces**: `start()`, `searchAgain()`, `setCode(String)`, `submitCode()`, `joinRoom(RoomId)`, `cancelRequest()`, `dismissOutcome()`, `retry()`
-- **Regras**: timer de 10 s só enquanto `rooms` vazio (ROOM-24); toques durante `awaiting` ignorados (ROOM-55); `joined` → navega para `room-member`
+- **State**: `JoinRoomState { phase (searching | noneFound | awaiting | outcome | codeNotFound | permissionDenied); List<RoomTileView> rooms (dedupe por `RoomId`, remove `available=false`); RoomId? selected; RoomTileView? target; JoinOutcome? outcome; String code }`
+- **Interfaces**: `start()`, `searchAgain()`, `selectRoom(RoomId)`, `setCode(String)`, `submitCode()`, `cancelRequest()`, `dismissOutcome()`, `retry()`
+- **Regras**: timer de 10 s só enquanto `rooms` vazio (ROOM-24); `submitCode` com sala escolhida pede só a ela; sem sala escolhida tenta as salas em ordem e passa para a próxima só em `invalidCode` (ROOM-25, ROOM-58); todas `invalidCode` (ou lista vazia) → `codeNotFound` (ROOM-26); toques durante `awaiting` ignorados (ROOM-55); `joined` → navega para `room-member`
 
 ### `MemberRoomNotifier`
 
@@ -225,7 +225,7 @@ sequenceDiagram
 | `RoomMemberScreen` | `lib/presentation/screens/room_member/room_member_screen.dart` | Sala provisória do Cantor (ROOM-42..44) |
 | `RoomCodeDisplay` | `lib/presentation/widgets/room_code_display.dart` | Novo (COMPONENTS.md) |
 | `CodeInput` | `lib/presentation/widgets/code_input.dart` | Novo; só dígitos, 4, borda de erro |
-| `RoomTile` | `lib/presentation/widgets/room_tile.dart` | Novo; sem "N pessoas" (spec) |
+| `RoomTile` | `lib/presentation/widgets/room_tile.dart` | Novo; sem código (NET-01) e sem "N pessoas" (spec) |
 | `JoinRequestRow` | `lib/presentation/widgets/join_request_row.dart` | Novo; nome + Recusar/Aprovar com rótulos "Aprovar Marina" |
 | `RoomPersonRow` | `lib/presentation/widgets/room_person_row.dart` | Novo, versão mínima do `ParticipantRow` (nome · papel), sem latência nem naipe |
 | `StatusPill` | existente | ganha variante `synced` só no visual que a tela usa ("Visível neste Wi‑Fi") |
@@ -284,7 +284,9 @@ sequenceDiagram
 | Nome vem da rede sem validação | `JoinRequestMessage` decode | Texto enorme ou com controle na tela do Mestre | `sanitizeRemoteDisplayName`; renderizado só como `Text` |
 | `ParticipantSession` carrega `sessionKey` no snapshot | `lib/domain/session/participant_session.dart:19` | Segredo acessível a quem lê o snapshot | Notifiers expõem só `RoomPersonView` (id, nome) |
 | Mudar a porta `RoomDiscovery` quebra 9 fakes de teste | `test/data/session/room_session_controller_test.dart:15` e outros 8 arquivos | Tarefa grande e mecânica | Uma tarefa só para a porta + fakes, antes de usar os campos novos |
-| Dois Mestres podem sortear o mesmo código | `lib/data/session/room_session_controller.dart:530` | Código digitado acha duas salas | ROOM-58 (lista filtrada) |
+| Dois Mestres podem sortear o mesmo código | `lib/data/session/room_session_controller.dart:530` | Código digitado sem sala escolhida cai na sala errada | ROOM-58: vai para a primeira que aceitar e o banner nomeia o Mestre; o cantor cancela |
+| Tentar o código em várias salas abre uma conexão por sala | `JoinRoomNotifier.submitCode` | Mais lento com muitas salas; cada tentativa errada é recusada pelo Mestre sem criar pedido | Tentativas em sequência; cada conexão recusada é fechada antes da próxima (T6) |
+| O teste de NET-01 exige `txt == null` | `test/infrastructure/network/nsd_room_discovery_test.dart:76` | O TXT com nome/música/versão quebra o teste | A intenção de NET-01 ("no embedded secret") continua: o teste passa a exigir que o TXT não tenha o código nem material de chave (decisão D7 do usuário) |
 | Reanunciar ao trocar música gera `lost` + `found` | `NsdRoomDiscovery.advertise` | Card pisca na lista do Cantor | Aceito; a conexão TCP de quem já pediu não é afetada |
 | mDNS real e canal de ajustes não rodam em `flutter test` | infra | Só o roteiro de aparelho cobre | Atualizar `docs/device-test-*.md` com os passos de sala |
 | `room_session_controller_test` lento (~5 s por teste) | `test/data/session/room_session_controller_test.dart` | Gate mais lento com testes novos | Testes novos do controller usam `tickInterval` curto e relógio injetado |
@@ -300,6 +302,6 @@ sequenceDiagram
 | Versão de protocolo | Constante `roomProtocolVersion = 1` no domínio, enviada no JoinRequest e no TXT | Mestre é a autoridade da recusa; TXT permite avisar antes no futuro |
 | Compatibilidade do JoinRequest | Campos novos no fim; ausência = versão 0 = recusa | Não há app publicado; decodificação continua aceitando o formato antigo para recusar com motivo |
 | "Abrir ajustes" | `MethodChannel` próprio de um método | Evita dependência nova para uma chamada nativa de uma linha |
-| Código no TXT do mDNS | Sim | PRD: o código é identificação visual, não autenticação (RNF-SEC-02); a aprovação continua obrigatória |
+| Código no TXT do mDNS | Não (NET-01 mantido, D7) | O código prova que a pessoa vê a tela do Mestre e filtra pedidos de estranhos na rede; a aprovação continua obrigatória |
 
 Decisões de projeto registradas no STATE.md: **AD-014** (`local_profile` de uma linha guarda `deviceId` e nome na sala) e **AD-015** (versão do protocolo de sala no JoinRequest; versão diferente é recusada pelo Mestre).

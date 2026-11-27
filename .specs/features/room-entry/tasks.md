@@ -147,7 +147,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T3: Room discovery port carries the announcement
 
-**What**: `RoomAnnouncement {code, masterName, songName?, protocolVersion}`; `advertise(id, port, announcement)` returns `Result<Unit, NetworkFailure>`; `DiscoveredRoom` gains `code`, `masterName`, `songName`, `available`; every fake in `test/` and `integration_test/` updated; `NsdRoomDiscovery` and the controller compile with a minimal pass-through.
+**What**: `RoomAnnouncement {masterName, songName?, protocolVersion}` (no code, NET-01); `advertise(id, port, announcement)` returns `Result<Unit, NetworkFailure>`; `DiscoveredRoom` gains `masterName`, `songName`, `protocolVersion`, `available`; every fake in `test/` and `integration_test/` updated; `NsdRoomDiscovery` and the controller compile with a minimal pass-through.
 **Where**: `lib/domain/session/room_discovery.dart`
 **Depends on**: T2
 **Reuses**: existing fakes
@@ -192,7 +192,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T5: Master side of the controller
 
-**What**: `createRoom({masterName, songName})` announces code/master/song/version and returns the `advertise` failure; `updateAnnouncement`; `roomCode`; incoming name sanitized; `reject` sends `JoinRejected(session.rejected)`; expired pending requests get `JoinRejected(session.request-expired)` before the close.
+**What**: `createRoom({masterName, songName})` announces master/song/version (never the code) and returns the `advertise` failure; `updateAnnouncement`; `roomCode`; incoming name sanitized; `reject` sends `JoinRejected(session.rejected)`; expired pending requests get `JoinRejected(session.request-expired)` before the close.
 **Where**: `lib/data/session/room_session_controller.dart`
 **Depends on**: T4
 **Reuses**: tick, `_closeConnectionsForTerminatedParticipants`
@@ -203,7 +203,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first, loopback tests: announcement holds code/master/song; song change re-announces; advertise failure → createRoom failure with the same code; reject → joiner receives `session.rejected`; expiry (injected clock) → `session.request-expired`; stalled handshake still closes without a reason; 200-char name arrives cut to 40
+- [ ] Failure modes first, loopback tests: announcement holds master/song/version and no code; song change re-announces; advertise failure → createRoom failure with the same code; reject → joiner receives `session.rejected`; expiry (injected clock) → `session.request-expired`; stalled handshake still closes without a reason; 200-char name arrives cut to 40
 - [ ] Playback and transfer tests still pass
 - [ ] Gate check passes: `flutter test`
 - [ ] Test count: all existing + ≥ 7 new
@@ -227,7 +227,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first, loopback tests: master closes before answering → connection-lost (no hang); unreachable port → connect-failed; injected short answer timeout → request-expired; cancelJoin → join completes with join-cancelled and the master snapshot drops the pending request; leaveRoom → master snapshot shows disconnected; master `endRoom` → `masterConnectionLost` fires once
+- [ ] Failure modes first, loopback tests: a refused attempt (invalid-code) followed by a second `requestJoin` on another room works on the same controller; master closes before answering → connection-lost (no hang); unreachable port → connect-failed; injected short answer timeout → request-expired; cancelJoin → join completes with join-cancelled and the master snapshot drops the pending request; leaveRoom → master snapshot shows disconnected; master `endRoom` → `masterConnectionLost` fires once
 - [ ] Gate check passes: `flutter test`
 - [ ] Test count: all existing + ≥ 6 new
 
@@ -239,7 +239,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T7: NSD announcement mapping
 
-**What**: Pure `announcementToTxt` / `discoveredRoomFrom(service, status)` (TXT `c`/`m`/`s`/`v`, song cut to 255 UTF-8 bytes, `lost` → `available=false`); `NsdError(securityIssue)` → `discovery.permission-denied`, other errors → `discovery.failed`, on advertise and on the discovery stream.
+**What**: Pure `announcementToTxt` / `discoveredRoomFrom(service, status)` (TXT `m`/`s`/`v`, never the code, song cut to 255 UTF-8 bytes, `lost` → `available=false`); `NsdError(securityIssue)` → `discovery.permission-denied`, other errors → `discovery.failed`, on advertise and on the discovery stream.
 **Where**: `lib/infrastructure/network/nsd_room_discovery.dart`
 **Depends on**: T6
 **Reuses**: existing register/discover cycle
@@ -250,7 +250,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests on the pure functions: round-trip; 300-byte song name cut without breaking a UTF-8 character; missing `c` → service ignored; `lost` → unavailable; error cause mapping
+- [ ] Tests on the pure functions: round-trip; 300-byte song name cut without breaking a UTF-8 character; no TXT (older app) → listed with "Sem nome" and version 0; `lost` → unavailable; error cause mapping; the NET-01 test now asserts the TXT holds no code and no key material (D7)
 - [ ] Gate check passes: `flutter test test/infrastructure/network`
 - [ ] Test count: all existing + ≥ 5 new
 
@@ -398,7 +398,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T14: JoinRoomNotifier
 
-**What**: Entrar em sala state: searching, noneFound (10 s), awaiting, outcome, codeNotFound, codeAmbiguous, permissionDenied; dedupe and removal of rooms; code input; cancel; retry.
+**What**: Entrar em sala state: searching, noneFound (10 s), awaiting, outcome, codeNotFound, permissionDenied; dedupe and removal of rooms; room selection; code input tried on the selected room or on each room in order; cancel; retry.
 **Where**: `lib/presentation/providers/join_room_notifier.dart`
 **Depends on**: T13
 **Reuses**: `ActiveRoomNotifier`, `joinOutcomeFor`
@@ -409,7 +409,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Tests for every phase and transition with a fake clock: 10 s → noneFound, late room still added; searchAgain restarts; same room twice → one entry; lost room removed; code with no match → codeNotFound; two matches → codeAmbiguous; awaiting ignores a second join; every outcome; cancel returns to the list; permission error → permissionDenied
+- [ ] Tests for every phase and transition with a fake clock: 10 s → noneFound, late room still added; searchAgain restarts; same room twice → one entry; lost room removed; selected room + code → only that room asked; no selection → rooms asked in order, next only after invalid-code, the first that accepts keeps the request (ROOM-58); every room invalid-code or no room → codeNotFound; selected room invalid-code → codeNotFound; awaiting ignores a second join; every outcome; cancel returns to the list; permission error → permissionDenied
 - [ ] Gate check passes: `flutter test test/presentation/providers`
 - [ ] Test count: all existing + ≥ 12 new
 
@@ -490,7 +490,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T18: `RoomTile`
 
-**What**: Found room: code in mono, master name, song or "Sem música escolhida", chevron, 2 px accent border when selected, disabled state; COMPONENTS.md updated (no "N pessoas").
+**What**: Found room: master name, song or "Sem música escolhida", chevron, 2 px accent border when selected, disabled state; COMPONENTS.md updated (no code, NET-01; no "N pessoas").
 **Where**: `lib/presentation/widgets/room_tile.dart`
 **Depends on**: T17
 **Reuses**: tokens
@@ -501,7 +501,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`
 
 **Done when**:
-- [ ] Widget tests: content, no-song text, selected border, disabled ignores taps, one button node "Sala 4827 de Marina, Ave Verum Corpus", ≥ 44 dp, dark theme, 360 dp at 130 % without overflow
+- [ ] Widget tests: content, no-song text, selected border, disabled ignores taps, one button node "Sala de Marina, Ave Verum Corpus", ≥ 44 dp, dark theme, 360 dp at 130 % without overflow
 - [ ] Gate check passes: `flutter test test/presentation/widgets`
 - [ ] Test count: all existing + ≥ 5 new
 
@@ -675,7 +675,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 
 ### T26: Entrar em sala screen and route
 
-**What**: `RoomJoinScreen` (§6.8) with name gate, `CodeInput` + Entrar, "Salas neste Wi‑Fi", one banner per phase with its action, iOS hint, footer; `room-join` route; UI_SPEC §6.8 updated (8 de 8, footer, protocol action, iOS hint, ambiguous code).
+**What**: `RoomJoinScreen` (§6.8) with name gate, `CodeInput` + Entrar, "Salas neste Wi‑Fi", tile selection with "Digite o código que aparece na tela de <Mestre>.", one banner per phase with its action, iOS hint, footer; `room-join` route; UI_SPEC §6.8 and COMPONENTS `RoomTile` updated (8 de 8, footer, protocol action, iOS hint, no code on the tile).
 **Where**: `lib/presentation/screens/room_join/room_join_screen.dart`
 **Depends on**: T25
 **Reuses**: T14, T17, T18, T22, `InlineBanner`
@@ -686,7 +686,7 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: `flutter-ui-ux`, `flutter-routing`
 
 **Done when**:
-- [ ] Widget tests, one per state with its text and action: procurando; nenhuma (Android) and nenhuma + dica (iOS via `debugDefaultTargetPlatformOverride`); código não encontrado (border + Digitar de novo clears and focuses); código repetido; aguardando (tile border, controls disabled, cancel); recusada; cheia; versão; não respondeu; sem conexão; permissão; joined → `room-member`; footer; banners are live regions; both themes; 360 dp at 130 %
+- [ ] Widget tests, one per state with its text and action: procurando; nenhuma (Android) and nenhuma + dica (iOS via `debugDefaultTargetPlatformOverride`); tile tap selects the room and focuses the field with the master's name; código não encontrado (border + Digitar de novo clears and focuses); aguardando (tile border, controls disabled, cancel); recusada; cheia; versão; não respondeu; sem conexão; permissão; joined → `room-member`; footer; banners are live regions; both themes; 360 dp at 130 %
 - [ ] Gate check passes: `flutter test`
 - [ ] Test count: all existing + ≥ 16 new
 

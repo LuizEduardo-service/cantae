@@ -40,6 +40,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 | O Mestre sai da tela Criar sala ou da sala provisória | Com ninguém na sala nem pedindo: encerra sem perguntar. Com alguém: `ConfirmSheet` "Encerrar sala?" | Encerrar derruba os outros: ação com efeito fora da tela (AGENTS.md) | n |
 | Cantor sabe por que saiu da sala | Uma única mensagem "A sala foi encerrada ou a conexão caiu." | O protocolo atual não distingue encerramento de queda de conexão | n |
 | Música anunciada | Nome da música escolhida aparece no `RoomTile`; sem música, "Sem música escolhida" | D4; o Cantor reconhece a sala certa pela música | y |
+| Código no anúncio do Wi‑Fi | Nunca anunciado; o `RoomTile` não mostra o código e o cantor sempre digita o que vê na tela do Mestre | NET-01 da Fase 3 (verificado) proíbe o código no anúncio; o código vira prova de que a pessoa vê a tela do Mestre (context.md D7) | y |
 | "N pessoas" no `RoomTile` | Fora desta feature | Exige reanunciar o serviço a cada entrada/saída; a lista de quem entrou já aparece depois de entrar | n |
 
 **Open questions:** none - all resolved or logged above.
@@ -104,12 +105,12 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 **Acceptance Criteria**:
 
 1. WHEN Entrar em sala abre com nome salvo THEN o app SHALL começar a procurar salas e mostrar "Salas neste Wi‑Fi" com "Procurando salas…" enquanto nenhuma foi encontrada. (ROOM-22)
-2. WHEN uma sala é encontrada THEN o app SHALL mostrar um `RoomTile` com o código em Geist Mono, o nome do Mestre e o nome da música ou "Sem música escolhida". (ROOM-23)
+2. WHEN uma sala é encontrada THEN o app SHALL mostrar um `RoomTile` com o nome do Mestre e o nome da música ou "Sem música escolhida", sem o código. (ROOM-23)
 3. IF nenhuma sala é encontrada em 10 s THEN o app SHALL mostrar o banner "Nenhuma sala neste Wi‑Fi" com "Procurar de novo", que reinicia a busca; salas encontradas depois disso SHALL aparecer na lista. (ROOM-24)
-4. WHEN o cantor digita 4 dígitos no `CodeInput` e toca "Entrar" e uma sala encontrada tem esse código THEN o app SHALL pedir entrada nessa sala. (ROOM-25)
-5. IF nenhuma sala encontrada tem o código digitado THEN o app SHALL mostrar a borda de erro no `CodeInput`, o banner "Código não encontrado" e "Digitar de novo", que limpa o campo e devolve o foco a ele. (ROOM-26)
+4. WHEN o cantor digita 4 dígitos no `CodeInput` e toca "Entrar" sem sala escolhida THEN o app SHALL pedir entrada às salas encontradas, uma por vez na ordem da lista, até uma não responder "código errado", e só essa SHALL ficar com o pedido. (ROOM-25)
+5. IF nenhuma sala encontrada aceita o código digitado (ou a sala escolhida responde "código errado") THEN o app SHALL mostrar a borda de erro no `CodeInput`, o banner "Código não encontrado" e "Digitar de novo", que limpa o campo e devolve o foco a ele. (ROOM-26)
 6. The `CodeInput` SHALL aceitar só dígitos, no máximo 4, e "Entrar" SHALL ficar desativado com menos de 4. (ROOM-27)
-7. WHEN o cantor toca um `RoomTile` THEN o app SHALL pedir entrada nessa sala. (ROOM-28)
+7. WHEN o cantor toca um `RoomTile` THEN o app SHALL marcar essa sala como escolhida (borda de 2 px `accent`), pôr o foco no `CodeInput` com a frase "Digite o código que aparece na tela de <nome do Mestre>.", e "Entrar" SHALL pedir entrada só nessa sala. (ROOM-28)
 8. WHILE o pedido aguarda o Mestre THEN o app SHALL mostrar o banner "Aguardando <nome do Mestre> aprovar" com "Cancelar pedido", destacar o `RoomTile` com borda de 2 px `accent` e desativar o `CodeInput` e os outros `RoomTile`s. (ROOM-29)
 9. WHEN o cantor toca "Cancelar pedido" THEN o app SHALL desistir do pedido, voltar à lista e o pedido SHALL sumir da tela do Mestre. (ROOM-30)
 10. WHEN o Mestre aprova e a conexão segura fica pronta THEN o app SHALL abrir a sala provisória do Cantor. (ROOM-31)
@@ -173,7 +174,7 @@ A camada de sessão da Fase 3 já cria salas, anuncia-as no Wi‑Fi, recebe pedi
 - IF o cantor toca "Entrar" ou um `RoomTile` de novo durante um pedido em andamento THEN o app SHALL ignorar o toque (os controles já estão desativados). (ROOM-55)
 - WHEN a mesma sala é encontrada mais de uma vez THEN o app SHALL mostrar um único `RoomTile` para ela. (ROOM-56)
 - IF o app do Cantor fecha durante o pedido THEN o Mestre SHALL ver o pedido sumir (ROOM-15).
-- IF mais de uma sala encontrada tem o código digitado THEN o app SHALL mostrar só essas salas na lista com a frase "Mais de uma sala com esse código. Toque na sua." e não pedir entrada até o cantor tocar uma. (ROOM-58)
+- IF duas salas usam o mesmo código THEN o pedido digitado sem sala escolhida SHALL ir só para a primeira da lista que aceitar, e o banner "Aguardando <nome do Mestre> aprovar" SHALL nomear o Mestre dela, para o cantor cancelar se não for o seu. (ROOM-58)
 
 ---
 

@@ -10,6 +10,7 @@ Data: 2026-11-26. Respostas do usuário às áreas cinzentas levantadas na espec
 | D4 | Música obrigatória para criar sala | Opcional | Vindo do Detalhe, já escolhida; vindo da Biblioteca, "Escolher música". |
 | D5 | Como ligar as telas à sessão da Fase 3 (design) | A: estender o `RoomSessionController` e o protocolo de entrada | design.md, abordagem A |
 | D6 | "Sem acesso à rede local" no iOS, onde o sistema não avisa | Dica e "Abrir ajustes" no banner "Nenhuma sala neste Wi‑Fi" | ROOM-57; ROOM-37 fica só para o Android |
+| D7 | Código no anúncio do Wi‑Fi (NET-01 da Fase 3 proíbe; UI_SPEC mostra no card) | Manter NET-01: o código nunca é anunciado | `RoomTile` sem código; tocar o card escolhe a sala e pede o código; código sem sala escolhida tenta as salas uma por vez (ROOM-23, 25, 26, 28, 58). O TXT leva só nome do Mestre, música e versão |
 
 Decisões tomadas por precedência de documentos (PRD > UI_SPEC), sem pergunta:
 
