@@ -296,9 +296,9 @@ T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9 → T10 → T11 → T
 - Skill: NONE
 
 **Done when**:
-- [ ] Failure modes first: two loads return the same device id; a new database instance on the same file keeps it; name saved and read back; closed database → `StorageFailure` with a non-empty code
-- [ ] Gate check passes: `flutter test test/data/repositories`
-- [ ] Test count: all existing + ≥ 4 new
+- [x] Failure modes first: two loads return the same device id; a new database instance on the same file keeps it; name saved and read back; closed database → `StorageFailure` with a non-empty code
+- [x] Gate check passes: `flutter test test/data/repositories`
+- [x] Test count: all existing + ≥ 4 new
 
 **Tests**: unit
 **Gate**: quick
