@@ -113,5 +113,28 @@ void main() {
         await visitor.close(visitorConnId);
       });
     }
+
+    test(
+        'regression: close() right after send(), while the flush is still in '
+        'flight, still closes the connection and the peer sees it', () async {
+      final master = TcpSessionTransport();
+      final visitor = TcpSessionTransport();
+      await master.listen(0);
+      final incoming = master.incomingConnections.first;
+      final visitorConnId =
+          await visitor.connect('127.0.0.1', master.boundPort);
+      await incoming;
+      final masterClosedFuture = master.closedConnections.first;
+
+      // Not awaited: the send's flush is pending when close() runs.
+      final sending = visitor.send(
+        visitorConnId,
+        Uint8List.fromList(List<int>.filled(64 * 1024, 7)),
+      );
+      await visitor.close(visitorConnId);
+      await sending;
+
+      await masterClosedFuture.timeout(const Duration(seconds: 5));
+    });
   });
 }
